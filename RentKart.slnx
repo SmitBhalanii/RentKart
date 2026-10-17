@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RentKart.Core/RentKart.Core.csproj" />
+    <Project Path="src/RentKart.Infrastructure/RentKart.Infrastructure.csproj" />
+    <Project Path="src/RentKart.Web/RentKart.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RentKart.Tests/RentKart.Tests.csproj" />
+  </Folder>
+</Solution>
