@@ -1,0 +1,150 @@
+/**
+ * RentKart Base & Reset Styles
+ * Enforces layout integrity, zero horizontal overflow, and accessible document flow.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--rk-bg-app);
+  color: var(--rk-text-primary);
+  font-family: var(--rk-font-family);
+  font-size: var(--rk-font-size-base);
+  font-weight: var(--rk-font-weight-regular);
+  line-height: var(--rk-line-height-normal);
+  /* Crucial: Prevent margin-bottom hack that breaks footer flow */
+  margin: 0;
+  padding: 0;
+}
+
+/* Accessible Skip Link */
+.rk-skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--rk-space-4);
+  background-color: var(--rk-color-navy-900);
+  color: var(--rk-color-white);
+  padding: var(--rk-space-2) var(--rk-space-4);
+  border-radius: var(--rk-radius-md);
+  font-weight: var(--rk-font-weight-semibold);
+  z-index: var(--rk-z-modal);
+  transition: top var(--rk-transition-fast);
+  text-decoration: none;
+}
+
+.rk-skip-link:focus {
+  top: var(--rk-space-4);
+  outline: none;
+  box-shadow: var(--rk-focus-ring);
+}
+
+/* Global Focus Styles for Accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--rk-color-teal-500);
+  outline-offset: 2px;
+}
+
+/* Typography Baseline */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--rk-color-navy-900);
+  font-weight: var(--rk-font-weight-bold);
+  line-height: var(--rk-line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: var(--rk-font-size-3xl); }
+h2 { font-size: var(--rk-font-size-2xl); }
+h3 { font-size: var(--rk-font-size-xl); }
+h4 { font-size: var(--rk-font-size-lg); }
+h5 { font-size: var(--rk-font-size-md); }
+h6 { font-size: var(--rk-font-size-base); }
+
+@media (min-width: 768px) {
+  h1 { font-size: var(--rk-font-size-4xl); }
+  h2 { font-size: var(--rk-font-size-3xl); }
+  h3 { font-size: var(--rk-font-size-2xl); }
+}
+
+p {
+  color: var(--rk-text-secondary);
+  margin-bottom: var(--rk-space-4);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  color: var(--rk-color-teal-600);
+  text-decoration: none;
+  transition: color var(--rk-transition-fast);
+}
+
+a:hover {
+  color: var(--rk-color-teal-700);
+  text-decoration: underline;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive Containers without Horizontal Overflow */
+.rk-container {
+  width: 100%;
+  max-width: var(--rk-container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--rk-space-4);
+  padding-right: var(--rk-space-4);
+}
+
+@media (min-width: 768px) {
+  .rk-container {
+    padding-left: var(--rk-space-6);
+    padding-right: var(--rk-space-6);
+  }
+}
+
+.rk-container-narrow {
+  width: 100%;
+  max-width: var(--rk-container-narrow);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--rk-space-4);
+  padding-right: var(--rk-space-4);
+}
+
+/* Normal document flow: Main element grows to fill space, keeping footer at the bottom */
+.rk-main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}

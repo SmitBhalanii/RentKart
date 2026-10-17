@@ -1,6 +1,55 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+@{
+    ViewData["Title"] = "Privacy Policy & Rental Standards";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="rk-container" style="padding-top: var(--rk-space-8); padding-bottom: var(--rk-space-16);">
+    <div style="max-width: 820px; margin: 0 auto;">
+        <!-- Header -->
+        <div style="margin-bottom: var(--rk-space-8);">
+            <span class="rk-badge rk-badge-teal" style="margin-bottom: var(--rk-space-2);">Legal & Marketplace Terms</span>
+            <h1 style="margin-bottom: var(--rk-space-3);">Privacy Policy & Marketplace Standards</h1>
+            <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm);">
+                Last updated: October 2026 &bull; RentKart Marketplace (College Project to Startup Blueprint)
+            </p>
+        </div>
+
+        <!-- Content Card -->
+        <div class="rk-card" style="padding: var(--rk-space-8); display: flex; flex-direction: column; gap: var(--rk-space-6);">
+            <section>
+                <h2 style="font-size: var(--rk-font-size-xl); margin-bottom: var(--rk-space-2);">1. Local Store Pickup Marketplace Model</h2>
+                <p>
+                    RentKart is a local multi-vendor equipment rental marketplace. Equipment is owned and stored by registered, verified rental businesses. Customers collect equipment directly at the business storefront and return it to the same location at the conclusion of the rental term.
+                </p>
+                <p>
+                    RentKart does not operate a delivery fleet, dispatch delivery drivers, or provide shipping services in this initial release.
+                </p>
+            </section>
+
+            <section>
+                <h2 style="font-size: var(--rk-font-size-xl); margin-bottom: var(--rk-space-2);">2. Identity Verification & Data Protection</h2>
+                <p>
+                    To protect equipment owners and customers against loss or fraud, customer accounts require accurate contact details (Full Name, Phone Number, and Primary Pickup City). When picking up equipment at a business storefront, businesses are required to inspect government-issued photo identification matching the customer account name.
+                </p>
+            </section>
+
+            <section>
+                <h2 style="font-size: var(--rk-font-size-xl); margin-bottom: var(--rk-space-2);">3. Security Deposits & Inspection Protocol</h2>
+                <p>
+                    Each equipment listing defines a mandatory refundable security deposit set by the business. Upon return, the business completes an inspection checklist to verify physical condition. Deposits are released or credited back once the return inspection is signed off without damage.
+                </p>
+            </section>
+
+            <section>
+                <h2 style="font-size: var(--rk-font-size-xl); margin-bottom: var(--rk-space-2);">4. Verified Reviews</h2>
+                <p>
+                    Reviews and ratings can only be submitted by customers who have completed a verified rental. Unverified, promotional, or fraudulent reviews are strictly prohibited and audited by platform administrators.
+                </p>
+            </section>
+
+            <div style="border-top: 1px solid var(--rk-border-subtle); padding-top: var(--rk-space-4); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">Questions about our rental policies?</span>
+                <a asp-controller="Home" asp-action="Index" class="rk-btn rk-btn-outline rk-btn-sm">Back to Marketplace</a>
+            </div>
+        </div>
+    </div>
+</div>

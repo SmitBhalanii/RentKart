@@ -1,0 +1,87 @@
+@*
+    RentKart Global Footer
+    Strictly in normal document flow. Guaranteed zero overlapping content.
+*@
+
+<footer class="rk-footer" id="mainFooter" role="contentinfo">
+    <div class="rk-container rk-footer-top">
+        <div class="rk-footer-grid">
+            <!-- Brand Column -->
+            <div class="rk-footer-col">
+                <a class="rk-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color: var(--rk-color-white);">
+                    <div class="rk-brand-logo" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    <div class="rk-brand-text">
+                        <span class="rk-brand-title" style="color: var(--rk-color-white);">Rent<span style="color: var(--rk-color-teal-400);">Kart</span></span>
+                        <span class="rk-brand-tagline" style="color: var(--rk-color-slate-400);">Rent Anything You Need</span>
+                    </div>
+                </a>
+                <p class="rk-footer-brand-desc">
+                    Your local, multi-vendor equipment rental marketplace. Discover products, check live availability, and pick up from verified nearby rental shops.
+                </p>
+                <div class="rk-footer-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>Store Pickup & Return Only &bull; No Delivery Fees</span>
+                </div>
+            </div>
+
+            <!-- Categories Column -->
+            <div class="rk-footer-col">
+                <h3 class="rk-footer-heading">Rental Categories</h3>
+                <ul class="rk-footer-links">
+                    <li><a class="rk-footer-link" href="#categories">Cameras & Photography</a></li>
+                    <li><a class="rk-footer-link" href="#categories">Power & Heavy Tools</a></li>
+                    <li><a class="rk-footer-link" href="#categories">Electronics & Displays</a></li>
+                    <li><a class="rk-footer-link" href="#categories">Event & Party Equipment</a></li>
+                    <li><a class="rk-footer-link" href="#categories">Camping & Outdoors</a></li>
+                </ul>
+            </div>
+
+            <!-- Platform & Roles -->
+            <div class="rk-footer-col">
+                <h3 class="rk-footer-heading">Marketplace</h3>
+                <ul class="rk-footer-links">
+                    <li><a class="rk-footer-link" href="#how-it-works">How It Works</a></li>
+                    <li><a class="rk-footer-link" href="#businesses">List Your Equipment</a></li>
+                    <li><a class="rk-footer-link" href="#businesses">Business Dashboard</a></li>
+                    <li><a class="rk-footer-link" href="#how-it-works">Store Pickup Guidelines</a></li>
+                    <li><a class="rk-footer-link" href="#component-preview">UI Design Showcase</a></li>
+                </ul>
+            </div>
+
+            <!-- Trust & Support -->
+            <div class="rk-footer-col">
+                <h3 class="rk-footer-heading">Trust & Security</h3>
+                <ul class="rk-footer-links">
+                    <li><a class="rk-footer-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                    <li><a class="rk-footer-link" href="#how-it-works">Verified Vendor Process</a></li>
+                    <li><a class="rk-footer-link" href="#how-it-works">Security Deposit Protection</a></li>
+                    <li><a class="rk-footer-link" href="#how-it-works">Condition Inspection Protocol</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="rk-container">
+        <div class="rk-footer-bottom">
+            <div>
+                &copy; @DateTime.UtcNow.Year RentKart. All rights reserved. &bull; <em>Rent Anything You Need.</em>
+            </div>
+            <div class="rk-footer-legal-links">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                <span>&bull;</span>
+                <a href="#how-it-works">Terms of Service</a>
+                <span>&bull;</span>
+                <a href="#businesses">Vendor Standards</a>
+            </div>
+        </div>
+    </div>
+</footer>
