@@ -5,6 +5,7 @@ using RentKart.Core.Interfaces;
 using RentKart.Infrastructure.Data;
 using RentKart.Infrastructure.Identity;
 using RentKart.Infrastructure.Services;
+using RentKart.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,10 +41,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(4);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".RentKart.Session";
+});
+
 builder.Services.AddScoped<IBusinessManagementService, BusinessManagementService>();
 builder.Services.AddScoped<IEquipmentCatalogService, EquipmentCatalogService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IBusinessEquipmentService, BusinessEquipmentService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -74,6 +87,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

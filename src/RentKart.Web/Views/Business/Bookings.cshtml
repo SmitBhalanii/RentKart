@@ -1,0 +1,157 @@
+@model List<RentKart.Core.Interfaces.BusinessBookingGroupListItemDto>
+@{
+    ViewData["Title"] = "Store Reservations";
+    var business = ViewBag.Business as RentKart.Core.Entities.BusinessProfile;
+    var currentStatus = ViewBag.CurrentStatus as RentKart.Core.Enums.BookingGroupStatus?;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+}
+
+<div class="rk-container" style="padding-top: var(--rk-space-8); padding-bottom: var(--rk-space-12);">
+    <!-- Breadcrumb -->
+    <nav style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+        <a asp-action="Dashboard" style="color: var(--rk-text-secondary); text-decoration: none;">Store Dashboard</a>
+        <span style="margin: 0 var(--rk-space-2);">&rsaquo;</span>
+        <span style="color: var(--rk-navy-900); font-weight: 600;">Customer Reservations</span>
+    </nav>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--rk-space-6); flex-wrap: wrap; gap: var(--rk-space-4);">
+        <div>
+            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+                Customer Reservations
+            </h1>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                Review incoming bookings, verify counter pickup codes, and record return inspections for <strong>@(business?.ShopName ?? "Your Store")</strong>.
+            </p>
+        </div>
+        <a asp-action="Equipment" class="rk-btn rk-btn-outline rk-btn-sm">
+            Manage Equipment & Inventory
+        </a>
+    </div>
+
+    <!-- Filter Pills -->
+    <div style="display: flex; gap: var(--rk-space-2); margin-bottom: var(--rk-space-6); flex-wrap: wrap;">
+        <a asp-action="Bookings" class="rk-btn rk-btn-sm @(!currentStatus.HasValue ? "rk-btn-primary" : "rk-btn-outline")">
+            All Reservations
+        </a>
+        <a asp-action="Bookings" asp-route-status="@((int)RentKart.Core.Enums.BookingGroupStatus.PendingApproval)" class="rk-btn rk-btn-sm @(currentStatus == RentKart.Core.Enums.BookingGroupStatus.PendingApproval ? "rk-btn-primary" : "rk-btn-outline")">
+            Pending Approval
+        </a>
+        <a asp-action="Bookings" asp-route-status="@((int)RentKart.Core.Enums.BookingGroupStatus.Confirmed)" class="rk-btn rk-btn-sm @(currentStatus == RentKart.Core.Enums.BookingGroupStatus.Confirmed ? "rk-btn-primary" : "rk-btn-outline")">
+            Confirmed (Awaiting Pickup)
+        </a>
+        <a asp-action="Bookings" asp-route-status="@((int)RentKart.Core.Enums.BookingGroupStatus.HandedOver)" class="rk-btn rk-btn-sm @(currentStatus == RentKart.Core.Enums.BookingGroupStatus.HandedOver ? "rk-btn-primary" : "rk-btn-outline")">
+            Handed Over (In Use)
+        </a>
+        <a asp-action="Bookings" asp-route-status="@((int)RentKart.Core.Enums.BookingGroupStatus.Completed)" class="rk-btn rk-btn-sm @(currentStatus == RentKart.Core.Enums.BookingGroupStatus.Completed ? "rk-btn-primary" : "rk-btn-outline")">
+            Completed & Returned
+        </a>
+        <a asp-action="Bookings" asp-route-status="@((int)RentKart.Core.Enums.BookingGroupStatus.Rejected)" class="rk-btn rk-btn-sm @(currentStatus == RentKart.Core.Enums.BookingGroupStatus.Rejected ? "rk-btn-primary" : "rk-btn-outline")">
+            Declined
+        </a>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="rk-card" style="padding: var(--rk-space-12); text-align: center; max-width: 540px; margin: 2rem auto;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--rk-neutral-100); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--rk-space-4); color: var(--rk-text-muted);">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">No reservations found</h2>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                @(currentStatus.HasValue ? "There are no bookings matching the selected status filter." : "Your store hasn't received any customer reservations yet.")
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="rk-card" style="overflow-x: auto; border: 1px solid var(--rk-border-light);">
+            <table class="rk-table" style="width: 100%; border-collapse: collapse; font-size: var(--rk-font-size-sm);">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--rk-border-light); background: var(--rk-neutral-50); text-align: left;">
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Group Ref</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Customer</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Items</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Rental Period</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Rental Fee</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Deposit</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700;">Status</th>
+                        <th style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var g in Model)
+                    {
+                        <tr style="border-bottom: 1px solid var(--rk-border-light);">
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700; color: var(--rk-navy-900);">
+                                @g.GroupNumber
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                <div style="font-weight: 600; color: var(--rk-navy-900);">@g.CustomerName</div>
+                                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@g.CustomerPhone</div>
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                <span class="rk-badge" style="background: var(--rk-neutral-100); color: var(--rk-navy-900);">
+                                    @g.ItemsCount item(s)
+                                </span>
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4); font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">
+                                @g.EarliestStartDate.ToString("MMM dd") - @g.LatestEndDate.ToString("MMM dd, yyyy")
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700; color: var(--rk-navy-900);">
+                                $@g.SubtotalRentalFee.ToString("F2")
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4); color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">
+                                $@g.SubtotalSecurityDeposit.ToString("F2")
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                @switch (g.Status)
+                                {
+                                    case RentKart.Core.Enums.BookingGroupStatus.PendingApproval:
+                                        <span class="rk-badge rk-badge-warning">Pending Approval</span>
+                                        break;
+                                    case RentKart.Core.Enums.BookingGroupStatus.Confirmed:
+                                        <span class="rk-badge rk-badge-success">Confirmed</span>
+                                        break;
+                                    case RentKart.Core.Enums.BookingGroupStatus.HandedOver:
+                                        <span class="rk-badge rk-badge-info">Handed Over</span>
+                                        break;
+                                    case RentKart.Core.Enums.BookingGroupStatus.Completed:
+                                        <span class="rk-badge rk-badge-success">Completed</span>
+                                        break;
+                                    case RentKart.Core.Enums.BookingGroupStatus.Rejected:
+                                        <span class="rk-badge" style="background: #fee2e2; color: #991b1b;">Declined</span>
+                                        break;
+                                    case RentKart.Core.Enums.BookingGroupStatus.CancelledByCustomer:
+                                        <span class="rk-badge" style="background: #fee2e2; color: #991b1b;">Cancelled</span>
+                                        break;
+                                    default:
+                                        <span class="rk-badge">@g.Status</span>
+                                        break;
+                                }
+                            </td>
+                            <td style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">
+                                <a asp-action="BookingGroupDetails" asp-route-id="@g.Id" class="rk-btn rk-btn-teal rk-btn-sm">
+                                    Manage &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div style="display: flex; justify-content: center; gap: var(--rk-space-2); margin-top: var(--rk-space-8);">
+                @for (int p = 1; p <= totalPages; p++)
+                {
+                    <a asp-action="Bookings" asp-route-status="@((int?)currentStatus)" asp-route-page="@p" class="rk-btn rk-btn-sm @(p == currentPage ? "rk-btn-primary" : "rk-btn-outline")">
+                        @p
+                    </a>
+                }
+            </div>
+        }
+    }
+</div>

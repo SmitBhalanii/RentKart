@@ -1,0 +1,146 @@
+@model List<RentKart.Core.Interfaces.CustomerBookingSummaryDto>
+@{
+    ViewData["Title"] = "My Rental Bookings";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+}
+
+<div class="rk-container" style="padding-top: var(--rk-space-8); padding-bottom: var(--rk-space-12);">
+    <!-- Breadcrumb -->
+    <nav style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+        <a asp-controller="Home" asp-action="Index" style="color: var(--rk-text-secondary); text-decoration: none;">Home</a>
+        <span style="margin: 0 var(--rk-space-2);">&rsaquo;</span>
+        <span style="color: var(--rk-navy-900); font-weight: 600;">My Bookings</span>
+    </nav>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--rk-space-6); flex-wrap: wrap; gap: var(--rk-space-4);">
+        <div>
+            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+                My Rental Bookings
+            </h1>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                Track multi-store reservations, view pickup verification codes, and manage active rentals.
+            </p>
+        </div>
+        <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-primary rk-btn-sm">
+            + New Equipment Rental
+        </a>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <!-- Empty State -->
+        <div class="rk-card" style="padding: var(--rk-space-12); text-align: center; max-width: 580px; margin: 2rem auto;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--rk-teal-50); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--rk-space-4); color: var(--rk-teal-600);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <h2 style="font-size: var(--rk-font-size-xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">No bookings yet</h2>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.6; margin-bottom: var(--rk-space-6);">
+                You haven't reserved any equipment yet. Explore our verified catalog to rent photography gear, power tools, audio equipment, and more.
+            </p>
+            <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-primary">
+                Browse Equipment Catalog &rarr;
+            </a>
+        </div>
+    }
+    else
+    {
+        <div style="display: flex; flex-direction: column; gap: var(--rk-space-5);">
+            @foreach (var booking in Model)
+            {
+                <div class="rk-card" style="overflow: hidden; border: 1px solid var(--rk-border-light);">
+                    <!-- Header -->
+                    <div style="background: var(--rk-neutral-50); border-bottom: 1px solid var(--rk-border-light); padding: var(--rk-space-4) var(--rk-space-5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: var(--rk-space-3); flex-wrap: wrap;">
+                            <span style="font-weight: 800; font-size: var(--rk-font-size-base); color: var(--rk-navy-900);">
+                                @booking.BookingNumber
+                            </span>
+                            <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                Placed on @booking.CreatedAtUtc.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                            </span>
+                        </div>
+
+                        <div>
+                            @switch (booking.Status)
+                            {
+                                case RentKart.Core.Enums.BookingStatus.Pending:
+                                    <span class="rk-badge rk-badge-warning">Pending Store Approvals</span>
+                                    break;
+                                case RentKart.Core.Enums.BookingStatus.PartiallyConfirmed:
+                                    <span class="rk-badge rk-badge-info">Partially Confirmed</span>
+                                    break;
+                                case RentKart.Core.Enums.BookingStatus.Confirmed:
+                                    <span class="rk-badge rk-badge-success">Fully Confirmed</span>
+                                    break;
+                                case RentKart.Core.Enums.BookingStatus.Active:
+                                    <span class="rk-badge rk-badge-info">Active Rental in Progress</span>
+                                    break;
+                                case RentKart.Core.Enums.BookingStatus.Completed:
+                                    <span class="rk-badge rk-badge-success">Completed & Returned</span>
+                                    break;
+                                case RentKart.Core.Enums.BookingStatus.Cancelled:
+                                    <span class="rk-badge" style="background: #fee2e2; color: #991b1b;">Cancelled</span>
+                                    break;
+                                default:
+                                    <span class="rk-badge">@booking.Status</span>
+                                    break;
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Body with groups -->
+                    <div style="padding: var(--rk-space-5);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                            @foreach (var g in booking.Groups)
+                            {
+                                <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); font-size: var(--rk-font-size-xs);">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
+                                        <strong style="color: var(--rk-navy-900); font-size: var(--rk-font-size-sm);">@g.BusinessName</strong>
+                                        <span class="rk-badge" style="font-size: 10px; padding: 2px 6px;">@g.Status</span>
+                                    </div>
+                                    <div style="color: var(--rk-text-muted); margin-bottom: 0.35rem;">
+                                        @g.BusinessCity &bull; @g.ItemsCount item(s)
+                                    </div>
+                                    <div style="color: var(--rk-text-secondary); margin-bottom: 0.35rem;">
+                                        Dates: @g.EarliestStartDate.ToString("MMM dd") - @g.LatestEndDate.ToString("MMM dd, yyyy")
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--rk-border-light); padding-top: 0.35rem; color: var(--rk-text-secondary);">
+                                        <span>Fee: $@g.SubtotalRentalFee.ToString("F2")</span>
+                                        <span>Dep: $@g.SubtotalSecurityDeposit.ToString("F2")</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Footer Total & Action -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-4); flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="font-size: var(--rk-font-size-sm); color: var(--rk-text-secondary);">
+                                Total: <strong style="color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">$@booking.GrandTotal.ToString("F2")</strong>
+                                <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-left: 0.5rem;">
+                                    (Rental: $@booking.TotalRentalFee.ToString("F2") + Deposit: $@booking.TotalSecurityDeposit.ToString("F2"))
+                                </span>
+                            </div>
+
+                            <a asp-action="Details" asp-route-id="@booking.Id" class="rk-btn rk-btn-primary rk-btn-sm">
+                                View Booking Details & Codes &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div style="display: flex; justify-content: center; gap: var(--rk-space-2); margin-top: var(--rk-space-8);">
+                @for (int p = 1; p <= totalPages; p++)
+                {
+                    <a asp-action="MyBookings" asp-route-page="@p" class="rk-btn rk-btn-sm @(p == currentPage ? "rk-btn-primary" : "rk-btn-outline")">
+                        @p
+                    </a>
+                }
+            </div>
+        }
+    }
+</div>

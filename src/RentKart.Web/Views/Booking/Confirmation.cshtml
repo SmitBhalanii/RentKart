@@ -1,0 +1,117 @@
+@model RentKart.Core.Interfaces.CustomerBookingDetailsDto
+@{
+    ViewData["Title"] = "Booking Confirmation #" + Model.BookingNumber;
+}
+
+<div class="rk-container" style="padding-top: var(--rk-space-8); padding-bottom: var(--rk-space-12); max-width: 860px;">
+    <!-- Confirmation Banner -->
+    <div class="rk-card rk-card-elevated" style="text-align: center; padding: var(--rk-space-8); margin-bottom: var(--rk-space-6); border-top: 4px solid var(--rk-teal-500);">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--rk-space-4); color: #15803d;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+            Booking Voucher Placed Successfully!
+        </h1>
+        <div style="font-size: var(--rk-font-size-base); color: var(--rk-teal-700); font-weight: 700; margin-bottom: var(--rk-space-2);">
+            Booking Reference: @Model.BookingNumber
+        </div>
+        <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); max-width: 540px; margin: 0 auto var(--rk-space-4);">
+            Your reservation request has been dispatched to each participating store. Present your pickup verification code when collecting equipment.
+        </p>
+        <div style="display: inline-flex; gap: var(--rk-space-6); background: var(--rk-neutral-50); padding: var(--rk-space-3) var(--rk-space-6); border-radius: var(--rk-radius-md); font-size: var(--rk-font-size-xs);">
+            <div>Total Rental Fee: <strong style="color: var(--rk-navy-900);">$@Model.TotalRentalFee.ToString("F2")</strong></div>
+            <div>Refundable Deposit: <strong style="color: var(--rk-navy-900);">$@Model.TotalSecurityDeposit.ToString("F2")</strong></div>
+            <div>Grand Total: <strong style="color: var(--rk-teal-700); font-size: var(--rk-font-size-sm);">$@Model.GrandTotal.ToString("F2")</strong></div>
+        </div>
+    </div>
+
+    <!-- Store Groups -->
+    <div style="display: flex; flex-direction: column; gap: var(--rk-space-6); margin-bottom: var(--rk-space-8);">
+        <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+            Pickup Instructions by Store (@Model.Groups.Count @(Model.Groups.Count == 1 ? "Store" : "Stores"))
+        </h2>
+
+        @foreach (var group in Model.Groups)
+        {
+            <div class="rk-card" style="border: 1px solid var(--rk-border-light); overflow: hidden;">
+                <div style="background: var(--rk-neutral-50); border-bottom: 1px solid var(--rk-border-light); padding: var(--rk-space-4) var(--rk-space-5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                            @group.BusinessName
+                        </div>
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                            Group Ref: <strong>@group.GroupNumber</strong> &bull; Address: @group.BusinessAddressLine, @group.BusinessCity
+                        </div>
+                    </div>
+                    <div>
+                        @switch (group.Status)
+                        {
+                            case RentKart.Core.Enums.BookingGroupStatus.PendingApproval:
+                                <span class="rk-badge rk-badge-warning">Pending Store Approval</span>
+                                break;
+                            case RentKart.Core.Enums.BookingGroupStatus.Confirmed:
+                                <span class="rk-badge rk-badge-success">Confirmed & Ready for Pickup</span>
+                                break;
+                            case RentKart.Core.Enums.BookingGroupStatus.HandedOver:
+                                <span class="rk-badge rk-badge-info">Active Rental</span>
+                                break;
+                            case RentKart.Core.Enums.BookingGroupStatus.Completed:
+                                <span class="rk-badge rk-badge-success">Completed & Returned</span>
+                                break;
+                            default:
+                                <span class="rk-badge">@group.Status</span>
+                                break;
+                        }
+                    </div>
+                </div>
+
+                <div style="padding: var(--rk-space-5);">
+                    <!-- Pickup Verification Voucher Box -->
+                    <div style="background: #f0fdfa; border: 1px dashed var(--rk-teal-500); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-4); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--rk-teal-800); font-weight: 700; letter-spacing: 0.5px;">Pickup Verification Code</div>
+                            <div style="font-size: var(--rk-font-size-2xl); font-weight: 900; color: var(--rk-teal-700); letter-spacing: 2px;">
+                                @group.PickupVerificationCode
+                            </div>
+                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                Show this code at counter pickup to verify reservation.
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">
+                            <div><strong>Hours:</strong> @group.OperatingHours</div>
+                            <div><strong>Store Phone:</strong> @group.BusinessPhone</div>
+                        </div>
+                    </div>
+
+                    <!-- Items list -->
+                    <div style="display: flex; flex-direction: column; gap: var(--rk-space-3);">
+                        @foreach (var item in group.Items)
+                        {
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--rk-space-2) 0; border-bottom: 1px solid var(--rk-neutral-100); font-size: var(--rk-font-size-sm);">
+                                <div>
+                                    <span style="font-weight: 600; color: var(--rk-navy-900);">@item.EquipmentTitle</span>
+                                    <span style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs); margin-left: 0.5rem;">
+                                        &times; @item.Quantity (@item.StartDate.ToString("MMM dd") - @item.EndDate.ToString("MMM dd, yyyy"))
+                                    </span>
+                                </div>
+                                <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                    $@item.TotalItemPrice.ToString("F2")
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; justify-content: center; gap: var(--rk-space-4); flex-wrap: wrap;">
+        <a asp-action="MyBookings" class="rk-btn rk-btn-primary" style="padding: 0.75rem 1.75rem;">
+            View All My Bookings &rarr;
+        </a>
+        <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-outline" style="padding: 0.75rem 1.75rem;">
+            Continue Browsing
+        </a>
+    </div>
+</div>

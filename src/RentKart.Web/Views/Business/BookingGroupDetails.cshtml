@@ -1,0 +1,246 @@
+@model RentKart.Core.Interfaces.BookingGroupDetailDto
+@{
+    ViewData["Title"] = "Manage Reservation #" + Model.GroupNumber;
+    var business = ViewBag.Business as RentKart.Core.Entities.BusinessProfile;
+}
+
+<div class="rk-container" style="padding-top: var(--rk-space-8); padding-bottom: var(--rk-space-12); max-width: 900px;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+        <a asp-action="Dashboard" style="color: var(--rk-text-secondary); text-decoration: none;">Store Dashboard</a>
+        <span style="margin: 0 var(--rk-space-2);">&rsaquo;</span>
+        <a asp-action="Bookings" style="color: var(--rk-text-secondary); text-decoration: none;">Reservations</a>
+        <span style="margin: 0 var(--rk-space-2);">&rsaquo;</span>
+        <span style="color: var(--rk-navy-900); font-weight: 600;">#@Model.GroupNumber</span>
+    </nav>
+
+    <!-- Header Card -->
+    <div class="rk-card" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); border-top: 4px solid var(--rk-teal-500);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 700;">
+                    Store Reservation Group
+                </div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 900; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+                    @Model.GroupNumber
+                </h1>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                    Assigned to Store: <strong>@Model.BusinessName</strong> &bull; Parent Booking ID: #@Model.ParentBookingId
+                </div>
+            </div>
+
+            <div>
+                @switch (Model.Status)
+                {
+                    case RentKart.Core.Enums.BookingGroupStatus.PendingApproval:
+                        <span class="rk-badge rk-badge-warning" style="font-size: var(--rk-font-size-sm); padding: 0.5rem 1rem;">Pending Store Action</span>
+                        break;
+                    case RentKart.Core.Enums.BookingGroupStatus.Confirmed:
+                        <span class="rk-badge rk-badge-success" style="font-size: var(--rk-font-size-sm); padding: 0.5rem 1rem;">Confirmed (Awaiting Pickup)</span>
+                        break;
+                    case RentKart.Core.Enums.BookingGroupStatus.HandedOver:
+                        <span class="rk-badge rk-badge-info" style="font-size: var(--rk-font-size-sm); padding: 0.5rem 1rem;">Handed Over (In Use)</span>
+                        break;
+                    case RentKart.Core.Enums.BookingGroupStatus.Completed:
+                        <span class="rk-badge rk-badge-success" style="font-size: var(--rk-font-size-sm); padding: 0.5rem 1rem;">Completed & Returned</span>
+                        break;
+                    case RentKart.Core.Enums.BookingGroupStatus.Rejected:
+                        <span class="rk-badge" style="background: #fee2e2; color: #991b1b; font-size: var(--rk-font-size-sm); padding: 0.5rem 1rem;">Declined by Store</span>
+                        break;
+                    case RentKart.Core.Enums.BookingGroupStatus.CancelledByCustomer:
+                        <span class="rk-badge" style="background: #fee2e2; color: #991b1b; font-size: var(--rk-font-size-sm); padding: 0.5rem 1rem;">Cancelled by Customer</span>
+                        break;
+                    default:
+                        <span class="rk-badge">@Model.Status</span>
+                        break;
+                }
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--rk-space-4); background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); text-align: center;">
+            <div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Store Rental Subtotal</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">$@Model.SubtotalRentalFee.ToString("F2")</div>
+            </div>
+            <div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Security Deposit (Refundable)</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-teal-700);">$@Model.SubtotalSecurityDeposit.ToString("F2")</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items in Group -->
+    <div class="rk-card" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
+        <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4);">
+            Reserved Equipment Items (@Model.Items.Count)
+        </h2>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: var(--rk-font-size-sm);">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--rk-border-light); color: var(--rk-text-muted); font-size: var(--rk-font-size-xs); text-align: left;">
+                    <th style="padding: 0.5rem 0;">Item</th>
+                    <th style="padding: 0.5rem 0;">Category</th>
+                    <th style="padding: 0.5rem 0;">Rental Period</th>
+                    <th style="padding: 0.5rem 0; text-align: center;">Qty</th>
+                    <th style="padding: 0.5rem 0; text-align: right;">Daily Rate</th>
+                    <th style="padding: 0.5rem 0; text-align: right;">Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr style="border-bottom: 1px dashed var(--rk-border-light);">
+                        <td style="padding: 0.65rem 0; font-weight: 600; color: var(--rk-navy-900);">
+                            @item.EquipmentTitle
+                        </td>
+                        <td style="padding: 0.65rem 0; color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">
+                            @item.CategoryName
+                        </td>
+                        <td style="padding: 0.65rem 0; color: var(--rk-text-secondary); font-size: var(--rk-font-size-xs);">
+                            @item.StartDate.ToString("MMM dd") - @item.EndDate.ToString("MMM dd, yyyy") (@item.DaysCount days)
+                        </td>
+                        <td style="padding: 0.65rem 0; text-align: center; font-weight: 700;">
+                            @item.Quantity
+                        </td>
+                        <td style="padding: 0.65rem 0; text-align: right;">
+                            $@item.DailyRentalRate.ToString("F2")
+                        </td>
+                        <td style="padding: 0.65rem 0; text-align: right; font-weight: 700; color: var(--rk-navy-900);">
+                            $@item.TotalItemPrice.ToString("F2")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- State Transition Action Panels -->
+    @if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.PendingApproval)
+    {
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); border: 2px solid var(--rk-teal-500);">
+            <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                Review Pending Reservation Voucher
+            </h2>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.5; margin-bottom: var(--rk-space-5);">
+                The customer has placed this reservation. Accepting will confirm the reservation and hold units until counter pickup. Declining will release all held inventory immediately.
+            </p>
+
+            <div style="display: flex; gap: var(--rk-space-4); flex-wrap: wrap;">
+                <form asp-action="AcceptBooking" asp-route-id="@Model.Id" method="post" style="margin: 0;">
+                    <button type="submit" class="rk-btn rk-btn-primary" style="padding: 0.75rem 1.75rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Accept Reservation Voucher
+                    </button>
+                </form>
+
+                <form asp-action="RejectBooking" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Decline this reservation? Held units will be released.');" style="display: flex; gap: var(--rk-space-2); flex-grow: 1;">
+                    <input type="text" name="rejectionReason" placeholder="Reason for declining (optional)..." class="rk-form-control" style="font-size: var(--rk-font-size-xs);" />
+                    <button type="submit" class="rk-btn rk-btn-outline" style="color: var(--rk-error); border-color: var(--rk-border-light); white-space: nowrap;">
+                        Decline Reservation
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+    else if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.Confirmed)
+    {
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); border: 2px solid var(--rk-teal-500);">
+            <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                Hand Over Equipment at Store Counter
+            </h2>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.5; margin-bottom: var(--rk-space-4);">
+                When the customer arrives at your counter, request their <strong>Pickup Verification Code</strong> (e.g. RK-XXXXXX) from their voucher.
+            </p>
+
+            <form asp-action="HandoverBooking" asp-route-id="@Model.Id" method="post">
+                <div style="display: grid; grid-template-columns: 240px 1fr auto; gap: var(--rk-space-3); align-items: flex-end;">
+                    <div>
+                        <label for="verificationCode" style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                            Customer Verification Code *
+                        </label>
+                        <input type="text" 
+                               id="verificationCode" 
+                               name="verificationCode" 
+                               required 
+                               placeholder="e.g. RK-123456" 
+                               class="rk-form-control" 
+                               style="font-family: monospace; font-size: var(--rk-font-size-base); font-weight: 700; text-transform: uppercase;" />
+                    </div>
+
+                    <div>
+                        <label for="handoverNotes" style="font-size: 11px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                            Handover Inspection Notes (Optional)
+                        </label>
+                        <input type="text" 
+                               id="handoverNotes" 
+                               name="handoverNotes" 
+                               placeholder="e.g. Clean condition, battery charged, accessories verified..." 
+                               class="rk-form-control" 
+                               style="font-size: var(--rk-font-size-xs);" />
+                    </div>
+
+                    <button type="submit" class="rk-btn rk-btn-primary" style="padding: 0.65rem 1.25rem; white-space: nowrap;">
+                        Verify & Hand Over &rarr;
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+    else if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.HandedOver)
+    {
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); border: 2px solid #22c55e;">
+            <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                Process Equipment Return & Inspection
+            </h2>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.5; margin-bottom: var(--rk-space-4);">
+                Equipment was collected on @Model.HandedOverAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC. Upon inspecting the equipment, record your condition remarks and finalize the return.
+            </p>
+
+            <form asp-action="CompleteBooking" asp-route-id="@Model.Id" method="post">
+                <div style="margin-bottom: var(--rk-space-4);">
+                    <label for="inspectionNotes" style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                        Return Condition & Inspection Report
+                    </label>
+                    <textarea id="inspectionNotes" 
+                              name="inspectionNotes" 
+                              rows="2" 
+                              placeholder="e.g. Equipment returned in excellent condition. No damages or missing accessories. Deposit approved for refund." 
+                              class="rk-form-control" 
+                              style="font-size: var(--rk-font-size-xs);"></textarea>
+                </div>
+
+                <button type="submit" class="rk-btn rk-btn-primary" style="background: #16a34a; border-color: #16a34a; padding: 0.75rem 1.75rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Confirm Return & Complete Rental
+                </button>
+            </form>
+        </div>
+    }
+
+    <!-- Logs & Notes if closed -->
+    @if (!string.IsNullOrWhiteSpace(Model.RejectionReason))
+    {
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-6); font-size: var(--rk-font-size-sm); color: #991b1b;">
+            <strong>Decline Note:</strong> @Model.RejectionReason
+        </div>
+    }
+
+    @if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
+    {
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-6); font-size: var(--rk-font-size-sm); color: #166534;">
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">Rental Completed & Inspected</div>
+            <div>Returned: @Model.ReturnedAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC</div>
+            @if (!string.IsNullOrWhiteSpace(Model.ReturnInspectionNotes))
+            {
+                <div style="margin-top: 0.25rem;"><em>Report: @Model.ReturnInspectionNotes</em></div>
+            }
+        </div>
+    }
+
+    <!-- Back Navigation -->
+    <div>
+        <a asp-action="Bookings" class="rk-btn rk-btn-outline">
+            &larr; Back to Reservations List
+        </a>
+    </div>
+</div>

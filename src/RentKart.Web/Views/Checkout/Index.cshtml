@@ -1,0 +1,190 @@
+@model RentKart.Core.Interfaces.CartSummaryDto
+@{
+    ViewData["Title"] = "Checkout & Place Rental Booking";
+}
+
+<div class="rk-container" style="padding-top: var(--rk-space-8); padding-bottom: var(--rk-space-12); max-width: 980px;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+        <a asp-controller="Home" asp-action="Index" style="color: var(--rk-text-secondary); text-decoration: none;">Home</a>
+        <span style="margin: 0 var(--rk-space-2);">&rsaquo;</span>
+        <a asp-controller="Cart" asp-action="Index" style="color: var(--rk-text-secondary); text-decoration: none;">Cart</a>
+        <span style="margin: 0 var(--rk-space-2);">&rsaquo;</span>
+        <span style="color: var(--rk-navy-900); font-weight: 600;">Checkout</span>
+    </nav>
+
+    <div style="margin-bottom: var(--rk-space-6);">
+        <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+            Confirm & Reserve Equipment
+        </h1>
+        <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+            Review pickup locations and submit your multi-store booking voucher.
+        </p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-6); color: #991b1b; font-size: var(--rk-font-size-sm);">
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">Please review the following errors:</div>
+            <div asp-validation-summary="All" style="margin: 0; padding-left: 1.25rem;"></div>
+        </div>
+    }
+
+    <form asp-action="SubmitOrder" method="post">
+        @Html.AntiForgeryToken()
+
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--rk-space-8); align-items: start;">
+            <!-- Left: Multi-Store Breakdown -->
+            <div style="display: flex; flex-direction: column; gap: var(--rk-space-6);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-lg); display: flex; align-items: center; gap: 0.5rem;">
+                    <span>Participating Store Groups (@Model.DistinctStoresCount)</span>
+                </div>
+
+                @foreach (var group in Model.BusinessGroups)
+                {
+                    <div class="rk-card" style="overflow: hidden; border: 1px solid var(--rk-border-light);">
+                        <!-- Store Card Header -->
+                        <div style="background: var(--rk-neutral-50); border-bottom: 1px solid var(--rk-border-light); padding: var(--rk-space-4) var(--rk-space-5);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                                <div>
+                                    <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                                        @group.BusinessName
+                                    </div>
+                                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); margin-top: 0.25rem;">
+                                        <strong>Pickup Address:</strong> @group.BusinessAddressLine, @group.BusinessCity
+                                    </div>
+                                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                        <strong>Phone:</strong> @group.BusinessPhone &bull; <strong>Hours:</strong> @group.OperatingHours
+                                    </div>
+                                </div>
+                                <span class="rk-badge rk-badge-info" style="font-size: var(--rk-font-size-xs);">
+                                    Independent Store Group
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Store Items Table -->
+                        <div style="padding: var(--rk-space-4) var(--rk-space-5);">
+                            <table style="width: 100%; border-collapse: collapse; font-size: var(--rk-font-size-xs);">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--rk-border-light); color: var(--rk-text-muted); text-align: left;">
+                                        <th style="padding: 0.5rem 0; font-weight: 600;">Equipment</th>
+                                        <th style="padding: 0.5rem 0; font-weight: 600;">Rental Dates</th>
+                                        <th style="padding: 0.5rem 0; font-weight: 600; text-align: center;">Qty</th>
+                                        <th style="padding: 0.5rem 0; font-weight: 600; text-align: right;">Rental Fee</th>
+                                        <th style="padding: 0.5rem 0; font-weight: 600; text-align: right;">Deposit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in group.Items)
+                                    {
+                                        <tr style="border-bottom: 1px dashed var(--rk-border-light);">
+                                            <td style="padding: 0.65rem 0; font-weight: 600; color: var(--rk-navy-900);">
+                                                @item.Title
+                                            </td>
+                                            <td style="padding: 0.65rem 0; color: var(--rk-text-secondary);">
+                                                @item.StartDate.ToString("MMM dd") - @item.EndDate.ToString("MMM dd, yyyy") (@item.DaysCount d)
+                                            </td>
+                                            <td style="padding: 0.65rem 0; text-align: center; color: var(--rk-navy-900);">
+                                                @item.Quantity
+                                            </td>
+                                            <td style="padding: 0.65rem 0; text-align: right; font-weight: 600; color: var(--rk-navy-900);">
+                                                $@item.ItemRentalSubtotal.ToString("F2")
+                                            </td>
+                                            <td style="padding: 0.65rem 0; text-align: right; color: var(--rk-text-muted);">
+                                                $@item.ItemDepositSubtotal.ToString("F2")
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" style="padding-top: 0.65rem; font-weight: 700; color: var(--rk-navy-900); text-align: right;">
+                                            Store Subtotal:
+                                        </td>
+                                        <td style="padding-top: 0.65rem; font-weight: 800; color: var(--rk-navy-900); text-align: right;">
+                                            $@group.GroupRentalSubtotal.ToString("F2")
+                                        </td>
+                                        <td style="padding-top: 0.65rem; font-weight: 600; color: var(--rk-text-muted); text-align: right;">
+                                            $@group.GroupDepositSubtotal.ToString("F2")
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                <!-- Customer Notes -->
+                <div class="rk-card" style="padding: var(--rk-space-5);">
+                    <label for="customerNotes" style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-sm); display: block; margin-bottom: var(--rk-space-2);">
+                        Pickup Notes / Special Requests (Optional)
+                    </label>
+                    <textarea id="customerNotes" 
+                              name="customerNotes" 
+                              rows="3" 
+                              class="rk-form-control" 
+                              placeholder="e.g. Expected pickup time, special vehicle requirements, or contact preferences..."></textarea>
+                </div>
+
+                <!-- Terms & Conditions Acknowledgment -->
+                <div class="rk-card" style="padding: var(--rk-space-5); background: var(--rk-teal-50); border: 1px solid var(--rk-teal-200);">
+                    <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; font-size: var(--rk-font-size-sm); color: var(--rk-navy-900); line-height: 1.5;">
+                        <input type="checkbox" name="acceptTerms" value="true" required style="margin-top: 0.25rem; width: 18px; height: 18px; accent-color: var(--rk-teal-600);" />
+                        <span>
+                            <strong>In-Store Pickup & Return Terms Agreement:</strong>
+                            I acknowledge that RentKart is a counter pickup marketplace. I agree to collect and return items at each listed business location within store operating hours, present my photo ID and booking verification code, and undergo mutual equipment condition inspection.
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Right: Order Summary Sticky -->
+            <div style="position: sticky; top: 80px;">
+                <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6);">
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4);">
+                        Grand Summary
+                    </h2>
+
+                    <div style="display: flex; flex-direction: column; gap: var(--rk-space-3); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-5);">
+                        <div style="display: flex; justify-content: space-between; color: var(--rk-text-secondary);">
+                            <span>Total Units</span>
+                            <span style="font-weight: 600; color: var(--rk-navy-900);">@Model.TotalItemsCount</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; color: var(--rk-text-secondary);">
+                            <span>Participating Stores</span>
+                            <span style="font-weight: 600; color: var(--rk-navy-900);">@Model.DistinctStoresCount</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; color: var(--rk-text-secondary);">
+                            <span>Total Rental Fees</span>
+                            <span style="font-weight: 600; color: var(--rk-navy-900);">$@Model.TotalRentalFee.ToString("F2")</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; color: var(--rk-text-secondary);">
+                            <span>Refundable Deposits</span>
+                            <span style="font-weight: 600; color: var(--rk-navy-900);">$@Model.TotalSecurityDeposit.ToString("F2")</span>
+                        </div>
+                        <div style="border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3); display: flex; justify-content: space-between; font-size: var(--rk-font-size-base);">
+                            <span style="font-weight: 700; color: var(--rk-navy-900);">Total to Pay at Pickup</span>
+                            <span style="font-weight: 800; color: var(--rk-teal-700); font-size: var(--rk-font-size-xl);">$@Model.GrandTotal.ToString("F2")</span>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--rk-neutral-50); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); line-height: 1.5; margin-bottom: var(--rk-space-5);">
+                        <div style="font-weight: 600; color: var(--rk-navy-900); margin-bottom: 2px;">Voucher Reservation Model</div>
+                        Submitting places your reservation voucher. Participating businesses review and confirm your booking. Units are held exclusively for you.
+                    </div>
+
+                    <button type="submit" class="rk-btn rk-btn-primary" style="width: 100%; justify-content: center; font-size: var(--rk-font-size-base); padding: 0.85rem 1rem;">
+                        Confirm & Place Booking &rarr;
+                    </button>
+
+                    <div style="margin-top: var(--rk-space-4); text-align: center;">
+                        <a asp-controller="Cart" asp-action="Index" style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-decoration: none;">
+                            &larr; Back to Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

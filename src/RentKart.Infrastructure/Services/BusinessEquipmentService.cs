@@ -534,7 +534,8 @@ public class BusinessEquipmentService : IBusinessEquipmentService
         var query = _context.BookingItems
             .AsNoTracking()
             .Where(bi => bi.EquipmentId == equipmentId 
-                      && (bi.BookingGroup.Status == BookingGroupStatus.Confirmed 
+                      && (bi.BookingGroup.Status == BookingGroupStatus.PendingApproval
+                       || bi.BookingGroup.Status == BookingGroupStatus.Confirmed 
                        || bi.BookingGroup.Status == BookingGroupStatus.HandedOver));
 
         if (fromDate.HasValue)

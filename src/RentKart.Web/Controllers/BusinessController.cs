@@ -18,6 +18,7 @@ public class BusinessController : Controller
     private readonly IBusinessManagementService _businessService;
     private readonly IBusinessEquipmentService _equipmentService;
     private readonly IEquipmentCatalogService _catalogService;
+    private readonly IBookingService _bookingService;
     private readonly ApplicationDbContext _context;
     private readonly ILogger<BusinessController> _logger;
 
@@ -26,6 +27,7 @@ public class BusinessController : Controller
         IBusinessManagementService businessService,
         IBusinessEquipmentService equipmentService,
         IEquipmentCatalogService catalogService,
+        IBookingService bookingService,
         ApplicationDbContext context,
         ILogger<BusinessController> logger)
     {
@@ -33,6 +35,7 @@ public class BusinessController : Controller
         _businessService = businessService;
         _equipmentService = equipmentService;
         _catalogService = catalogService;
+        _bookingService = bookingService;
         _context = context;
         _logger = logger;
     }
@@ -582,6 +585,128 @@ public class BusinessController : Controller
         }
 
         return RedirectToAction(nameof(EditEquipment), new { id = equipmentId });
+    }
+
+    // =========================================================================
+    // BOOKING LIFECYCLE MANAGEMENT (PHASE 7)
+    // =========================================================================
+
+    [HttpGet]
+    [Route("Business/Bookings")]
+    public async Task<IActionResult> Bookings(BookingGroupStatus? status = null, int page = 1)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var (items, totalCount) = await _bookingService.GetBusinessBookingGroupsAsync(business.Id, status, page, pageSize: 15);
+        ViewBag.CurrentStatus = status;
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / 15.0);
+        ViewBag.TotalCount = totalCount;
+        ViewBag.Business = business;
+
+        return View(items);
+    }
+
+    [HttpGet]
+    [Route("Business/Bookings/Details/{id:int}")]
+    public async Task<IActionResult> BookingGroupDetails(int id)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var groupDetails = await _bookingService.GetBusinessBookingGroupDetailsAsync(id, business.Id);
+        if (groupDetails == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.Business = business;
+        return View(groupDetails);
+    }
+
+    [HttpPost]
+    [Route("Business/Bookings/Accept/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AcceptBooking(int id)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var result = await _bookingService.AcceptBookingGroupAsync(id, business.Id);
+        if (!result.Success)
+        {
+            TempData["ErrorMessage"] = result.ErrorMessage ?? "Could not accept booking.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Reservation accepted and confirmed. Customer notified for pickup.";
+        }
+
+        return RedirectToAction(nameof(BookingGroupDetails), new { id });
+    }
+
+    [HttpPost]
+    [Route("Business/Bookings/Reject/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectBooking(int id, string? rejectionReason)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var result = await _bookingService.RejectBookingGroupAsync(id, business.Id, rejectionReason);
+        if (!result.Success)
+        {
+            TempData["ErrorMessage"] = result.ErrorMessage ?? "Could not decline booking.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Reservation declined. Held inventory units have been released.";
+        }
+
+        return RedirectToAction(nameof(BookingGroupDetails), new { id });
+    }
+
+    [HttpPost]
+    [Route("Business/Bookings/Handover/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> HandoverBooking(int id, string verificationCode, string? handoverNotes)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var result = await _bookingService.HandoverBookingGroupAsync(id, business.Id, verificationCode, handoverNotes);
+        if (!result.Success)
+        {
+            TempData["ErrorMessage"] = result.ErrorMessage ?? "Handover verification failed.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Equipment pickup verified and handed over to customer successfully!";
+        }
+
+        return RedirectToAction(nameof(BookingGroupDetails), new { id });
+    }
+
+    [HttpPost]
+    [Route("Business/Bookings/Complete/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CompleteBooking(int id, string? inspectionNotes)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var result = await _bookingService.CompleteReturnBookingGroupAsync(id, business.Id, inspectionNotes);
+        if (!result.Success)
+        {
+            TempData["ErrorMessage"] = result.ErrorMessage ?? "Could not complete return.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Return inspection recorded and booking completed! Units restored to active inventory.";
+        }
+
+        return RedirectToAction(nameof(BookingGroupDetails), new { id });
     }
 
     // =========================================================================
