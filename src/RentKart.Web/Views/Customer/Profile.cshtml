@@ -1,0 +1,50 @@
+@model RentKart.Web.Models.Customer.CustomerProfileViewModel
+@{
+    ViewData["Title"] = "Customer Profile";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container" style="max-width: 560px;">
+        <div style="margin-bottom: var(--rk-space-4);">
+            <a asp-action="Dashboard" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                &larr; Back to Dashboard
+            </a>
+        </div>
+
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6);">
+            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-1);">Manage Profile</h1>
+            <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-5);">Update your contact details used for rental counter receipts</p>
+
+            <form asp-action="Profile" method="post" id="customerProfileForm" novalidate>
+                <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-4);"></div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="Email" class="rk-form-label"></label>
+                    <input asp-for="Email" class="rk-form-control" readonly disabled style="background-color: var(--rk-neutral-100); cursor: not-allowed;" />
+                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">Email address cannot be changed directly in the profile editor.</span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="FullName" class="rk-form-label"></label>
+                    <input asp-for="FullName" class="rk-form-control" required />
+                    <span asp-validation-for="FullName" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-5);">
+                    <label asp-for="PhoneNumber" class="rk-form-label"></label>
+                    <input asp-for="PhoneNumber" class="rk-form-control" required />
+                    <span asp-validation-for="PhoneNumber" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div style="display: flex; gap: var(--rk-space-3); justify-content: flex-end;">
+                    <a asp-action="Dashboard" class="rk-btn rk-btn-outline">Cancel</a>
+                    <button type="submit" class="rk-btn rk-btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

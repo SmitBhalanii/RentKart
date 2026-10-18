@@ -1,0 +1,86 @@
+@model RentKart.Web.Models.Customer.CustomerDashboardViewModel
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Header Profile Banner -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-navy-800) 100%); color: #ffffff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4);">
+                <div style="display: flex; align-items: center; gap: var(--rk-space-4);">
+                    <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-full); background: var(--rk-teal-500); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--rk-font-size-xl);">
+                        @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName[..1].ToUpper())
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2px;">
+                            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #ffffff; margin-bottom: 0;">Hello, @Model.FullName</h1>
+                            <span class="rk-badge rk-badge-info" style="font-size: 0.75rem; background: rgba(255, 255, 255, 0.15); color: #ffffff;">Customer Account</span>
+                        </div>
+                        <p style="color: var(--rk-neutral-300); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                            @Model.Email &bull; Member since @Model.MemberSinceUtc.ToString("MMM yyyy")
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: var(--rk-space-3);">
+                    <a asp-action="Profile" class="rk-btn rk-btn-outline" style="border-color: rgba(255, 255, 255, 0.4); color: #ffffff;">
+                        Edit Profile
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="rk-btn rk-btn-teal">
+                        Browse Equipment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Activity & Status Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
+            <!-- Active Bookings card (Phase 7 integration point) -->
+            <div class="rk-card" style="padding: var(--rk-space-5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-3);">
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Your Rental Bookings</h2>
+                    <span class="rk-badge rk-badge-neutral">Phase 7 Ready</span>
+                </div>
+                <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.5; margin-bottom: var(--rk-space-4);">
+                    Once equipment is reserved, your multi-business rental orders, counter pickup receipts, and return status will be tracked here.
+                </p>
+                <div style="background: var(--rk-neutral-50); border: 1px dashed var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); text-align: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--rk-text-muted); margin-bottom: 0.5rem;">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">No active bookings yet. Start browsing nearby equipment catalogs.</div>
+                </div>
+            </div>
+
+            <!-- Account Security & Profile Card -->
+            <div class="rk-card" style="padding: var(--rk-space-5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-3);">
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Account Information</h2>
+                    <span class="rk-badge rk-badge-success">Verified</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: var(--rk-space-3); font-size: var(--rk-font-size-sm);">
+                    <div>
+                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Full Name</div>
+                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.FullName</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Email Address</div>
+                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.Email</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Phone Number</div>
+                        <div style="font-weight: 600; color: var(--rk-navy-900);">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</div>
+                    </div>
+                </div>
+                <div style="margin-top: var(--rk-space-4); border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3);">
+                    <a asp-action="Profile" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-xs); font-weight: 600; text-decoration: none;">
+                        Update Contact Details &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

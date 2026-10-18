@@ -1,0 +1,150 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Admin.BusinessManagementViewModel
+@{
+    ViewData["Title"] = "Business Directory Management";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+            <div>
+                <a asp-action="Dashboard" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+                    &larr; Back to Admin Dashboard
+                </a>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0;">Business Verification & Lifecycle</h1>
+            </div>
+
+            <!-- Status Filter Tabs -->
+            <div style="display: flex; gap: var(--rk-space-2); flex-wrap: wrap;">
+                <a asp-action="Businesses" asp-route-status="" class="rk-btn rk-btn-sm @(!Model.StatusFilter.HasValue ? "rk-btn-primary" : "rk-btn-outline")">
+                    All
+                </a>
+                <a asp-action="Businesses" asp-route-status="@BusinessStatus.PendingApproval" class="rk-btn rk-btn-sm @(Model.StatusFilter == BusinessStatus.PendingApproval ? "rk-btn-primary" : "rk-btn-outline")">
+                    Pending
+                </a>
+                <a asp-action="Businesses" asp-route-status="@BusinessStatus.Approved" class="rk-btn rk-btn-sm @(Model.StatusFilter == BusinessStatus.Approved ? "rk-btn-primary" : "rk-btn-outline")">
+                    Approved
+                </a>
+                <a asp-action="Businesses" asp-route-status="@BusinessStatus.Suspended" class="rk-btn rk-btn-sm @(Model.StatusFilter == BusinessStatus.Suspended ? "rk-btn-primary" : "rk-btn-outline")">
+                    Suspended
+                </a>
+                <a asp-action="Businesses" asp-route-status="@BusinessStatus.Rejected" class="rk-btn rk-btn-sm @(Model.StatusFilter == BusinessStatus.Rejected ? "rk-btn-primary" : "rk-btn-outline")">
+                    Rejected
+                </a>
+            </div>
+        </div>
+
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            @if (Model.Businesses.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Store ID & Name</th>
+                                <th>Owner Contact</th>
+                                <th>Location & Hours</th>
+                                <th>Status</th>
+                                <th>Dates</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in Model.Businesses)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">@b.ShopName</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">ID #@b.Id</div>
+                                    </td>
+                                    <td>
+                                        <div>@b.OwnerName</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.OwnerEmail</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.ContactPhone</div>
+                                    </td>
+                                    <td>
+                                        <div>@b.City, @b.State</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.OperatingHours</div>
+                                    </td>
+                                    <td>
+                                        @switch (b.Status)
+                                        {
+                                            case BusinessStatus.Approved:
+                                                <span class="rk-badge rk-badge-success">Approved</span>
+                                                break;
+                                            case BusinessStatus.PendingApproval:
+                                                <span class="rk-badge rk-badge-warning">Pending</span>
+                                                break;
+                                            case BusinessStatus.Suspended:
+                                                <span class="rk-badge rk-badge-error">Suspended</span>
+                                                break;
+                                            case BusinessStatus.Rejected:
+                                                <span class="rk-badge rk-badge-error">Rejected</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">Reg: @b.CreatedAtUtc.ToString("dd MMM yyyy")</div>
+                                        @if (b.ApprovedAtUtc.HasValue)
+                                        {
+                                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-teal-600);">Appr: @b.ApprovedAtUtc.Value.ToString("dd MMM yyyy")</div>
+                                        }
+                                        @if (b.SuspendedAtUtc.HasValue)
+                                        {
+                                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-error);">Susp: @b.SuspendedAtUtc.Value.ToString("dd MMM yyyy")</div>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <div style="display: inline-flex; gap: 0.35rem; justify-content: flex-end;">
+                                            @if (b.Status == BusinessStatus.PendingApproval)
+                                            {
+                                                <form asp-action="ApproveBusiness" method="post" style="display: inline;">
+                                                    <input type="hidden" name="id" value="@b.Id" />
+                                                    <button type="submit" class="rk-btn rk-btn-sm rk-btn-teal" title="Approve">
+                                                        Approve
+                                                    </button>
+                                                </form>
+                                                <form asp-action="RejectBusiness" method="post" style="display: inline;">
+                                                    <input type="hidden" name="id" value="@b.Id" />
+                                                    <input type="hidden" name="reason" value="Verification rejected by admin" />
+                                                    <button type="submit" class="rk-btn rk-btn-sm rk-btn-outline" style="color: var(--rk-error); border-color: var(--rk-error);" title="Reject">
+                                                        Reject
+                                                    </button>
+                                                </form>
+                                            }
+                                            else if (b.Status == BusinessStatus.Approved)
+                                            {
+                                                <form asp-action="SuspendBusiness" method="post" style="display: inline;">
+                                                    <input type="hidden" name="id" value="@b.Id" />
+                                                    <input type="hidden" name="reason" value="Compliance investigation" />
+                                                    <button type="submit" class="rk-btn rk-btn-sm rk-btn-outline" style="color: var(--rk-error); border-color: var(--rk-error);" title="Suspend">
+                                                        Suspend
+                                                    </button>
+                                                </form>
+                                            }
+                                            else if (b.Status == BusinessStatus.Suspended || b.Status == BusinessStatus.Rejected)
+                                            {
+                                                <form asp-action="ActivateBusiness" method="post" style="display: inline;">
+                                                    <input type="hidden" name="id" value="@b.Id" />
+                                                    <button type="submit" class="rk-btn rk-btn-sm rk-btn-teal" title="Reactivate">
+                                                        Reactivate
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-8); color: var(--rk-text-muted);">
+                    No businesses match the current filter.
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+@{
+    ViewData["Title"] = "Choose Account Type";
+}
+
+<div class="rk-section" style="min-height: calc(100vh - 350px); display: flex; align-items: center;">
+    <div class="rk-container" style="max-width: 760px;">
+        <div style="text-align: center; margin-bottom: var(--rk-space-6);">
+            <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">Join RentKart</h1>
+            <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-base); max-width: 500px; margin: 0 auto;">Select how you plan to use RentKart today. You can always sign up as a customer or list your rental business.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--rk-space-5);">
+            <!-- Customer Card -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); display: flex; flex-direction: column; justify-content: space-between; border: 2px solid transparent; transition: all 0.2s ease;">
+                <div>
+                    <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-lg); background: rgba(14, 165, 233, 0.12); color: var(--rk-teal-600); display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-4);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <h2 style="font-size: var(--rk-font-size-xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">Customer Account</h2>
+                    <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.6; margin-bottom: var(--rk-space-4);">
+                        Rent cameras, tools, audiovisual equipment, and gear from verified local businesses near you. Fast booking and convenient counter pickup.
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin: 0 0 var(--rk-space-5) 0; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                        <li style="margin-bottom: var(--rk-space-2); display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Free instant account creation
+                        </li>
+                        <li style="margin-bottom: var(--rk-space-2); display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Multi-vendor unified rental bookings
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Verified local pickup & return receipts
+                        </li>
+                    </ul>
+                </div>
+                <a asp-action="RegisterCustomer" class="rk-btn rk-btn-primary" style="width: 100%; justify-content: center;">
+                    Sign Up as Customer
+                </a>
+            </div>
+
+            <!-- Business Card -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); display: flex; flex-direction: column; justify-content: space-between; border: 2px solid var(--rk-teal-500); background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);">
+                <div>
+                    <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-lg); background: var(--rk-teal-600); color: #ffffff; display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-4);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: var(--rk-space-2);">
+                        <h2 style="font-size: var(--rk-font-size-xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Rental Business</h2>
+                        <span class="rk-badge rk-badge-info" style="font-size: 0.7rem;">Stores & Vendors</span>
+                    </div>
+                    <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.6; margin-bottom: var(--rk-space-4);">
+                        List your inventory, accept customer reservations, manage store handovers, and increase your local rental store revenue.
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin: 0 0 var(--rk-space-5) 0; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                        <li style="margin-bottom: var(--rk-space-2); display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Store profile with operating hours & pickup counter
+                        </li>
+                        <li style="margin-bottom: var(--rk-space-2); display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Independent booking acceptance & inventory control
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Fast verification by RentKart administration
+                        </li>
+                    </ul>
+                </div>
+                <a asp-action="RegisterBusiness" class="rk-btn rk-btn-teal" style="width: 100%; justify-content: center;">
+                    Register Your Business
+                </a>
+            </div>
+        </div>
+
+        <div style="margin-top: var(--rk-space-6); text-align: center; font-size: var(--rk-font-size-sm); color: var(--rk-text-secondary);">
+            Already have an account? 
+            <a asp-action="Login" style="color: var(--rk-teal-600); font-weight: 600; text-decoration: none;">Sign in here</a>
+        </div>
+    </div>
+</div>

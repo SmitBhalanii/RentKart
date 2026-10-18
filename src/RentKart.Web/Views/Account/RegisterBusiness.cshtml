@@ -1,0 +1,139 @@
+@model RentKart.Web.Models.Account.RegisterBusinessViewModel
+@{
+    ViewData["Title"] = "Business Registration";
+}
+
+<div class="rk-section" style="min-height: calc(100vh - 350px); padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container" style="max-width: 680px;">
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6);">
+            <div style="text-align: center; margin-bottom: var(--rk-space-6);">
+                <div class="rk-brand-logo" style="width: 52px; height: 52px; margin: 0 auto var(--rk-space-3); border-radius: var(--rk-radius-lg); background: var(--rk-teal-600); color: #fff;" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                </div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-1);">List Your Rental Business</h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm);">Register your store location to list equipment and receive customer bookings</p>
+            </div>
+
+            <div class="rk-alert rk-alert-info" style="margin-bottom: var(--rk-space-5); display: flex; gap: var(--rk-space-3); align-items: flex-start;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <div style="font-size: var(--rk-font-size-xs); line-height: 1.5;">
+                    <strong>Verification Process:</strong> RentKart is a trusted local marketplace. New business accounts are initialized in <em>Pending Approval</em> status. An administrator verifies your business location before equipment listings go live.
+                </div>
+            </div>
+
+            <form asp-action="RegisterBusiness" method="post" id="businessRegisterForm" novalidate>
+                <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-4);"></div>
+
+                <!-- Section 1: Business Account Credentials -->
+                <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3); padding-bottom: var(--rk-space-2); border-bottom: 1px solid var(--rk-border-light);">
+                    1. Account Credentials & Owner Contact
+                </h3>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="FullName" class="rk-form-label"></label>
+                    <input asp-for="FullName" class="rk-form-control" placeholder="e.g. Sarah Jenkins" autocomplete="name" required />
+                    <span asp-validation-for="FullName" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="Email" class="rk-form-label"></label>
+                    <input asp-for="Email" class="rk-form-control" placeholder="contact@hardwarehub.com" autocomplete="email" required />
+                    <span asp-validation-for="Email" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+                    <div class="rk-form-group">
+                        <label asp-for="Password" class="rk-form-label"></label>
+                        <input asp-for="Password" class="rk-form-control" placeholder="Min. 8 characters" autocomplete="new-password" required />
+                        <span asp-validation-for="Password" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="ConfirmPassword" class="rk-form-label"></label>
+                        <input asp-for="ConfirmPassword" class="rk-form-control" placeholder="Repeat password" autocomplete="new-password" required />
+                        <span asp-validation-for="ConfirmPassword" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <!-- Section 2: Store Information & Physical Pickup Location -->
+                <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3); padding-bottom: var(--rk-space-2); border-bottom: 1px solid var(--rk-border-light);">
+                    2. Physical Store Location & Operating Hours
+                </h3>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="ShopName" class="rk-form-label"></label>
+                        <input asp-for="ShopName" class="rk-form-control" placeholder="e.g. Apex Lens & Camera Rentals" required />
+                        <span asp-validation-for="ShopName" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="ContactPhone" class="rk-form-label"></label>
+                        <input asp-for="ContactPhone" class="rk-form-control" placeholder="+1 (555) 019-2831" autocomplete="tel" required />
+                        <span asp-validation-for="ContactPhone" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="AddressLine" class="rk-form-label"></label>
+                    <input asp-for="AddressLine" class="rk-form-control" placeholder="e.g. 450 Commerce Blvd, Suite 100" autocomplete="street-address" required />
+                    <span asp-validation-for="AddressLine" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: var(--rk-space-3); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="City" class="rk-form-label"></label>
+                        <input asp-for="City" class="rk-form-control" placeholder="City" autocomplete="address-level2" required />
+                        <span asp-validation-for="City" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="State" class="rk-form-label"></label>
+                        <input asp-for="State" class="rk-form-control" placeholder="State/Province" autocomplete="address-level1" required />
+                        <span asp-validation-for="State" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="PostalCode" class="rk-form-label"></label>
+                        <input asp-for="PostalCode" class="rk-form-control" placeholder="Postal Code" autocomplete="postal-code" required />
+                        <span asp-validation-for="PostalCode" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="OperatingHours" class="rk-form-label"></label>
+                    <input asp-for="OperatingHours" class="rk-form-control" placeholder="e.g. Mon-Fri: 08:30 - 18:00, Sat: 09:00 - 16:00" required />
+                    <span asp-validation-for="OperatingHours" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="RegistrationNumber" class="rk-form-label"></label>
+                    <input asp-for="RegistrationNumber" class="rk-form-control" placeholder="Tax ID / Trade License Number (Optional)" />
+                    <span asp-validation-for="RegistrationNumber" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-5);">
+                    <label asp-for="PickupInstructions" class="rk-form-label"></label>
+                    <textarea asp-for="PickupInstructions" class="rk-form-control" rows="2" placeholder="e.g. Parking available behind the warehouse; enter through Door B for equipment check-out counter."></textarea>
+                    <span asp-validation-for="PickupInstructions" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <button type="submit" class="rk-btn rk-btn-teal" style="width: 100%; justify-content: center; font-size: var(--rk-font-size-base); padding: 0.75rem 1.5rem;">
+                    Submit Business Registration
+                </button>
+            </form>
+
+            <div style="margin-top: var(--rk-space-5); text-align: center; border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-4); font-size: var(--rk-font-size-sm); color: var(--rk-text-secondary);">
+                Already have an account? 
+                <a asp-action="Login" style="color: var(--rk-teal-600); font-weight: 600; text-decoration: none;">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,141 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Admin.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Platform Administration";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Admin Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2px;">
+                    <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0;">Administration Portal</h1>
+                    <span class="rk-badge rk-badge-info" style="background: var(--rk-navy-900); color: #ffffff;">Admin Privileges</span>
+                </div>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Platform oversight, business verification lifecycle, and operational metrics
+                </p>
+            </div>
+
+            <div>
+                <a asp-action="Businesses" class="rk-btn rk-btn-primary">
+                    Manage All Businesses &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Metrics Overview Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Total Users</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">@Model.TotalUsers</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Customers</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-teal-600); margin-top: 0.25rem;">@Model.TotalCustomers</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Total Stores</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">@Model.TotalBusinesses</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-warning);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-warning); text-transform: uppercase;">Pending Approvals</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-warning); margin-top: 0.25rem;">@Model.PendingBusinessesCount</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-success);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-success); text-transform: uppercase;">Approved Stores</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-success); margin-top: 0.25rem;">@Model.ApprovedBusinessesCount</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-error);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-error); text-transform: uppercase;">Suspended Stores</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-error); margin-top: 0.25rem;">@Model.SuspendedBusinessesCount</div>
+            </div>
+        </div>
+
+        <!-- Pending Approval Queue -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Pending Store Verifications</h2>
+                    <span class="rk-badge rk-badge-warning">@Model.PendingBusinessesCount Awaiting</span>
+                </div>
+            </div>
+
+            @if (Model.PendingBusinesses.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Store & Owner</th>
+                                <th>Location</th>
+                                <th>Contact & Hours</th>
+                                <th>Registered</th>
+                                <th style="text-align: right;">Administrative Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var biz in Model.PendingBusinesses)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">@biz.ShopName</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                            Owner: @biz.OwnerName (@biz.OwnerEmail)
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>@biz.City, @biz.State</div>
+                                    </td>
+                                    <td>
+                                        <div>@biz.ContactPhone</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@biz.OperatingHours</div>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">@biz.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm") UTC</span>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
+                                            <form asp-action="ApproveBusiness" method="post" style="display: inline;">
+                                                <input type="hidden" name="id" value="@biz.Id" />
+                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                                <button type="submit" class="rk-btn rk-btn-sm rk-btn-teal" title="Approve store so listings can go live">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                            <form asp-action="RejectBusiness" method="post" style="display: inline;">
+                                                <input type="hidden" name="id" value="@biz.Id" />
+                                                <input type="hidden" name="reason" value="Failed verification criteria" />
+                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                                <button type="submit" class="rk-btn rk-btn-sm rk-btn-outline" style="color: var(--rk-error); border-color: var(--rk-error);" title="Reject store registration">
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-6); background: var(--rk-neutral-50); border-radius: var(--rk-radius-md);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--rk-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <div style="font-weight: 600; color: var(--rk-navy-900);">Verification queue is clear</div>
+                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">All registered business applications have been reviewed.</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

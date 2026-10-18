@@ -1,3 +1,9 @@
+@using Microsoft.AspNetCore.Identity
+@using RentKart.Core.Entities
+@using RentKart.Infrastructure.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 @*
     RentKart Global Top Navigation
     Brand: RentKart | Tagline: Rent Anything You Need.
@@ -21,7 +27,7 @@
                 </div>
             </a>
 
-            <!-- Header Quick Search Shell (Placeholder for Phase 6) -->
+            <!-- Header Quick Search Shell -->
             <div class="rk-nav-search" role="search">
                 <form method="get" action="#" onsubmit="event.preventDefault();" class="rk-input-group">
                     <span class="rk-input-addon-left" aria-hidden="true">
@@ -48,35 +54,88 @@
                         Browse Equipment
                     </a>
                 </li>
-                <li>
-                    <a class="rk-nav-link" href="#how-it-works">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                        How It Works
-                    </a>
-                </li>
-                <li>
-                    <a class="rk-nav-link" href="#businesses">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                        </svg>
-                        For Businesses
-                    </a>
-                </li>
+                @if (User.IsInRole(IdentityDataSeeder.RoleAdmin))
+                {
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Admin" asp-action="Dashboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Admin Portal
+                        </a>
+                    </li>
+                }
+                else if (User.IsInRole(IdentityDataSeeder.RoleBusiness))
+                {
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Business" asp-action="Dashboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            Store Dashboard
+                        </a>
+                    </li>
+                }
+                else if (User.IsInRole(IdentityDataSeeder.RoleCustomer))
+                {
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Customer" asp-action="Dashboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            My Account
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Home" asp-action="Index" fragment="how-it-works">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            How It Works
+                        </a>
+                    </li>
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Account" asp-action="RegisterBusiness">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            For Businesses
+                        </a>
+                    </li>
+                }
             </ul>
 
             <!-- Header Action Buttons -->
             <div class="rk-nav-actions">
-                <a class="rk-btn rk-btn-outline rk-btn-sm" href="#component-preview" title="Sign In preview (implemented in Phase 4)">
-                    Sign In
-                </a>
-                <a class="rk-btn rk-btn-teal rk-btn-sm" href="#businesses" title="List Your Business preview (implemented in Phase 4)">
-                    List Business
-                </a>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <div style="display: flex; align-items: center; gap: var(--rk-space-3);">
+                        <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0; display: inline;">
+                            <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" title="Sign out of your account">
+                                Sign Out
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a class="rk-btn rk-btn-outline rk-btn-sm" asp-controller="Account" asp-action="Login">
+                        Sign In
+                    </a>
+                    <a class="rk-btn rk-btn-teal rk-btn-sm" asp-controller="Account" asp-action="Register">
+                        Register
+                    </a>
+                }
+
                 <!-- Mobile Menu Button -->
                 <button type="button" 
                         class="rk-nav-toggle" 
@@ -97,12 +156,37 @@
     <!-- Mobile Drawer Menu -->
     <div class="rk-mobile-menu" id="mobileMenu" aria-hidden="true">
         <a class="rk-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Browse Equipment</a>
-        <a class="rk-nav-link" href="#how-it-works">How It Works</a>
-        <a class="rk-nav-link" href="#businesses">For Businesses</a>
-        <a class="rk-nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
-        <div style="display: flex; gap: var(--rk-space-2); margin-top: var(--rk-space-3); padding: 0 1rem;">
-            <a class="rk-btn rk-btn-outline" style="flex: 1;" href="#component-preview">Sign In</a>
-            <a class="rk-btn rk-btn-teal" style="flex: 1;" href="#businesses">Register</a>
-        </div>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            @if (User.IsInRole(IdentityDataSeeder.RoleAdmin))
+            {
+                <a class="rk-nav-link" asp-controller="Admin" asp-action="Dashboard">Admin Portal</a>
+                <a class="rk-nav-link" asp-controller="Admin" asp-action="Businesses">Manage Businesses</a>
+            }
+            else if (User.IsInRole(IdentityDataSeeder.RoleBusiness))
+            {
+                <a class="rk-nav-link" asp-controller="Business" asp-action="Dashboard">Store Dashboard</a>
+                <a class="rk-nav-link" asp-controller="Business" asp-action="Profile">Store Profile</a>
+            }
+            else
+            {
+                <a class="rk-nav-link" asp-controller="Customer" asp-action="Dashboard">My Account</a>
+                <a class="rk-nav-link" asp-controller="Customer" asp-action="Profile">Edit Profile</a>
+            }
+            <div style="padding: 0.5rem 1rem;">
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0;">
+                    <button type="submit" class="rk-btn rk-btn-outline" style="width: 100%; justify-content: center;">Sign Out</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <a class="rk-nav-link" asp-controller="Account" asp-action="RegisterBusiness">For Businesses</a>
+            <a class="rk-nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+            <div style="display: flex; gap: var(--rk-space-2); margin-top: var(--rk-space-3); padding: 0 1rem;">
+                <a class="rk-btn rk-btn-outline" style="flex: 1; text-align: center;" asp-controller="Account" asp-action="Login">Sign In</a>
+                <a class="rk-btn rk-btn-teal" style="flex: 1; text-align: center;" asp-controller="Account" asp-action="Register">Register</a>
+            </div>
+        }
     </div>
 </header>

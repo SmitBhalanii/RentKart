@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RentKart.Core.Entities;
+using RentKart.Core.Interfaces;
 using RentKart.Infrastructure.Data;
+using RentKart.Infrastructure.Identity;
+using RentKart.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +27,39 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = ".RentKart.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+builder.Services.AddScoped<IBusinessManagementService, BusinessManagementService>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Seed identity roles and administrator account
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        await IdentityDataSeeder.SeedRolesAndAdminAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding Identity roles and administrator.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -49,3 +82,6 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
+
+// Required for WebApplicationFactory in integration tests
+public partial class Program { }

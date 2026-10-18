@@ -1,0 +1,109 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Business.BusinessProfileViewModel
+@{
+    ViewData["Title"] = "Store Profile";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container" style="max-width: 680px;">
+        <div style="margin-bottom: var(--rk-space-4);">
+            <a asp-action="Dashboard" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                &larr; Back to Business Dashboard
+            </a>
+        </div>
+
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-2);">
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Store Profile & Pickup Counter</h1>
+                @switch (Model.Status)
+                {
+                    case BusinessStatus.Approved:
+                        <span class="rk-badge rk-badge-success">Verified</span>
+                        break;
+                    case BusinessStatus.PendingApproval:
+                        <span class="rk-badge rk-badge-warning">Pending Approval</span>
+                        break;
+                    case BusinessStatus.Suspended:
+                        <span class="rk-badge rk-badge-error">Suspended</span>
+                        break;
+                    case BusinessStatus.Rejected:
+                        <span class="rk-badge rk-badge-error">Rejected</span>
+                        break;
+                }
+            </div>
+            <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-5);">
+                Accurate store address and hours ensure seamless customer pickups and equipment returns.
+            </p>
+
+            <form asp-action="Profile" method="post" id="businessProfileForm" novalidate>
+                <input type="hidden" asp-for="BusinessId" />
+
+                <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-4);"></div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="ShopName" class="rk-form-label"></label>
+                        <input asp-for="ShopName" class="rk-form-control" required />
+                        <span asp-validation-for="ShopName" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="ContactPhone" class="rk-form-label"></label>
+                        <input asp-for="ContactPhone" class="rk-form-control" required />
+                        <span asp-validation-for="ContactPhone" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="AddressLine" class="rk-form-label"></label>
+                    <input asp-for="AddressLine" class="rk-form-control" required />
+                    <span asp-validation-for="AddressLine" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: var(--rk-space-3); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="City" class="rk-form-label"></label>
+                        <input asp-for="City" class="rk-form-control" required />
+                        <span asp-validation-for="City" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="State" class="rk-form-label"></label>
+                        <input asp-for="State" class="rk-form-control" required />
+                        <span asp-validation-for="State" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="PostalCode" class="rk-form-label"></label>
+                        <input asp-for="PostalCode" class="rk-form-control" required />
+                        <span asp-validation-for="PostalCode" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="OperatingHours" class="rk-form-label"></label>
+                    <input asp-for="OperatingHours" class="rk-form-control" required />
+                    <span asp-validation-for="OperatingHours" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="RegistrationNumber" class="rk-form-label"></label>
+                    <input asp-for="RegistrationNumber" class="rk-form-control" />
+                    <span asp-validation-for="RegistrationNumber" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-5);">
+                    <label asp-for="PickupInstructions" class="rk-form-label"></label>
+                    <textarea asp-for="PickupInstructions" class="rk-form-control" rows="3"></textarea>
+                    <span asp-validation-for="PickupInstructions" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div style="display: flex; gap: var(--rk-space-3); justify-content: flex-end;">
+                    <a asp-action="Dashboard" class="rk-btn rk-btn-outline">Cancel</a>
+                    <button type="submit" class="rk-btn rk-btn-teal">Save Store Information</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

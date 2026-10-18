@@ -1,0 +1,142 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Business.BusinessDashboardViewModel
+@{
+    ViewData["Title"] = "Business Dashboard";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Store Header Banner -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-teal-900) 100%); color: #ffffff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4);">
+                <div style="display: flex; align-items: center; gap: var(--rk-space-4);">
+                    <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-lg); background: var(--rk-teal-500); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--rk-font-size-xl);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2px;">
+                            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #ffffff; margin-bottom: 0;">@Model.ShopName</h1>
+                            @switch (Model.Status)
+                            {
+                                case BusinessStatus.Approved:
+                                    <span class="rk-badge rk-badge-success">Verified Store</span>
+                                    break;
+                                case BusinessStatus.PendingApproval:
+                                    <span class="rk-badge rk-badge-warning">Verification Pending</span>
+                                    break;
+                                case BusinessStatus.Suspended:
+                                    <span class="rk-badge rk-badge-error">Suspended</span>
+                                    break;
+                                case BusinessStatus.Rejected:
+                                    <span class="rk-badge rk-badge-error">Rejected</span>
+                                    break;
+                            }
+                        </div>
+                        <p style="color: var(--rk-neutral-300); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                            Owner: @Model.OwnerName &bull; @Model.Email &bull; Store ID #@Model.BusinessId
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: var(--rk-space-3);">
+                    <a asp-action="Profile" class="rk-btn rk-btn-outline" style="border-color: rgba(255, 255, 255, 0.4); color: #ffffff;">
+                        Edit Store Details
+                    </a>
+                    @if (Model.CanPublishListings)
+                    {
+                        <a href="#equipment-listings" class="rk-btn rk-btn-teal" title="Equipment management opens in Phase 5">
+                            + List Equipment
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="rk-btn rk-btn-teal" disabled style="opacity: 0.6; cursor: not-allowed;" title="Approval required before listing equipment">
+                            + List Equipment (Locked)
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Context Alert -->
+        @if (Model.Status == BusinessStatus.PendingApproval)
+        {
+            <div class="rk-alert rk-alert-warning" role="alert" style="margin-bottom: var(--rk-space-6); display: flex; gap: var(--rk-space-3); align-items: flex-start;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <strong style="font-size: var(--rk-font-size-sm); display: block; margin-bottom: 2px;">Verification in Progress</strong>
+                    <div style="font-size: var(--rk-font-size-xs); line-height: 1.5;">
+                        Your business profile is queued for review by the platform administration team. While your account is pending approval, you cannot publish equipment listings or accept customer reservations. You will be notified as soon as verification completes.
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model.Status == BusinessStatus.Suspended)
+        {
+            <div class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-6); display: flex; gap: var(--rk-space-3); align-items: flex-start;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+                    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <strong style="font-size: var(--rk-font-size-sm); display: block; margin-bottom: 2px;">Account Suspended</strong>
+                    <div style="font-size: var(--rk-font-size-xs); line-height: 1.5;">
+                        This store account has been suspended by administration. Your equipment listings have been taken offline and customer handovers are restricted. Please contact RentKart Support for compliance resolution.
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Store Overview & Inventory Shell Grid -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
+            <!-- Inventory & Rental Status Card -->
+            <div class="rk-card" style="padding: var(--rk-space-5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Equipment Catalog</h2>
+                    <span class="rk-badge rk-badge-info">Phase 5 Implementation</span>
+                </div>
+                <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.6; margin-bottom: var(--rk-space-4);">
+                    Manage your rental inventory units, daily pricing, security deposits, and maintenance downtime schedules.
+                </p>
+                <div style="background: var(--rk-neutral-50); border: 1px dashed var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-6); text-align: center;">
+                    <div style="font-size: var(--rk-font-size-sm); font-weight: 600; color: var(--rk-navy-900); margin-bottom: var(--rk-space-1);">Catalog Ready for Phase 5</div>
+                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); max-width: 400px; margin: 0 auto;">
+                        Approved stores will be able to upload multi-photo listings with category tagging and maintenance logs.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Location & Counter Info Card -->
+            <div class="rk-card" style="padding: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">Pickup Counter Info</h2>
+                <div style="display: flex; flex-direction: column; gap: var(--rk-space-3); font-size: var(--rk-font-size-sm);">
+                    <div>
+                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Store Phone</div>
+                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.ContactPhone</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Physical Address</div>
+                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.Address</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Operating Hours</div>
+                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.OperatingHours</div>
+                    </div>
+                </div>
+                <div style="margin-top: var(--rk-space-4); border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3);">
+                    <a asp-action="Profile" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-xs); font-weight: 600; text-decoration: none;">
+                        Update Store Details &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
