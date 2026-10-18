@@ -41,6 +41,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddScoped<IBusinessManagementService, BusinessManagementService>();
+builder.Services.AddScoped<IEquipmentCatalogService, EquipmentCatalogService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -53,11 +55,12 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await IdentityDataSeeder.SeedRolesAndAdminAsync(services);
+        await CatalogDataSeeder.SeedCatalogDataAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding Identity roles and administrator.");
+        logger.LogError(ex, "An error occurred while seeding Identity roles and catalog data.");
     }
 }
 

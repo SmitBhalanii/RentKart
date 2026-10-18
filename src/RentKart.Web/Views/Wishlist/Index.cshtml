@@ -1,0 +1,114 @@
+@model RentKart.Web.Models.Catalog.WishlistViewModel
+@{
+    ViewData["Title"] = "My Saved Equipment (Wishlist)";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-5); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Header -->
+        <div style="margin-bottom: var(--rk-space-6);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0;">
+                    Saved Equipment Wishlist
+                </h1>
+                <span class="rk-badge rk-badge-info">@Model.TotalItems @(Model.TotalItems == 1 ? "Item" : "Items")</span>
+            </div>
+            <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                Keep track of items you plan to rent for upcoming jobs, shoots, or weekend projects
+            </p>
+        </div>
+
+        @if (Model.Items.Any())
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--rk-space-5);">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="rk-card rk-card-elevated" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
+                        <div style="position: relative; height: 180px; background: var(--rk-neutral-100); overflow: hidden;">
+                            @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
+                            {
+                                <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--rk-text-muted);">
+                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                </div>
+                            }
+
+                            <div style="position: absolute; top: 0.5rem; left: 0.5rem;">
+                                <span class="rk-badge rk-badge-info" style="font-size: 0.68rem;">@item.CategoryName</span>
+                            </div>
+
+                            <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                                <form asp-action="Remove" method="post" style="margin: 0;">
+                                    <input type="hidden" name="equipmentId" value="@item.EquipmentId" />
+                                    <button type="submit" 
+                                            class="rk-btn rk-btn-sm" 
+                                            style="padding: 0.35rem; border-radius: var(--rk-radius-full); background: rgba(255, 255, 255, 0.9); border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15); color: var(--rk-error);" 
+                                            title="Remove from Wishlist">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div style="padding: var(--rk-space-4); display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: 0.25rem;">
+                                    Pickup: @item.City, @item.State &bull; <a asp-controller="Store" asp-action="Details" asp-route-id="@item.BusinessId" style="color: var(--rk-teal-600); text-decoration: none;">@item.ShopName</a>
+                                </div>
+
+                                <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.EquipmentId" style="color: inherit; text-decoration: none;">
+                                        @item.Title
+                                    </a>
+                                </h3>
+                            </div>
+
+                            <div style="border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3); margin-top: var(--rk-space-2);">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--rk-space-3);">
+                                    <div>
+                                        <span style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">$@item.DailyRentalRate.ToString("F2")</span>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">/ day</span>
+                                    </div>
+                                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                        Deposit: $@item.SecurityDeposit.ToString("F2")
+                                    </div>
+                                </div>
+
+                                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.EquipmentId" class="rk-btn rk-btn-primary" style="width: 100%; justify-content: center; font-size: var(--rk-font-size-xs);">
+                                    View & Reserve
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="rk-card" style="text-align: center; padding: var(--rk-space-8) var(--rk-space-4);">
+                <div style="width: 60px; height: 60px; border-radius: var(--rk-radius-full); background: rgba(14, 165, 233, 0.1); color: var(--rk-teal-600); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--rk-space-3);">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>
+                <h2 style="font-size: var(--rk-font-size-xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+                    Your Wishlist is Empty
+                </h2>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); max-width: 440px; margin: 0 auto var(--rk-space-5);">
+                    Save equipment listings while browsing to easily compare daily rates, locations, and prepare your rental plans.
+                </p>
+                <div>
+                    <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-primary">
+                        Browse Equipment Catalog
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

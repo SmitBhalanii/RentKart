@@ -28,4 +28,5 @@ public class Equipment
     public virtual ICollection<BookingItem> BookingItems { get; set; } = new List<BookingItem>();
     public virtual ICollection<MaintenanceRecord> MaintenanceRecords { get; set; } = new List<MaintenanceRecord>();
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public virtual ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
 }

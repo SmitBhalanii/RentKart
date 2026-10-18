@@ -1,0 +1,189 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Catalog.EquipmentDetailViewModel
+@{
+    ViewData["Title"] = $"{Model.Title} - RentKart";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-5); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Preview Alert if Inactive/Draft -->
+        @if (Model.IsPreview)
+        {
+            <div class="rk-alert rk-alert-warning" role="alert" style="margin-bottom: var(--rk-space-5); display: flex; gap: var(--rk-space-3); align-items: center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div>
+                    <strong>Unpublished Listing Preview:</strong> This equipment is currently inactive or belongs to a store awaiting verification. Only authorized store owners and administrators can view this preview.
+                </div>
+            </div>
+        }
+
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="Breadcrumb" style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+            <a asp-controller="Home" asp-action="Index" style="color: var(--rk-teal-600); text-decoration: none;">Home</a>
+            <span style="margin: 0 0.4rem;">/</span>
+            <a asp-controller="Catalog" asp-action="Index" style="color: var(--rk-teal-600); text-decoration: none;">Catalog</a>
+            <span style="margin: 0 0.4rem;">/</span>
+            <a asp-controller="Catalog" asp-action="Index" asp-route-categorySlug="@Model.CategorySlug" style="color: var(--rk-teal-600); text-decoration: none;">@Model.CategoryName</a>
+            <span style="margin: 0 0.4rem;">/</span>
+            <span style="color: var(--rk-navy-900); font-weight: 600;">@Model.Title</span>
+        </nav>
+
+        <!-- Main Product Grid -->
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--rk-space-6); align-items: flex-start;">
+            <!-- Left Column: Media & Specifications -->
+            <div>
+                <!-- Primary Image Display -->
+                <div class="rk-card" style="padding: 0; overflow: hidden; height: 380px; background: var(--rk-neutral-100); display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-4);">
+                    @if (Model.ImageUrls.Any())
+                    {
+                        <img src="@Model.ImageUrls.First()" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div style="text-align: center; color: var(--rk-text-muted);">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            <div style="font-size: var(--rk-font-size-xs); margin-top: 0.5rem;">No photo uploaded yet</div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Product Title & Overview -->
+                <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-5);">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: var(--rk-space-2);">
+                        <span class="rk-badge rk-badge-info">@Model.CategoryName</span>
+                        <span class="rk-badge rk-badge-neutral">Condition: @Model.Condition</span>
+                    </div>
+
+                    <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3); line-height: 1.3;">
+                        @Model.Title
+                    </h1>
+
+                    <h3 style="font-size: var(--rk-font-size-sm); font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; margin-bottom: var(--rk-space-2);">
+                        Equipment Description & Notes
+                    </h3>
+                    <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.7; white-space: pre-line; margin-bottom: 0;">
+                        @Model.Description
+                    </p>
+                </div>
+
+                <!-- Pickup Location & Storefront Information -->
+                <div class="rk-card" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-5);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-3);">
+                        <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                            Store Pickup & Return Counter
+                        </h3>
+                        <span class="rk-badge rk-badge-success">Verified Local Store</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-4); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-4);">
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Business Storefront</div>
+                            <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                <a asp-controller="Store" asp-action="Details" asp-route-id="@Model.BusinessId" style="color: var(--rk-teal-600); text-decoration: none;">
+                                    @Model.ShopName &rarr;
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Store Phone</div>
+                            <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.ContactPhone</div>
+                        </div>
+
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Physical Address</div>
+                            <div style="font-weight: 600; color: var(--rk-navy-900);">
+                                @Model.AddressLine<br />@Model.City, @Model.State @Model.PostalCode
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Operating Hours</div>
+                            <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.OperatingHours</div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.PickupInstructions))
+                    {
+                        <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); line-height: 1.5;">
+                            <strong>Pickup Instructions:</strong> @Model.PickupInstructions
+                        </div>
+                    }
+                </div>
+
+                <!-- Verified Reviews Section (Honest state without fabricated ratings) -->
+                <div class="rk-card" style="padding: var(--rk-space-5);">
+                    <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                        Customer Ratings & Feedback
+                    </h3>
+                    <div style="background: var(--rk-neutral-50); border: 1px dashed var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-5); text-align: center;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--rk-text-muted); margin-bottom: 0.5rem;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <div style="font-weight: 600; color: var(--rk-navy-900); font-size: var(--rk-font-size-sm); margin-bottom: 0.25rem;">No reviews yet</div>
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); max-width: 420px; margin: 0 auto;">
+                            RentKart only permits verified reviews from customers who have completed an in-store pickup and return inspection.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pricing & Reservation Box -->
+            <div style="position: sticky; top: 80px;">
+                <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); border: 2px solid var(--rk-teal-500);">
+                    <!-- Price Tag -->
+                    <div style="margin-bottom: var(--rk-space-4);">
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">Daily Rental Rate</div>
+                        <div style="display: flex; align-items: baseline; gap: 0.35rem;">
+                            <span style="font-size: var(--rk-font-size-4xl); font-weight: 800; color: var(--rk-navy-900);">
+                                $@Model.DailyRentalRate.ToString("F2")
+                            </span>
+                            <span style="font-size: var(--rk-font-size-sm); color: var(--rk-text-muted);">/ calendar day</span>
+                        </div>
+                    </div>
+
+                    <!-- Deposit Breakdown -->
+                    <div style="background: var(--rk-neutral-50); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); margin-bottom: var(--rk-space-5); font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); line-height: 1.5;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <span>Security Deposit (Refundable):</span>
+                            <strong style="color: var(--rk-navy-900);">$@Model.SecurityDeposit.ToString("F2")</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Available Units:</span>
+                            <strong style="color: var(--rk-navy-900);">@Model.TotalQuantity @(Model.TotalQuantity == 1 ? "unit" : "units")</strong>
+                        </div>
+                    </div>
+
+                    <!-- Pickup Notice -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-5);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--rk-teal-600)" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>Counter pickup at <strong>@Model.ShopName</strong> (@Model.City)</span>
+                    </div>
+
+                    <!-- Rent Button (Handoff to Phase 7 booking engine) -->
+                    <div style="display: flex; flex-direction: column; gap: var(--rk-space-3);">
+                        <a href="#booking-lifecycle" class="rk-btn rk-btn-primary" style="justify-content: center; font-size: var(--rk-font-size-base); padding: 0.75rem 1.5rem;" title="Date range selection & multi-vendor booking is implemented in Phase 7">
+                            Select Rental Dates
+                        </a>
+
+                        <!-- Wishlist Action -->
+                        <form asp-controller="Wishlist" asp-action="Toggle" method="post" style="margin: 0;">
+                            <input type="hidden" name="equipmentId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" 
+                                    class="rk-btn rk-btn-outline" 
+                                    style="width: 100%; justify-content: center; gap: 0.5rem; color: @(Model.IsInWishlist ? "var(--rk-error)" : "var(--rk-neutral-700)"); border-color: @(Model.IsInWishlist ? "var(--rk-error)" : "var(--rk-border-light)");">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="@(Model.IsInWishlist ? "currentColor" : "none")" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                @(Model.IsInWishlist ? "Saved in Wishlist" : "Save to Wishlist")
+                            </button>
+                        </form>
+                    </div>
+
+                    <div style="font-size: 0.7rem; color: var(--rk-text-muted); text-align: center; margin-top: var(--rk-space-4);">
+                        No home delivery charges &bull; Free cancellation before business approval
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

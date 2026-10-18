@@ -1,0 +1,259 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Catalog.EquipmentCatalogViewModel
+@{
+    ViewData["Title"] = !string.IsNullOrEmpty(Model.CurrentCategoryName) 
+        ? $"{Model.CurrentCategoryName} Rentals" 
+        : "Browse Equipment Catalog";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-5); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Header & Breadcrumb -->
+        <div style="margin-bottom: var(--rk-space-5);">
+            <nav aria-label="Breadcrumb" style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-2);">
+                <a asp-controller="Home" asp-action="Index" style="color: var(--rk-teal-600); text-decoration: none;">Home</a>
+                <span style="margin: 0 0.4rem;">/</span>
+                <span style="color: var(--rk-text-secondary);">Catalog</span>
+                @if (!string.IsNullOrEmpty(Model.CurrentCategoryName))
+                {
+                    <span style="margin: 0 0.4rem;">/</span>
+                    <span style="color: var(--rk-navy-900); font-weight: 600;">@Model.CurrentCategoryName</span>
+                }
+            </nav>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--rk-space-3);">
+                <div>
+                    <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+                        @(!string.IsNullOrEmpty(Model.CurrentCategoryName) ? Model.CurrentCategoryName : "All Equipment Listings")
+                    </h1>
+                    <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                        Showing @Model.TotalCount verified rental @(Model.TotalCount == 1 ? "item" : "items") from approved local businesses
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <form method="get" asp-action="Index" id="catalogFilterForm">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--rk-space-3); align-items: flex-end;">
+                    <!-- Keyword Search -->
+                    <div class="rk-form-group" style="margin-bottom: 0;">
+                        <label class="rk-form-label" style="font-size: var(--rk-font-size-xs);">Keyword Search</label>
+                        <input type="text" 
+                               name="Search" 
+                               value="@Model.Query.Search" 
+                               class="rk-form-control" 
+                               placeholder="e.g. Sony, Drill, Projector..." />
+                    </div>
+
+                    <!-- Category Selector -->
+                    <div class="rk-form-group" style="margin-bottom: 0;">
+                        <label class="rk-form-label" style="font-size: var(--rk-font-size-xs);">Category</label>
+                        <select name="CategorySlug" class="rk-form-control">
+                            <option value="">All Categories</option>
+                            @foreach (var cat in Model.AvailableCategories)
+                            {
+                                <option value="@cat.Slug" selected="@(Model.Query.CategorySlug == cat.Slug)">
+                                    @cat.Name (@cat.ActiveListingsCount)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Nearby City Selector (No GPS assumed) -->
+                    <div class="rk-form-group" style="margin-bottom: 0;">
+                        <label class="rk-form-label" style="font-size: var(--rk-font-size-xs);">Store Location (City)</label>
+                        <select name="City" class="rk-form-control">
+                            <option value="">All Cities</option>
+                            @foreach (var city in Model.AvailableCities)
+                            {
+                                <option value="@city" selected="@(string.Equals(Model.Query.City, city, StringComparison.OrdinalIgnoreCase))">
+                                    @city
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Sort Order -->
+                    <div class="rk-form-group" style="margin-bottom: 0;">
+                        <label class="rk-form-label" style="font-size: var(--rk-font-size-xs);">Sort By</label>
+                        <select name="SortBy" class="rk-form-control">
+                            <option value="newest" selected="@(Model.Query.SortBy == "newest")">Newest Additions</option>
+                            <option value="price_asc" selected="@(Model.Query.SortBy == "price_asc")">Price: Low to High</option>
+                            <option value="price_desc" selected="@(Model.Query.SortBy == "price_desc")">Price: High to Low</option>
+                            <option value="title_asc" selected="@(Model.Query.SortBy == "title_asc")">Alphabetical (A-Z)</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Actions -->
+                    <div style="display: flex; gap: var(--rk-space-2);">
+                        <button type="submit" class="rk-btn rk-btn-primary" style="flex: 1; justify-content: center;">
+                            Apply Filters
+                        </button>
+                        <a asp-action="Index" class="rk-btn rk-btn-outline" title="Clear all search filters">
+                            Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Equipment Grid / Empty State -->
+        @if (Model.Items.Any())
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="rk-card rk-card-elevated" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg); transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                        <!-- Equipment Image Container -->
+                        <div style="position: relative; height: 190px; background: var(--rk-neutral-100); overflow: hidden;">
+                            @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
+                            {
+                                <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--rk-text-muted);">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                            }
+
+                            <!-- Badges Overlay -->
+                            <div style="position: absolute; top: 0.6rem; left: 0.6rem; display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                                <span class="rk-badge rk-badge-info" style="font-size: 0.7rem; backdrop-filter: blur(4px);">
+                                    @item.CategoryName
+                                </span>
+                            </div>
+
+                            <!-- Wishlist Toggle Form -->
+                            <div style="position: absolute; top: 0.6rem; right: 0.6rem;">
+                                <form asp-controller="Wishlist" asp-action="Toggle" method="post" style="margin: 0;">
+                                    <input type="hidden" name="equipmentId" value="@item.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit" 
+                                            class="rk-btn rk-btn-sm" 
+                                            style="padding: 0.35rem; border-radius: var(--rk-radius-full); background: rgba(255, 255, 255, 0.9); border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15); color: @(item.IsInWishlist ? "var(--rk-error)" : "var(--rk-neutral-500)");" 
+                                            title="@(item.IsInWishlist ? "Remove from Wishlist" : "Save to Wishlist")">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="@(item.IsInWishlist ? "currentColor" : "none")" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div style="padding: var(--rk-space-4); display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); display: flex; align-items: center; gap: 0.25rem;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        @item.City, @item.State
+                                    </span>
+                                    <span class="rk-badge rk-badge-neutral" style="font-size: 0.68rem;">
+                                        @item.Condition
+                                    </span>
+                                </div>
+
+                                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); line-height: 1.4; margin-bottom: 0.35rem;">
+                                    <a asp-action="Details" asp-route-id="@item.Id" style="color: inherit; text-decoration: none;">
+                                        @item.Title
+                                    </a>
+                                </h2>
+
+                                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); margin-bottom: var(--rk-space-3);">
+                                    Store: 
+                                    <a asp-controller="Store" asp-action="Details" asp-route-id="@item.BusinessId" style="color: var(--rk-teal-600); font-weight: 600; text-decoration: none;">
+                                        @item.ShopName
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Price and Actions -->
+                            <div style="border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3); margin-top: var(--rk-space-2);">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--rk-space-3);">
+                                    <div>
+                                        <span style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">
+                                            $@item.DailyRentalRate.ToString("F2")
+                                        </span>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">/ day</span>
+                                    </div>
+                                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-align: right;">
+                                        Deposit: $@item.SecurityDeposit.ToString("F2")
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: var(--rk-space-2);">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="rk-btn rk-btn-primary" style="flex: 1; justify-content: center; font-size: var(--rk-font-size-xs);">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Server-Side Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div style="display: flex; justify-content: center; align-items: center; gap: var(--rk-space-2); margin-top: var(--rk-space-6);">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a asp-action="Index" 
+                           asp-route-page="@(Model.CurrentPage - 1)" 
+                           asp-route-search="@Model.Query.Search"
+                           asp-route-categorySlug="@Model.Query.CategorySlug"
+                           asp-route-city="@Model.Query.City"
+                           asp-route-sortBy="@Model.Query.SortBy"
+                           class="rk-btn rk-btn-outline rk-btn-sm">
+                            &larr; Previous
+                        </a>
+                    }
+
+                    <div style="font-size: var(--rk-font-size-sm); color: var(--rk-text-muted); padding: 0 var(--rk-space-3);">
+                        Page <strong>@Model.CurrentPage</strong> of <strong>@Model.TotalPages</strong>
+                    </div>
+
+                    @if (Model.HasNextPage)
+                    {
+                        <a asp-action="Index" 
+                           asp-route-page="@(Model.CurrentPage + 1)" 
+                           asp-route-search="@Model.Query.Search"
+                           asp-route-categorySlug="@Model.Query.CategorySlug"
+                           asp-route-city="@Model.Query.City"
+                           asp-route-sortBy="@Model.Query.SortBy"
+                           class="rk-btn rk-btn-outline rk-btn-sm">
+                            Next &rarr;
+                        </a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Empty Search State -->
+            <div class="rk-card" style="text-align: center; padding: var(--rk-space-8) var(--rk-space-4); margin: var(--rk-space-6) 0;">
+                <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-full); background: var(--rk-neutral-100); color: var(--rk-text-muted); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--rk-space-3);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+                <h2 style="font-size: var(--rk-font-size-xl); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0.25rem;">No Equipment Matches Found</h2>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); max-width: 460px; margin: 0 auto var(--rk-space-5);">
+                    We couldn't find active listings matching your search or location criteria. Try broadening your keywords, selecting a nearby city, or viewing all categories.
+                </p>
+                <div>
+                    <a asp-action="Index" class="rk-btn rk-btn-primary">
+                        Clear All Filters
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

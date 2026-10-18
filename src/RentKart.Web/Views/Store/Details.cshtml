@@ -1,0 +1,164 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Catalog.BusinessStorefrontViewModel
+@{
+    ViewData["Title"] = $"{Model.ShopName} - RentKart Storefront";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-5); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Store Header Banner -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-navy-800) 100%); color: #ffffff;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--rk-space-4);">
+                <div style="display: flex; gap: var(--rk-space-4); align-items: flex-start;">
+                    <div style="width: 64px; height: 64px; border-radius: var(--rk-radius-lg); background: var(--rk-teal-500); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: var(--rk-font-size-2xl);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
+                            <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: #ffffff; margin-bottom: 0;">@Model.ShopName</h1>
+                            @if (Model.Status == BusinessStatus.Approved)
+                            {
+                                <span class="rk-badge rk-badge-success">Verified Store</span>
+                            }
+                            else
+                            {
+                                <span class="rk-badge rk-badge-warning">Verification Pending</span>
+                            }
+                        </div>
+                        <p style="color: var(--rk-neutral-300); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-3);">
+                            Store ID #@Model.BusinessId &bull; Operating in @Model.City, @Model.State
+                        </p>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: var(--rk-neutral-200);">
+                            <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                @Model.AddressLine, @Model.City, @Model.State @Model.PostalCode
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                @Model.OperatingHours
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                @Model.ContactPhone
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-outline" style="border-color: rgba(255,255,255,0.4); color: #ffffff;">
+                        &larr; Back to Catalog
+                    </a>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.PickupInstructions))
+            {
+                <div style="margin-top: var(--rk-space-4); border-top: 1px solid rgba(255,255,255,0.15); padding-top: var(--rk-space-3); font-size: var(--rk-font-size-xs); color: var(--rk-neutral-300);">
+                    <strong>Pickup & Counter Instructions:</strong> @Model.PickupInstructions
+                </div>
+            }
+        </div>
+
+        <!-- Store Catalog Section -->
+        <div style="margin-bottom: var(--rk-space-4);">
+            <h2 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0.25rem;">
+                Available Equipment from this Store
+            </h2>
+            <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                Showing @Model.Listings.Count active rental @(Model.Listings.Count == 1 ? "listing" : "listings") ready for store pickup
+            </p>
+        </div>
+
+        @if (Model.Listings.Any())
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--rk-space-5);">
+                @foreach (var item in Model.Listings)
+                {
+                    <div class="rk-card rk-card-elevated" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
+                        <div style="position: relative; height: 180px; background: var(--rk-neutral-100); overflow: hidden;">
+                            @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
+                            {
+                                <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--rk-text-muted);">
+                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                </div>
+                            }
+
+                            <div style="position: absolute; top: 0.5rem; left: 0.5rem;">
+                                <span class="rk-badge rk-badge-info" style="font-size: 0.68rem;">@item.CategoryName</span>
+                            </div>
+
+                            <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                                <form asp-controller="Wishlist" asp-action="Toggle" method="post" style="margin: 0;">
+                                    <input type="hidden" name="equipmentId" value="@item.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" 
+                                            class="rk-btn rk-btn-sm" 
+                                            style="padding: 0.35rem; border-radius: var(--rk-radius-full); background: rgba(255, 255, 255, 0.9); border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15); color: @(item.IsInWishlist ? "var(--rk-error)" : "var(--rk-neutral-500)");" 
+                                            title="@(item.IsInWishlist ? "Remove from Wishlist" : "Save to Wishlist")">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="@(item.IsInWishlist ? "currentColor" : "none")" stroke="currentColor" stroke-width="2">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div style="padding: var(--rk-space-4); display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                    <span class="rk-badge rk-badge-neutral" style="font-size: 0.65rem;">@item.Condition</span>
+                                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@item.TotalQuantity units</span>
+                                </div>
+
+                                <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.Id" style="color: inherit; text-decoration: none;">
+                                        @item.Title
+                                    </a>
+                                </h3>
+                            </div>
+
+                            <div style="border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3);">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--rk-space-3);">
+                                    <div>
+                                        <span style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">$@item.DailyRentalRate.ToString("F2")</span>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">/ day</span>
+                                    </div>
+                                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                        Deposit: $@item.SecurityDeposit.ToString("F2")
+                                    </div>
+                                </div>
+
+                                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.Id" class="rk-btn rk-btn-primary" style="width: 100%; justify-content: center; font-size: var(--rk-font-size-xs);">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="rk-card" style="text-align: center; padding: var(--rk-space-8) var(--rk-space-4);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-lg); margin-bottom: 0.25rem;">
+                    No equipment currently listed by this store
+                </div>
+                <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-4);">
+                    Check back soon or explore listings from other nearby rental stores.
+                </div>
+                <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-primary">
+                    Browse All Catalog Listings
+                </a>
+            </div>
+        }
+    </div>
+</div>
