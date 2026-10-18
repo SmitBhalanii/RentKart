@@ -47,7 +47,7 @@
                     </a>
                     @if (Model.CanPublishListings)
                     {
-                        <a href="#equipment-listings" class="rk-btn rk-btn-teal" title="Equipment management opens in Phase 5">
+                        <a asp-action="CreateEquipment" class="rk-btn rk-btn-teal">
                             + List Equipment
                         </a>
                     }
@@ -100,16 +100,30 @@
             <!-- Inventory & Rental Status Card -->
             <div class="rk-card" style="padding: var(--rk-space-5);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
-                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Equipment Catalog</h2>
-                    <span class="rk-badge rk-badge-info">Phase 5 Implementation</span>
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Equipment Catalog & Inventory</h2>
+                    <a asp-action="Equipment" class="rk-btn rk-btn-teal rk-btn-sm">
+                        Manage Equipment &rarr;
+                    </a>
                 </div>
                 <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.6; margin-bottom: var(--rk-space-4);">
                     Manage your rental inventory units, daily pricing, security deposits, and maintenance downtime schedules.
                 </p>
-                <div style="background: var(--rk-neutral-50); border: 1px dashed var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-6); text-align: center;">
-                    <div style="font-size: var(--rk-font-size-sm); font-weight: 600; color: var(--rk-navy-900); margin-bottom: var(--rk-space-1);">Catalog Ready for Phase 5</div>
-                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); max-width: 400px; margin: 0 auto;">
-                        Approved stores will be able to upload multi-photo listings with category tagging and maintenance logs.
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--rk-space-3); background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); text-align: center;">
+                    <div>
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Listings</div>
+                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">@ViewBag.TotalListings</div>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Active</div>
+                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-teal-700);">@ViewBag.ActiveListings</div>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Inventory Units</div>
+                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">@ViewBag.TotalUnits</div>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Maintenance</div>
+                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: #b45309;">@ViewBag.UnderMaintenance</div>
                     </div>
                 </div>
             </div>

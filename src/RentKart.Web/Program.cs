@@ -43,6 +43,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IBusinessManagementService, BusinessManagementService>();
 builder.Services.AddScoped<IEquipmentCatalogService, EquipmentCatalogService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
+builder.Services.AddScoped<IBusinessEquipmentService, BusinessEquipmentService>();
 
 builder.Services.AddControllersWithViews();
 

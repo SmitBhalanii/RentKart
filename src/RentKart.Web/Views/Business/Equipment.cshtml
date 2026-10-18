@@ -1,0 +1,224 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Business.BusinessEquipmentIndexViewModel
+@{
+    ViewData["Title"] = "Manage Equipment & Inventory - RentKart Business";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Breadcrumb & Top Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div>
+                <nav aria-label="breadcrumb" style="margin-bottom: var(--rk-space-2);">
+                    <ol style="display: flex; gap: var(--rk-space-2); list-style: none; padding: 0; margin: 0; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                        <li><a asp-action="Dashboard" style="color: var(--rk-teal-600); text-decoration: none;">Dashboard</a></li>
+                        <li>&rsaquo;</li>
+                        <li style="color: var(--rk-text-primary); font-weight: 600;">Equipment & Inventory</li>
+                    </ol>
+                </nav>
+                <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Equipment & Inventory Management
+                </h1>
+                <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Manage your rental catalog, set pricing, adjust inventory quantities, and schedule maintenance downtime.
+                </p>
+            </div>
+
+            <div>
+                @if (Model.CanPublishListings)
+                {
+                    <a asp-action="CreateEquipment" class="rk-btn rk-btn-teal" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add New Equipment
+                    </a>
+                }
+                else
+                {
+                    <button class="rk-btn rk-btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;" title="Store verification required before adding equipment">
+                        Add New Equipment (Approval Required)
+                    </button>
+                }
+            </div>
+        </div>
+
+        @if (!Model.CanPublishListings)
+        {
+            <div class="rk-alert rk-alert-warning" role="alert" style="margin-bottom: var(--rk-space-6); display: flex; gap: var(--rk-space-3); align-items: flex-start;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <strong>Verification Required:</strong> Your business status is currently 
+                    <span class="rk-badge rk-badge-warning" style="vertical-align: middle;">@Model.BusinessStatus</span>. 
+                    Only approved stores can publish active equipment listings to the public discovery catalog.
+                </div>
+            </div>
+        }
+
+        <!-- Metrics Overview Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-navy-700);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); font-weight: 600; text-transform: uppercase;">Total Listings</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 4px;">@Model.TotalListingsCount</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-teal-500);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); font-weight: 600; text-transform: uppercase;">Active in Catalog</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-teal-700); margin-top: 4px;">@Model.ActiveListingsCount</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-navy-400);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); font-weight: 600; text-transform: uppercase;">Total Inventory Units</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 4px;">@Model.TotalInventoryUnits</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-amber-500);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); font-weight: 600; text-transform: uppercase;">Units in Maintenance</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: #b45309; margin-top: 4px;">@Model.UnitsUnderMaintenance</div>
+            </div>
+        </div>
+
+        <!-- Equipment Inventory Table Card -->
+        <div class="rk-card rk-card-elevated" style="padding: 0; overflow: hidden;">
+            <div style="padding: var(--rk-space-4) var(--rk-space-5); border-bottom: 1px solid var(--rk-border-light); display: flex; justify-content: space-between; align-items: center; background: var(--rk-neutral-50);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                    Inventory Listings (@Model.TotalListingsCount)
+                </h2>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                    Quantities and availability update in real-time
+                </div>
+            </div>
+
+            @if (Model.Equipments.Count > 0)
+            {
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--rk-font-size-sm);">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--rk-border-light); background: var(--rk-neutral-50); color: var(--rk-text-secondary); font-size: var(--rk-font-size-xs); text-transform: uppercase;">
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4); width: 80px;">Media</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Title & Category</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Daily Rate</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Deposit</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Inventory Units</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Condition</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Status</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Equipments)
+                            {
+                                <tr style="border-bottom: 1px solid var(--rk-border-light); vertical-align: middle;">
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
+                                        {
+                                            <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 56px; height: 42px; object-fit: cover; border-radius: var(--rk-radius-sm); border: 1px solid var(--rk-border-light);" />
+                                        }
+                                        else
+                                        {
+                                            <div style="width: 56px; height: 42px; background: var(--rk-neutral-100); border-radius: var(--rk-radius-sm); display: flex; align-items: center; justify-content: center; color: var(--rk-text-muted); font-size: 10px;">
+                                                No Photo
+                                            </div>
+                                        }
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                            <a asp-action="EditEquipment" asp-route-id="@item.Id" style="color: inherit; text-decoration: none;">
+                                                @item.Title
+                                            </a>
+                                        </div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                            @item.CategoryName &bull; Added @item.CreatedAtUtc.ToString("MMM d, yyyy")
+                                        </div>
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 600; color: var(--rk-navy-900);">
+                                        $@item.DailyRentalRate.ToString("F2")<span style="font-size: var(--rk-font-size-xs); font-weight: normal; color: var(--rk-text-muted);">/day</span>
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); color: var(--rk-text-secondary);">
+                                        $@item.SecurityDeposit.ToString("F2")
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                            <strong style="color: var(--rk-teal-700);">@item.AvailableQuantity</strong>
+                                            <span style="color: var(--rk-text-muted);">/ @item.TotalQuantity total</span>
+                                        </div>
+                                        @if (item.ActiveMaintenanceBlockedQuantity > 0)
+                                        {
+                                            <div style="font-size: 11px; color: #b45309; font-weight: 600;">
+                                                (@item.ActiveMaintenanceBlockedQuantity under maintenance)
+                                            </div>
+                                        }
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        <span class="rk-badge rk-badge-confirmed" style="font-size: 11px;">@item.Condition</span>
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="rk-badge rk-badge-success" style="font-size: 11px;">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rk-badge" style="background: var(--rk-neutral-200); color: var(--rk-neutral-700); font-size: 11px;">Inactive</span>
+                                        }
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">
+                                        <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
+                                            <a asp-action="EditEquipment" asp-route-id="@item.Id" class="rk-btn rk-btn-outline rk-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 12px;">
+                                                Edit
+                                            </a>
+                                            <a asp-action="Maintenance" asp-route-id="@item.Id" class="rk-btn rk-btn-outline rk-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 12px;" title="Maintenance downtime">
+                                                Maintenance
+                                            </a>
+                                            <form method="post" asp-action="ToggleEquipmentStatus" asp-route-id="@item.Id" style="display: inline;">
+                                                @Html.AntiForgeryToken()
+                                                @if (item.IsActive)
+                                                {
+                                                    <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 12px; color: var(--rk-error-600);" title="Deactivate listing">
+                                                        Deactivate
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 12px; color: var(--rk-teal-700);" title="Activate listing">
+                                                        Activate
+                                                    </button>
+                                                }
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="padding: var(--rk-space-8); text-align: center;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--rk-neutral-100); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--rk-space-3); color: var(--rk-text-muted);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-1);">No equipment listings yet</h3>
+                    <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); max-width: 420px; margin: 0 auto var(--rk-space-4);">
+                        You have not published any equipment listings for this store yet. Add your gear to start receiving customer rental requests.
+                    </p>
+                    @if (Model.CanPublishListings)
+                    {
+                        <a asp-action="CreateEquipment" class="rk-btn rk-btn-teal rk-btn-sm">
+                            + Add First Equipment Listing
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,233 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Business.EditEquipmentViewModel
+@{
+    ViewData["Title"] = $"Edit {Model.Title} - RentKart Business";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container" style="max-width: 860px;">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" style="margin-bottom: var(--rk-space-3);">
+            <ol style="display: flex; gap: var(--rk-space-2); list-style: none; padding: 0; margin: 0; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                <li><a asp-action="Dashboard" style="color: var(--rk-teal-600); text-decoration: none;">Dashboard</a></li>
+                <li>&rsaquo;</li>
+                <li><a asp-action="Equipment" style="color: var(--rk-teal-600); text-decoration: none;">Equipment</a></li>
+                <li>&rsaquo;</li>
+                <li style="color: var(--rk-text-primary); font-weight: 600;">Edit Listing</li>
+            </ol>
+        </nav>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-3); margin-bottom: var(--rk-space-5);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Edit Listing: @Model.Title
+                </h1>
+                <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Update rates, specifications, and manage rentable inventory limits.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: var(--rk-space-2);">
+                <a asp-action="Maintenance" asp-route-id="@Model.EquipmentId" class="rk-btn rk-btn-outline rk-btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                    Maintenance Logs (@Model.ActiveMaintenanceBlockedCount blocked)
+                </a>
+                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.EquipmentId" target="_blank" class="rk-btn rk-btn-outline rk-btn-sm" title="Open customer preview in new tab">
+                    Preview Listing &nearr;
+                </a>
+            </div>
+        </div>
+
+        @if (Model.ActiveReservationsCount > 0)
+        {
+            <div class="rk-alert rk-alert-info" role="alert" style="margin-bottom: var(--rk-space-5); display: flex; gap: var(--rk-space-3); align-items: flex-start;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <div>
+                    <strong>Active Booking Notice:</strong> This equipment currently has 
+                    <strong>@Model.ActiveReservationsCount</strong> unit(s) reserved across active or confirmed customer reservations. 
+                    To protect customer fulfillment, RentKart will not allow inventory reductions below this threshold.
+                </div>
+            </div>
+        }
+
+        <form method="post" asp-action="EditEquipment" asp-route-id="@Model.EquipmentId" novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="EquipmentId" />
+            <input type="hidden" asp-for="BusinessId" />
+            @if (Model.RowVersion != null)
+            {
+                <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(Model.RowVersion)" />
+            }
+
+            <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-5);"></div>
+
+            <!-- Card 1: Equipment Details -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
+                    Equipment Information & Classification
+                </h2>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="Title" class="rk-form-label"></label>
+                    <input asp-for="Title" class="rk-form-control" />
+                    <span asp-validation-for="Title" class="rk-form-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="CategoryId" class="rk-form-label"></label>
+                        <select asp-for="CategoryId" class="rk-form-control">
+                            @foreach (var cat in Model.AvailableCategories)
+                            {
+                                <option value="@cat.Id" selected="@(cat.Id == Model.CategoryId)">@cat.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId" class="rk-form-error"></span>
+                    </div>
+
+                    <div class="rk-form-group">
+                        <label asp-for="Condition" class="rk-form-label"></label>
+                        <select asp-for="Condition" class="rk-form-control" asp-items="Html.GetEnumSelectList<EquipmentCondition>()">
+                        </select>
+                        <span asp-validation-for="Condition" class="rk-form-error"></span>
+                    </div>
+                </div>
+
+                <div class="rk-form-group" style="margin-bottom: 0;">
+                    <label asp-for="Description" class="rk-form-label"></label>
+                    <textarea asp-for="Description" class="rk-form-control" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="rk-form-error"></span>
+                </div>
+            </div>
+
+            <!-- Card 2: Pricing & Total Rentable Inventory -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
+                    Pricing Rates & Total Inventory
+                </h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="DailyRentalRate" class="rk-form-label"></label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">$</span>
+                            <input asp-for="DailyRentalRate" class="rk-form-control" type="number" step="0.01" min="0.01" style="padding-left: 28px;" />
+                        </div>
+                        <span asp-validation-for="DailyRentalRate" class="rk-form-error"></span>
+                    </div>
+
+                    <div class="rk-form-group">
+                        <label asp-for="SecurityDeposit" class="rk-form-label"></label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">$</span>
+                            <input asp-for="SecurityDeposit" class="rk-form-control" type="number" step="0.01" min="0.00" style="padding-left: 28px;" />
+                        </div>
+                        <span asp-validation-for="SecurityDeposit" class="rk-form-error"></span>
+                    </div>
+
+                    <div class="rk-form-group">
+                        <label asp-for="TotalQuantity" class="rk-form-label"></label>
+                        <input asp-for="TotalQuantity" class="rk-form-control" type="number" min="1" max="10000" />
+                        <span asp-validation-for="TotalQuantity" class="rk-form-error"></span>
+                    </div>
+                </div>
+
+                <div style="margin-top: var(--rk-space-4); padding-top: var(--rk-space-3); border-top: 1px solid var(--rk-border-light);">
+                    <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: var(--rk-font-size-sm); font-weight: 600; color: var(--rk-navy-900);">
+                        <input asp-for="IsActive" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--rk-teal-600);" />
+                        <span>Listing is Active and searchable in customer discovery</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div style="display: flex; justify-content: flex-end; gap: var(--rk-space-3); margin-bottom: var(--rk-space-6);">
+                <a asp-action="Equipment" class="rk-btn rk-btn-outline">Cancel</a>
+                <button type="submit" class="rk-btn rk-btn-teal" style="padding-left: var(--rk-space-6); padding-right: var(--rk-space-6);">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+
+        <!-- Media & Photo Gallery Manager -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                    Photo Gallery Manager (@Model.ExistingImages.Count photos)
+                </h2>
+            </div>
+
+            @if (Model.ExistingImages.Count > 0)
+            {
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+                    @foreach (var img in Model.ExistingImages)
+                    {
+                        <div style="border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); overflow: hidden; position: relative; background: #ffffff;">
+                            <img src="@img.ImageUrl" alt="Equipment photo" style="width: 100%; height: 120px; object-fit: cover;" />
+                            
+                            @if (img.IsPrimary)
+                            {
+                                <span class="rk-badge rk-badge-success" style="position: absolute; top: 6px; left: 6px; font-size: 10px;">Primary Photo</span>
+                            }
+
+                            <div style="padding: var(--rk-space-2); display: flex; justify-content: space-between; align-items: center; background: var(--rk-neutral-50);">
+                                @if (!img.IsPrimary)
+                                {
+                                    <form method="post" asp-action="SetPrimaryImage" asp-route-equipmentId="@Model.EquipmentId" asp-route-imageId="@img.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" style="font-size: 11px; padding: 2px 6px;">Set Primary</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="font-size: 11px; color: var(--rk-teal-700); font-weight: 600;">Main Photo</span>
+                                }
+
+                                <form method="post" asp-action="DeleteImage" asp-route-equipmentId="@Model.EquipmentId" asp-route-imageId="@img.Id">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" style="font-size: 11px; padding: 2px 6px; color: var(--rk-error-600);" title="Remove photo" onclick="return confirm('Remove this photo?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-4);">
+                    No photos currently attached to this listing. Add at least one photo URL to improve customer discovery.
+                </p>
+            }
+
+            <!-- Quick Add Image Form -->
+            <form method="post" asp-action="AddImage" asp-route-equipmentId="@Model.EquipmentId" style="display: flex; gap: var(--rk-space-3); align-items: flex-end; background: var(--rk-neutral-50); padding: var(--rk-space-4); border-radius: var(--rk-radius-md);">
+                @Html.AntiForgeryToken()
+                <div style="flex: 1;">
+                    <label class="rk-form-label" style="font-size: var(--rk-font-size-xs);">Add Photo by Web URL</label>
+                    <input type="url" name="imageUrl" required class="rk-form-control" placeholder="https://images.unsplash.com/photo-... or your hosted photo URL" />
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 8px;">
+                    <label style="font-size: var(--rk-font-size-xs); display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                        <input type="checkbox" name="isPrimary" value="true" style="accent-color: var(--rk-teal-600);" />
+                        Set as Primary
+                    </label>
+                </div>
+                <div>
+                    <button type="submit" class="rk-btn rk-btn-teal rk-btn-sm">
+                        + Add Photo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

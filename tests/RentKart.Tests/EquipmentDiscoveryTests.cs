@@ -226,8 +226,8 @@ public class EquipmentDiscoveryTests : IClassFixture<WebApplicationFactory<Progr
         using var scope = _factory.Services.CreateScope();
         var catalogService = scope.ServiceProvider.GetRequiredService<IEquipmentCatalogService>();
 
-        // Get an active listing
-        var catalog = await catalogService.SearchCatalogAsync(new CatalogFilterCriteria { PageSize = 1 });
+        // Get an active listing with images (seeded Sony listing)
+        var catalog = await catalogService.SearchCatalogAsync(new CatalogFilterCriteria { Search = "Sony", PageSize = 1 });
         var firstItem = catalog.Items.First();
 
         var details = await catalogService.GetEquipmentDetailsAsync(firstItem.Id, includeInactive: false);

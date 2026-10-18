@@ -1,0 +1,191 @@
+@model RentKart.Web.Models.Business.EquipmentMaintenanceViewModel
+@{
+    ViewData["Title"] = $"Maintenance Logs: {Model.EquipmentTitle} - RentKart Business";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container" style="max-width: 920px;">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" style="margin-bottom: var(--rk-space-3);">
+            <ol style="display: flex; gap: var(--rk-space-2); list-style: none; padding: 0; margin: 0; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                <li><a asp-action="Dashboard" style="color: var(--rk-teal-600); text-decoration: none;">Dashboard</a></li>
+                <li>&rsaquo;</li>
+                <li><a asp-action="Equipment" style="color: var(--rk-teal-600); text-decoration: none;">Equipment</a></li>
+                <li>&rsaquo;</li>
+                <li><a asp-action="EditEquipment" asp-route-id="@Model.EquipmentId" style="color: var(--rk-teal-600); text-decoration: none;">@Model.EquipmentTitle</a></li>
+                <li>&rsaquo;</li>
+                <li style="color: var(--rk-text-primary); font-weight: 600;">Maintenance & Downtime</li>
+            </ol>
+        </nav>
+
+        <!-- Equipment Overview Header -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-5); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-navy-800) 100%); color: #ffffff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-3);">
+                <div>
+                    <span class="rk-badge" style="background: var(--rk-teal-500); color: #ffffff; font-size: 11px; margin-bottom: 4px;">Inventory Capacity Controller</span>
+                    <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #ffffff; margin-bottom: 2px;">
+                        @Model.EquipmentTitle
+                    </h1>
+                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-neutral-300);">
+                        Total Owned Units: <strong>@Model.TotalQuantity</strong> &bull; Current Active Reservations: <strong>@Model.ActiveReservedCount</strong>
+                    </div>
+                </div>
+
+                <div>
+                    <a asp-action="EditEquipment" asp-route-id="@Model.EquipmentId" class="rk-btn rk-btn-outline" style="border-color: rgba(255,255,255,0.4); color: #ffffff;">
+                        &larr; Back to Listing
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Maintenance Form Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6);">
+            <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                Schedule Maintenance Downtime
+            </h2>
+            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: var(--rk-space-4);">
+                Temporarily block a quantity of this equipment for service, calibration, cleaning, or repair. Blocked units are automatically excluded from customer availability calculations.
+            </p>
+
+            <form method="post" asp-action="AddMaintenance" asp-route-id="@Model.EquipmentId" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-4);"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="NewRecord.BlockedQuantity" class="rk-form-label"></label>
+                        <input asp-for="NewRecord.BlockedQuantity" class="rk-form-control" type="number" min="1" max="@Model.TotalQuantity" />
+                        <span asp-validation-for="NewRecord.BlockedQuantity" class="rk-form-error"></span>
+                    </div>
+
+                    <div class="rk-form-group">
+                        <label asp-for="NewRecord.StartDate" class="rk-form-label"></label>
+                        <input asp-for="NewRecord.StartDate" class="rk-form-control" type="date" />
+                        <span asp-validation-for="NewRecord.StartDate" class="rk-form-error"></span>
+                    </div>
+
+                    <div class="rk-form-group">
+                        <label asp-for="NewRecord.EndDate" class="rk-form-label"></label>
+                        <input asp-for="NewRecord.EndDate" class="rk-form-control" type="date" />
+                        <span asp-validation-for="NewRecord.EndDate" class="rk-form-error"></span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="NewRecord.Reason" class="rk-form-label"></label>
+                        <input asp-for="NewRecord.Reason" class="rk-form-control" placeholder="e.g. Annual sensor calibration and battery diagnostics" />
+                        <span asp-validation-for="NewRecord.Reason" class="rk-form-error"></span>
+                    </div>
+
+                    <div class="rk-form-group">
+                        <label asp-for="NewRecord.EstimatedCost" class="rk-form-label"></label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">$</span>
+                            <input asp-for="NewRecord.EstimatedCost" class="rk-form-control" type="number" step="0.01" min="0" style="padding-left: 28px;" placeholder="Optional" />
+                        </div>
+                        <span asp-validation-for="NewRecord.EstimatedCost" class="rk-form-error"></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end;">
+                    <button type="submit" class="rk-btn rk-btn-teal">
+                        + Save Maintenance Downtime
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Maintenance History Log Card -->
+        <div class="rk-card rk-card-elevated" style="padding: 0; overflow: hidden;">
+            <div style="padding: var(--rk-space-4) var(--rk-space-5); border-bottom: 1px solid var(--rk-border-light); background: var(--rk-neutral-50);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                    Maintenance Records & Downtime History (@Model.Records.Count)
+                </h2>
+            </div>
+
+            @if (Model.Records.Count > 0)
+            {
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--rk-font-size-sm);">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--rk-border-light); background: var(--rk-neutral-50); color: var(--rk-text-secondary); font-size: var(--rk-font-size-xs); text-transform: uppercase;">
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Blocked Units</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Date Window</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Reason & Notes</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Est. Cost</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4);">Status</th>
+                                <th style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.Records)
+                            {
+                                <tr style="border-bottom: 1px solid var(--rk-border-light); vertical-align: middle;">
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700; color: var(--rk-navy-900);">
+                                        @record.BlockedQuantity unit(s)
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); font-size: var(--rk-font-size-xs);">
+                                        <strong>@record.StartDate.ToString("MMM d, yyyy")</strong> &rarr; <strong>@record.EndDate.ToString("MMM d, yyyy")</strong>
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        <div>@record.Reason</div>
+                                        <div style="font-size: 11px; color: var(--rk-text-muted);">Logged on @record.CreatedAtUtc.ToString("MMM d, yyyy")</div>
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); color: var(--rk-text-secondary);">
+                                        @(record.EstimatedCost.HasValue ? $"${record.EstimatedCost.Value:F2}" : "—")
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                        @if (record.IsResolved)
+                                        {
+                                            <span class="rk-badge rk-badge-success" style="font-size: 11px;">Resolved</span>
+                                        }
+                                        else if (record.IsActiveNow)
+                                        {
+                                            <span class="rk-badge" style="background: #fef3c7; color: #92400e; font-size: 11px;">Under Service (Active)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rk-badge rk-badge-info" style="font-size: 11px;">Scheduled Future</span>
+                                        }
+                                    </td>
+                                    <td style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">
+                                        <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
+                                            @if (!record.IsResolved)
+                                            {
+                                                <form method="post" asp-action="ResolveMaintenance" asp-route-equipmentId="@Model.EquipmentId" asp-route-recordId="@record.Id" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="rk-btn rk-btn-teal rk-btn-sm" style="padding: 2px 8px; font-size: 11px;">
+                                                        Mark Resolved
+                                                    </button>
+                                                </form>
+                                            }
+                                            <form method="post" asp-action="DeleteMaintenance" asp-route-equipmentId="@Model.EquipmentId" asp-route-recordId="@record.Id" style="display: inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" style="padding: 2px 8px; font-size: 11px; color: var(--rk-error-600);" onclick="return confirm('Delete this maintenance record?');">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="padding: var(--rk-space-6); text-align: center; color: var(--rk-text-muted); font-size: var(--rk-font-size-sm);">
+                    No maintenance downtime records currently logged for this equipment.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
