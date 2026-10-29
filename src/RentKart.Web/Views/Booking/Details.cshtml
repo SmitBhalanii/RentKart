@@ -143,22 +143,24 @@
 
                     @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.HandedOver && group.HandedOverAtUtc.HasValue)
                     {
-                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--rk-radius-md); padding: var(--rk-space-3); margin-bottom: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: #1e40af;">
-                            <strong>Equipment Collected:</strong> Picked up on @group.HandedOverAtUtc.Value.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC.
+                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: #1e40af;">
+                            <div style="font-weight: 700; margin-bottom: 0.25rem;">Equipment Handed Over & In Active Rental</div>
+                            <div>Picked up from counter on @group.HandedOverAtUtc.Value.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC.</div>
                             @if (!string.IsNullOrWhiteSpace(group.HandoverNotes))
                             {
-                                <div><em>Notes: @group.HandoverNotes</em></div>
+                                <div style="background: #fff; border: 1px solid #bfdbfe; border-radius: var(--rk-radius-sm); padding: var(--rk-space-3); margin-top: var(--rk-space-2); white-space: pre-wrap; font-family: inherit; line-height: 1.5; color: var(--rk-navy-900);">@group.HandoverNotes</div>
                             }
                         </div>
                     }
 
                     @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.Completed && group.ReturnedAtUtc.HasValue)
                     {
-                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-3); margin-bottom: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: #166534;">
-                            <strong>Returned & Inspected:</strong> Returned on @group.ReturnedAtUtc.Value.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC. Security deposit eligible for refund.
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: #166534;">
+                            <div style="font-weight: 700; margin-bottom: 0.25rem;">Returned & Inspection Finalized</div>
+                            <div>Returned to store on @group.ReturnedAtUtc.Value.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC.</div>
                             @if (!string.IsNullOrWhiteSpace(group.ReturnInspectionNotes))
                             {
-                                <div><em>Inspection Report: @group.ReturnInspectionNotes</em></div>
+                                <div style="background: #fff; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-sm); padding: var(--rk-space-3); margin-top: var(--rk-space-2); white-space: pre-wrap; font-family: inherit; line-height: 1.5; color: var(--rk-navy-900);">@group.ReturnInspectionNotes</div>
                             }
                         </div>
                     }

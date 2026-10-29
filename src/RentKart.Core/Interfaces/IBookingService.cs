@@ -198,12 +198,96 @@ public interface IBookingService
     Task<BookingGroupOperationResult> HandoverBookingGroupAsync(int bookingGroupId, int businessId, string verificationCode, string? handoverNotes);
 
     /// <summary>
+    /// Business records detailed handover with per-item quantity and condition checklist.
+    /// </summary>
+    Task<BookingGroupOperationResult> HandoverBookingGroupDetailedAsync(int bookingGroupId, int businessId, HandoverBookingGroupRequestDto request);
+
+    /// <summary>
     /// Business records return and inspection of equipment (HandedOver -> Completed). Releases inventory.
     /// </summary>
     Task<BookingGroupOperationResult> CompleteReturnBookingGroupAsync(int bookingGroupId, int businessId, string? inspectionNotes);
 
     /// <summary>
+    /// Business records detailed return inspection with damage evaluation, deposit assessment, and automatic maintenance blocking.
+    /// </summary>
+    Task<ReturnInspectionResultDto> CompleteReturnWithInspectionAsync(int bookingGroupId, int businessId, CompleteReturnBookingGroupRequestDto request);
+
+    /// <summary>
     /// Calculates authoritative date-range availability for an equipment item considering all active reservations and maintenance downtime.
     /// </summary>
     Task<int> GetAuthoritativeAvailableQuantityAsync(int equipmentId, DateOnly startDate, DateOnly endDate);
+}
+
+public class HandoverItemCheckDto
+{
+    public int BookingItemId { get; set; }
+    public int QuantityHandedOver { get; set; }
+    public string? ConditionNotes { get; set; }
+    public bool AccessoriesConfirmed { get; set; } = true;
+}
+
+public class HandoverBookingGroupRequestDto
+{
+    public string VerificationCode { get; set; } = string.Empty;
+    public string? GeneralHandoverNotes { get; set; }
+    public List<HandoverItemCheckDto> Items { get; set; } = new();
+}
+
+public class ReturnItemInspectionDto
+{
+    public int BookingItemId { get; set; }
+    public int ReturnedQuantity { get; set; }
+    public int MissingQuantity { get; set; }
+    public string Condition { get; set; } = "Good";
+    public bool HasDamage { get; set; }
+    public string? DamageDescription { get; set; }
+    public decimal? EstimatedRepairCost { get; set; }
+    public string? PhotoEvidenceUrl { get; set; }
+    public bool CreateMaintenanceBlock { get; set; } = true;
+    public int? EstimatedMaintenanceDays { get; set; } = 7;
+}
+
+public class CompleteReturnBookingGroupRequestDto
+{
+    public string? GeneralInspectionNotes { get; set; }
+    public decimal? AssessedDamageFee { get; set; }
+    public List<ReturnItemInspectionDto> Items { get; set; } = new();
+}
+
+public class ReturnInspectionResultDto
+{
+    public bool Success { get; set; }
+    public string? ErrorMessage { get; set; }
+    public BookingGroupStatus NewStatus { get; set; }
+    public decimal TotalDepositHeld { get; set; }
+    public decimal TotalDamageFeeAssessed { get; set; }
+    public decimal DepositRefundAmount { get; set; }
+    public decimal ForfeitedDepositAmount { get; set; }
+    public int MaintenanceRecordsCreatedCount { get; set; }
+    public List<int> CreatedMaintenanceRecordIds { get; set; } = new();
+    public List<string> InspectionSummaryLines { get; set; } = new();
+
+    public static ReturnInspectionResultDto Ok(
+        BookingGroupStatus status,
+        decimal depositHeld,
+        decimal damageFee,
+        decimal refundAmount,
+        decimal forfeitedAmount,
+        List<int> maintenanceIds,
+        List<string> summaries) =>
+        new()
+        {
+            Success = true,
+            NewStatus = status,
+            TotalDepositHeld = depositHeld,
+            TotalDamageFeeAssessed = damageFee,
+            DepositRefundAmount = refundAmount,
+            ForfeitedDepositAmount = forfeitedAmount,
+            MaintenanceRecordsCreatedCount = maintenanceIds.Count,
+            CreatedMaintenanceRecordIds = maintenanceIds,
+            InspectionSummaryLines = summaries
+        };
+
+    public static ReturnInspectionResultDto Fail(string error) =>
+        new() { Success = false, ErrorMessage = error };
 }

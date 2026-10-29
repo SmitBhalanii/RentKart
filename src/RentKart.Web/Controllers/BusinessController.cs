@@ -670,12 +670,12 @@ public class BusinessController : Controller
     [HttpPost]
     [Route("Business/Bookings/Handover/{id:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> HandoverBooking(int id, string verificationCode, string? handoverNotes)
+    public async Task<IActionResult> HandoverBooking(int id, HandoverBookingGroupRequestDto request)
     {
         var business = await GetCurrentBusinessAsync();
         if (business == null) return RedirectToAction(nameof(Dashboard));
 
-        var result = await _bookingService.HandoverBookingGroupAsync(id, business.Id, verificationCode, handoverNotes);
+        var result = await _bookingService.HandoverBookingGroupDetailedAsync(id, business.Id, request);
         if (!result.Success)
         {
             TempData["ErrorMessage"] = result.ErrorMessage ?? "Handover verification failed.";
@@ -691,19 +691,22 @@ public class BusinessController : Controller
     [HttpPost]
     [Route("Business/Bookings/Complete/{id:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CompleteBooking(int id, string? inspectionNotes)
+    public async Task<IActionResult> CompleteBooking(int id, CompleteReturnBookingGroupRequestDto request)
     {
         var business = await GetCurrentBusinessAsync();
         if (business == null) return RedirectToAction(nameof(Dashboard));
 
-        var result = await _bookingService.CompleteReturnBookingGroupAsync(id, business.Id, inspectionNotes);
+        var result = await _bookingService.CompleteReturnWithInspectionAsync(id, business.Id, request);
         if (!result.Success)
         {
             TempData["ErrorMessage"] = result.ErrorMessage ?? "Could not complete return.";
         }
         else
         {
-            TempData["SuccessMessage"] = "Return inspection recorded and booking completed! Units restored to active inventory.";
+            string maintenanceMsg = result.MaintenanceRecordsCreatedCount > 0 
+                ? $" ({result.MaintenanceRecordsCreatedCount} item(s) quarantined in repair downtime)" 
+                : "";
+            TempData["SuccessMessage"] = $"Return inspection completed! Deposit held: ${result.TotalDepositHeld:F2}, Damage assessed: ${result.TotalDamageFeeAssessed:F2}, Net refund: ${result.DepositRefundAmount:F2}.{maintenanceMsg}";
         }
 
         return RedirectToAction(nameof(BookingGroupDetails), new { id });

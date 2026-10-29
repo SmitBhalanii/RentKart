@@ -145,73 +145,252 @@
     else if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.Confirmed)
     {
         <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); border: 2px solid var(--rk-teal-500);">
-            <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
-                Hand Over Equipment at Store Counter
-            </h2>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: var(--rk-space-2);">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--rk-teal-500);"></div>
+                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900); margin: 0;">
+                    Counter Equipment Handover Checklist
+                </h2>
+            </div>
             <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.5; margin-bottom: var(--rk-space-4);">
-                When the customer arrives at your counter, request their <strong>Pickup Verification Code</strong> (e.g. RK-XXXXXX) from their voucher.
+                When the customer arrives at your counter, request their <strong>Pickup Verification Code</strong> (e.g. RK-XXXXXX), inspect the items together, verify accessories, and confirm handover.
             </p>
 
             <form asp-action="HandoverBooking" asp-route-id="@Model.Id" method="post">
-                <div style="display: grid; grid-template-columns: 240px 1fr auto; gap: var(--rk-space-3); align-items: flex-end;">
-                    <div>
-                        <label for="verificationCode" style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 4px;">
-                            Customer Verification Code *
-                        </label>
-                        <input type="text" 
-                               id="verificationCode" 
-                               name="verificationCode" 
-                               required 
-                               placeholder="e.g. RK-123456" 
-                               class="rk-form-control" 
-                               style="font-family: monospace; font-size: var(--rk-font-size-base); font-weight: 700; text-transform: uppercase;" />
-                    </div>
+                <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+                    <div style="display: grid; grid-template-columns: 240px 1fr; gap: var(--rk-space-4); align-items: flex-start;">
+                        <div>
+                            <label for="verificationCode" style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                                Customer Verification Code *
+                            </label>
+                            <input type="text" 
+                                   id="verificationCode" 
+                                   name="VerificationCode" 
+                                   required 
+                                   placeholder="e.g. RK-123456" 
+                                   class="rk-form-control" 
+                                   style="font-family: monospace; font-size: var(--rk-font-size-base); font-weight: 700; text-transform: uppercase;" />
+                        </div>
 
-                    <div>
-                        <label for="handoverNotes" style="font-size: 11px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">
-                            Handover Inspection Notes (Optional)
-                        </label>
-                        <input type="text" 
-                               id="handoverNotes" 
-                               name="handoverNotes" 
-                               placeholder="e.g. Clean condition, battery charged, accessories verified..." 
-                               class="rk-form-control" 
-                               style="font-size: var(--rk-font-size-xs);" />
+                        <div>
+                            <label for="generalHandoverNotes" style="font-size: 11px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                                General Handover Remarks (Optional)
+                            </label>
+                            <input type="text" 
+                                   id="generalHandoverNotes" 
+                                   name="GeneralHandoverNotes" 
+                                   placeholder="e.g. Identity verified, battery fully charged, customer briefed on usage..." 
+                                   class="rk-form-control" 
+                                   style="font-size: var(--rk-font-size-xs);" />
+                        </div>
                     </div>
-
-                    <button type="submit" class="rk-btn rk-btn-primary" style="padding: 0.65rem 1.25rem; white-space: nowrap;">
-                        Verify & Hand Over &rarr;
-                    </button>
                 </div>
+
+                <div style="margin-bottom: var(--rk-space-4);">
+                    <label style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 6px;">
+                        Item & Quantity Checklist
+                    </label>
+                    <div style="border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: var(--rk-font-size-xs);">
+                            <thead style="background: var(--rk-neutral-100); color: var(--rk-text-secondary); text-align: left;">
+                                <tr>
+                                    <th style="padding: 0.5rem 0.75rem;">Item</th>
+                                    <th style="padding: 0.5rem 0.75rem; text-align: center; width: 110px;">Handover Qty</th>
+                                    <th style="padding: 0.5rem 0.75rem; text-align: center; width: 130px;">Accessories</th>
+                                    <th style="padding: 0.5rem 0.75rem;">Condition Notes at Handover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Items.Count; i++)
+                                {
+                                    var itm = Model.Items[i];
+                                    <tr style="border-top: 1px solid var(--rk-border-light);">
+                                        <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--rk-navy-900);">
+                                            <input type="hidden" name="Items[@i].BookingItemId" value="@itm.Id" />
+                                            @itm.EquipmentTitle
+                                            <div style="font-size: 10px; color: var(--rk-text-muted);">Requested: @itm.Quantity unit(s)</div>
+                                        </td>
+                                        <td style="padding: 0.6rem 0.75rem; text-align: center;">
+                                            <input type="number" 
+                                                   name="Items[@i].QuantityHandedOver" 
+                                                   value="@itm.Quantity" 
+                                                   min="0" 
+                                                   max="@itm.Quantity" 
+                                                   class="rk-form-control" 
+                                                   style="text-align: center; font-weight: 700; width: 75px; margin: 0 auto; font-size: var(--rk-font-size-xs);" />
+                                        </td>
+                                        <td style="padding: 0.6rem 0.75rem; text-align: center;">
+                                            <label style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600; cursor: pointer;">
+                                                <input type="checkbox" name="Items[@i].AccessoriesConfirmed" value="true" checked />
+                                                Verified
+                                            </label>
+                                        </td>
+                                        <td style="padding: 0.6rem 0.75rem;">
+                                            <input type="text" 
+                                                   name="Items[@i].ConditionNotes" 
+                                                   value="Clean, tested and working" 
+                                                   class="rk-form-control" 
+                                                   style="font-size: var(--rk-font-size-xs);" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button type="submit" class="rk-btn rk-btn-primary" style="padding: 0.75rem 1.75rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Verify Code & Confirm Handover &rarr;
+                </button>
             </form>
         </div>
     }
     else if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.HandedOver)
     {
         <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); border: 2px solid #22c55e;">
-            <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
-                Process Equipment Return & Inspection
-            </h2>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: var(--rk-space-2);">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></div>
+                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900); margin: 0;">
+                    Return Inspection, Damage & Deposit Assessment
+                </h2>
+            </div>
             <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.5; margin-bottom: var(--rk-space-4);">
-                Equipment was collected on @Model.HandedOverAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC. Upon inspecting the equipment, record your condition remarks and finalize the return.
+                Equipment was collected on @Model.HandedOverAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC. Inspect all returned items, mark condition/damages, calculate deposit deductions, and automatically block damaged units in maintenance downtime.
             </p>
 
             <form asp-action="CompleteBooking" asp-route-id="@Model.Id" method="post">
                 <div style="margin-bottom: var(--rk-space-4);">
-                    <label for="inspectionNotes" style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 4px;">
-                        Return Condition & Inspection Report
+                    <label for="generalInspectionNotes" style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                        General Inspection Summary
                     </label>
-                    <textarea id="inspectionNotes" 
-                              name="inspectionNotes" 
+                    <textarea id="generalInspectionNotes" 
+                              name="GeneralInspectionNotes" 
                               rows="2" 
-                              placeholder="e.g. Equipment returned in excellent condition. No damages or missing accessories. Deposit approved for refund." 
+                              placeholder="e.g. Return inspection conducted by store technician. All items checked for operational integrity and accessories." 
                               class="rk-form-control" 
                               style="font-size: var(--rk-font-size-xs);"></textarea>
                 </div>
 
+                <div style="margin-bottom: var(--rk-space-5);">
+                    <label style="font-size: 11px; font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; display: block; margin-bottom: 6px;">
+                        Per-Item Condition & Damage Inspection
+                    </label>
+
+                    @for (int i = 0; i < Model.Items.Count; i++)
+                    {
+                        var itm = Model.Items[i];
+                        <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-3);">
+                            <input type="hidden" name="Items[@i].BookingItemId" value="@itm.Id" />
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-3); border-bottom: 1px dashed var(--rk-border-light); padding-bottom: 0.5rem;">
+                                <div>
+                                    <strong style="color: var(--rk-navy-900); font-size: var(--rk-font-size-sm);">@itm.EquipmentTitle</strong>
+                                    <span style="font-size: 11px; color: var(--rk-text-muted); margin-left: 0.5rem;">Total Out: @itm.Quantity unit(s) &bull; Security Deposit: $@itm.ItemSecurityDeposit.ToString("F2")</span>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 120px 120px 140px 1fr; gap: var(--rk-space-3); margin-bottom: var(--rk-space-3);">
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Returned Qty</label>
+                                    <input type="number" 
+                                           name="Items[@i].ReturnedQuantity" 
+                                           value="@itm.Quantity" 
+                                           min="0" 
+                                           max="@itm.Quantity" 
+                                           class="rk-form-control" 
+                                           style="font-size: var(--rk-font-size-xs); font-weight: 700;" />
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Missing Qty</label>
+                                    <input type="number" 
+                                           name="Items[@i].MissingQuantity" 
+                                           value="0" 
+                                           min="0" 
+                                           max="@itm.Quantity" 
+                                           class="rk-form-control" 
+                                           style="font-size: var(--rk-font-size-xs);" />
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Condition</label>
+                                    <select name="Items[@i].Condition" class="rk-form-control" style="font-size: var(--rk-font-size-xs);">
+                                        <option value="Good" selected>Good (No Damage)</option>
+                                        <option value="Fair">Fair / Minor Wear</option>
+                                        <option value="Damaged">Damaged / Broken</option>
+                                        <option value="MissingParts">Missing Parts</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Damage / Defect Details</label>
+                                    <input type="text" 
+                                           name="Items[@i].DamageDescription" 
+                                           placeholder="e.g. Scratched lens, broken hinge, cracked housing..." 
+                                           class="rk-form-control" 
+                                           style="font-size: var(--rk-font-size-xs);" />
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 140px 1fr auto; gap: var(--rk-space-3); align-items: center; background: #fff; padding: var(--rk-space-2) var(--rk-space-3); border-radius: var(--rk-radius-sm); border: 1px solid var(--rk-border-light);">
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Est. Repair Cost ($)</label>
+                                    <input type="number" 
+                                           step="0.01" 
+                                           name="Items[@i].EstimatedRepairCost" 
+                                           placeholder="0.00" 
+                                           class="rk-form-control" 
+                                           style="font-size: var(--rk-font-size-xs);" />
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Photo Evidence Reference / URL</label>
+                                    <input type="text" 
+                                           name="Items[@i].PhotoEvidenceUrl" 
+                                           placeholder="e.g. https://... or damage-ref-001" 
+                                           class="rk-form-control" 
+                                           style="font-size: var(--rk-font-size-xs);" />
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Maintenance Quarantine</label>
+                                    <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; cursor: pointer;">
+                                        <input type="checkbox" name="Items[@i].CreateMaintenanceBlock" value="true" checked />
+                                        Block Inventory
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Financial Deposit Reconciliation Box -->
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4);">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: 700;">Security Deposit Held for Store</div>
+                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: #166534;">$@Model.SubtotalSecurityDeposit.ToString("F2")</div>
+                        <div style="font-size: 11px; color: var(--rk-text-muted);">Assessed damages/missing fees are deducted against this deposit automatically.</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div>
+                            <label for="assessedDamageFee" style="font-size: 10px; font-weight: 700; color: #166534; text-transform: uppercase; display: block; margin-bottom: 2px;">
+                                Total Damage Fee Override ($)
+                            </label>
+                            <input type="number" 
+                                   step="0.01" 
+                                   id="assessedDamageFee" 
+                                   name="AssessedDamageFee" 
+                                   placeholder="Leave blank to sum item costs" 
+                                   class="rk-form-control" 
+                                   style="font-size: var(--rk-font-size-xs); width: 220px;" />
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="rk-btn rk-btn-primary" style="background: #16a34a; border-color: #16a34a; padding: 0.75rem 1.75rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Confirm Return & Complete Rental
+                    Finalize Inspection & Complete Return &rarr;
                 </button>
             </form>
         </div>
@@ -227,12 +406,21 @@
 
     @if (Model.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
     {
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-6); font-size: var(--rk-font-size-sm); color: #166534;">
-            <div style="font-weight: 700; margin-bottom: 0.25rem;">Rental Completed & Inspected</div>
-            <div>Returned: @Model.ReturnedAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC</div>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-5); margin-bottom: var(--rk-space-6); font-size: var(--rk-font-size-sm); color: #166534;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--rk-space-3);">
+                <div>
+                    <div style="font-weight: 800; font-size: var(--rk-font-size-base); color: #166534; margin-bottom: 0.25rem;">
+                        Rental Completed & Inspected
+                    </div>
+                    <div>Returned: <strong>@Model.ReturnedAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC</strong></div>
+                    <div>Handed Over: @Model.HandedOverAtUtc?.ToString("MMM dd, yyyy 'at' hh:mm tt") UTC</div>
+                </div>
+                <span class="rk-badge rk-badge-success" style="font-size: var(--rk-font-size-xs);">Settled</span>
+            </div>
+
             @if (!string.IsNullOrWhiteSpace(Model.ReturnInspectionNotes))
             {
-                <div style="margin-top: 0.25rem;"><em>Report: @Model.ReturnInspectionNotes</em></div>
+                <div style="background: #fff; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-sm); padding: var(--rk-space-3); margin-top: var(--rk-space-3); white-space: pre-wrap; font-family: inherit; font-size: var(--rk-font-size-xs); line-height: 1.6; color: var(--rk-navy-900);">@Model.ReturnInspectionNotes</div>
             }
         </div>
     }

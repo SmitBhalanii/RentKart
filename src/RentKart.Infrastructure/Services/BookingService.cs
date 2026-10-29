@@ -1,5 +1,6 @@
 using System.Data;
 using System.Security.Cryptography;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RentKart.Core.Entities;
@@ -522,9 +523,21 @@ public class BookingService : IBookingService
         return BookingGroupOperationResult.Ok(group.Status);
     }
 
-    public async Task<BookingGroupOperationResult> HandoverBookingGroupAsync(int bookingGroupId, int businessId, string verificationCode, string? handoverNotes)
+    public Task<BookingGroupOperationResult> HandoverBookingGroupAsync(int bookingGroupId, int businessId, string verificationCode, string? handoverNotes)
+    {
+        return HandoverBookingGroupDetailedAsync(bookingGroupId, businessId, new HandoverBookingGroupRequestDto
+        {
+            VerificationCode = verificationCode,
+            GeneralHandoverNotes = handoverNotes
+        });
+    }
+
+    public async Task<BookingGroupOperationResult> HandoverBookingGroupDetailedAsync(int bookingGroupId, int businessId, HandoverBookingGroupRequestDto request)
     {
         var group = await _dbContext.BookingGroups
+            .Include(bg => bg.Business)
+            .Include(bg => bg.BookingItems)
+                .ThenInclude(bi => bi.Equipment)
             .Include(bg => bg.ParentBooking)
                 .ThenInclude(b => b.BookingGroups)
             .FirstOrDefaultAsync(bg => bg.Id == bookingGroupId);
@@ -532,6 +545,11 @@ public class BookingService : IBookingService
         if (group == null || group.BusinessId != businessId)
         {
             return BookingGroupOperationResult.Fail("Booking group not found or access denied.");
+        }
+
+        if (group.Business.Status != BusinessStatus.Approved)
+        {
+            return BookingGroupOperationResult.Fail("Your business account is not approved to perform handovers.");
         }
 
         if (group.Status != BookingGroupStatus.Confirmed)
@@ -539,51 +557,255 @@ public class BookingService : IBookingService
             return BookingGroupOperationResult.Fail($"Cannot handover equipment for group with status '{group.Status}'. Reservation must be Confirmed.");
         }
 
-        if (string.IsNullOrWhiteSpace(verificationCode) || !string.Equals(group.PickupVerificationCode.Trim(), verificationCode.Trim(), StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(request.VerificationCode) ||
+            !string.Equals(group.PickupVerificationCode.Trim(), request.VerificationCode.Trim(), StringComparison.OrdinalIgnoreCase))
         {
             return BookingGroupOperationResult.Fail("Invalid pickup verification code. Please check the customer's voucher code.");
         }
 
+        var checklistSummary = new List<string>();
+        if (request.Items != null && request.Items.Count > 0)
+        {
+            foreach (var bi in group.BookingItems)
+            {
+                var check = request.Items.FirstOrDefault(c => c.BookingItemId == bi.Id);
+                if (check != null)
+                {
+                    if (check.QuantityHandedOver < 0 || check.QuantityHandedOver > bi.Quantity)
+                    {
+                        return BookingGroupOperationResult.Fail($"Invalid handover quantity for item '{bi.Equipment.Title}'. Handed over quantity must be between 0 and requested {bi.Quantity}.");
+                    }
+
+                    string itemNotes = string.IsNullOrWhiteSpace(check.ConditionNotes) ? "Good condition" : check.ConditionNotes.Trim();
+                    checklistSummary.Add($"[Item #{bi.Id} {bi.Equipment.Title}] Qty: {check.QuantityHandedOver}/{bi.Quantity}. Condition: {itemNotes}. Accessories: {(check.AccessoriesConfirmed ? "Verified" : "Unverified")}");
+                }
+                else
+                {
+                    checklistSummary.Add($"[Item #{bi.Id} {bi.Equipment.Title}] Qty: {bi.Quantity}/{bi.Quantity}. Condition: Good condition. Accessories: Verified");
+                }
+            }
+        }
+        else
+        {
+            foreach (var bi in group.BookingItems)
+            {
+                checklistSummary.Add($"[Item #{bi.Id} {bi.Equipment.Title}] Qty: {bi.Quantity}/{bi.Quantity}. Condition: Good condition. Accessories: Verified");
+            }
+        }
+
+        var sb = new StringBuilder();
+        if (!string.IsNullOrWhiteSpace(request.GeneralHandoverNotes))
+        {
+            sb.AppendLine(request.GeneralHandoverNotes.Trim());
+            sb.AppendLine();
+        }
+        sb.AppendLine("Handover Checklist:");
+        foreach (var line in checklistSummary)
+        {
+            sb.AppendLine("- " + line);
+        }
+
         group.Status = BookingGroupStatus.HandedOver;
         group.HandedOverAtUtc = DateTime.UtcNow;
-        group.HandoverNotes = handoverNotes?.Trim();
+        group.HandoverNotes = sb.ToString().Trim();
+
+        _dbContext.AuditLogs.Add(new AuditLog
+        {
+            Action = "EquipmentHandover",
+            EntityType = nameof(BookingGroup),
+            EntityId = group.Id.ToString(),
+            Details = $"Handover recorded for Group {group.GroupNumber}. Notes: {group.HandoverNotes}",
+            TimestampUtc = DateTime.UtcNow
+        });
 
         UpdateParentBookingStatus(group.ParentBooking);
 
         await _dbContext.SaveChangesAsync();
 
-        _logger.LogInformation("Business {BusinessId} handed over equipment for group {GroupNumber}.", businessId, group.GroupNumber);
+        _logger.LogInformation("Business {BusinessId} completed handover for booking group {GroupNumber}.", businessId, group.GroupNumber);
         return BookingGroupOperationResult.Ok(group.Status);
     }
 
     public async Task<BookingGroupOperationResult> CompleteReturnBookingGroupAsync(int bookingGroupId, int businessId, string? inspectionNotes)
     {
+        var result = await CompleteReturnWithInspectionAsync(bookingGroupId, businessId, new CompleteReturnBookingGroupRequestDto
+        {
+            GeneralInspectionNotes = inspectionNotes
+        });
+
+        if (!result.Success)
+        {
+            return BookingGroupOperationResult.Fail(result.ErrorMessage ?? "Could not complete return.");
+        }
+
+        return BookingGroupOperationResult.Ok(result.NewStatus);
+    }
+
+    public async Task<ReturnInspectionResultDto> CompleteReturnWithInspectionAsync(int bookingGroupId, int businessId, CompleteReturnBookingGroupRequestDto request)
+    {
         var group = await _dbContext.BookingGroups
+            .Include(bg => bg.Business)
+            .Include(bg => bg.BookingItems)
+                .ThenInclude(bi => bi.Equipment)
             .Include(bg => bg.ParentBooking)
                 .ThenInclude(b => b.BookingGroups)
             .FirstOrDefaultAsync(bg => bg.Id == bookingGroupId);
 
         if (group == null || group.BusinessId != businessId)
         {
-            return BookingGroupOperationResult.Fail("Booking group not found or access denied.");
+            return ReturnInspectionResultDto.Fail("Booking group not found or access denied.");
         }
 
         if (group.Status != BookingGroupStatus.HandedOver)
         {
-            return BookingGroupOperationResult.Fail($"Cannot complete return for group with status '{group.Status}'. Equipment must currently be Handed Over.");
+            return ReturnInspectionResultDto.Fail($"Cannot complete return for group with status '{group.Status}'. Equipment must currently be Handed Over.");
         }
 
-        group.Status = BookingGroupStatus.Completed;
-        group.ReturnedAtUtc = DateTime.UtcNow;
-        group.CompletedAtUtc = DateTime.UtcNow;
-        group.ReturnInspectionNotes = inspectionNotes?.Trim();
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            decimal calculatedDamageFee = 0;
+            var maintenanceRecordEntities = new List<MaintenanceRecord>();
+            var inspectionSummaryLines = new List<string>();
 
-        UpdateParentBookingStatus(group.ParentBooking);
+            foreach (var item in group.BookingItems)
+            {
+                var insp = request.Items?.FirstOrDefault(i => i.BookingItemId == item.Id);
+                int returnedQty = insp != null ? insp.ReturnedQuantity : item.Quantity;
+                if (returnedQty < 0) returnedQty = 0;
+                if (returnedQty > item.Quantity) returnedQty = item.Quantity;
 
-        await _dbContext.SaveChangesAsync();
+                int missingQty = insp != null && insp.MissingQuantity >= 0
+                    ? insp.MissingQuantity
+                    : Math.Max(0, item.Quantity - returnedQty);
 
-        _logger.LogInformation("Business {BusinessId} marked booking group {GroupNumber} as completed and returned.", businessId, group.GroupNumber);
-        return BookingGroupOperationResult.Ok(group.Status);
+                string condition = insp?.Condition ?? "Good";
+                bool isDamaged = insp?.HasDamage == true || string.Equals(condition, "Damaged", StringComparison.OrdinalIgnoreCase);
+                decimal repairCost = insp?.EstimatedRepairCost ?? 0;
+                if (repairCost < 0) repairCost = 0;
+
+                calculatedDamageFee += repairCost;
+
+                int damagedQty = isDamaged ? returnedQty : 0;
+                int blockedQty = damagedQty + missingQty;
+
+                if (blockedQty > 0 && (insp == null || insp.CreateMaintenanceBlock))
+                {
+                    int maintenanceDays = (insp?.EstimatedMaintenanceDays.HasValue == true && insp.EstimatedMaintenanceDays.Value > 0)
+                        ? insp.EstimatedMaintenanceDays.Value
+                        : 7;
+
+                    var mRecord = new MaintenanceRecord
+                    {
+                        EquipmentId = item.EquipmentId,
+                        BlockedQuantity = blockedQty,
+                        StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                        EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(maintenanceDays)),
+                        Reason = $"Post-rental inspection damage/missing from Booking Group {group.GroupNumber}: {(string.IsNullOrWhiteSpace(insp?.DamageDescription) ? condition : insp.DamageDescription.Trim())}",
+                        EstimatedCost = repairCost > 0 ? repairCost : null,
+                        IsResolved = false,
+                        CreatedAtUtc = DateTime.UtcNow
+                    };
+
+                    _dbContext.MaintenanceRecords.Add(mRecord);
+                    maintenanceRecordEntities.Add(mRecord);
+                }
+
+                var lineSb = new StringBuilder();
+                lineSb.Append($"[Item #{item.Id} {item.Equipment.Title}] Returned: {returnedQty}/{item.Quantity}. Condition: {condition}.");
+                if (missingQty > 0)
+                {
+                    lineSb.Append($" Missing: {missingQty}.");
+                }
+                if (isDamaged)
+                {
+                    lineSb.Append($" Damage: {(string.IsNullOrWhiteSpace(insp?.DamageDescription) ? "Reported" : insp.DamageDescription.Trim())}.");
+                }
+                if (repairCost > 0)
+                {
+                    lineSb.Append($" Repair Cost: ${repairCost:F2}.");
+                }
+                if (!string.IsNullOrWhiteSpace(insp?.PhotoEvidenceUrl))
+                {
+                    lineSb.Append($" Evidence: {insp.PhotoEvidenceUrl.Trim()}.");
+                }
+
+                inspectionSummaryLines.Add(lineSb.ToString());
+            }
+
+            decimal finalDamageFee = request.AssessedDamageFee.HasValue && request.AssessedDamageFee.Value >= 0
+                ? request.AssessedDamageFee.Value
+                : calculatedDamageFee;
+
+            decimal totalDepositHeld = group.SubtotalSecurityDeposit;
+            decimal forfeitedDeposit = Math.Min(totalDepositHeld, finalDamageFee);
+            decimal refundAmount = Math.Max(0, totalDepositHeld - forfeitedDeposit);
+
+            var reportSb = new StringBuilder();
+            if (!string.IsNullOrWhiteSpace(request.GeneralInspectionNotes))
+            {
+                reportSb.AppendLine(request.GeneralInspectionNotes.Trim());
+                reportSb.AppendLine();
+            }
+            reportSb.AppendLine("Inspection Findings:");
+            foreach (var line in inspectionSummaryLines)
+            {
+                reportSb.AppendLine("- " + line);
+            }
+            reportSb.AppendLine();
+            reportSb.AppendLine("Financial Assessment:");
+            reportSb.AppendLine($"- Security Deposit Held: ${totalDepositHeld:F2}");
+            reportSb.AppendLine($"- Damage / Missing Fee Assessed: ${finalDamageFee:F2}");
+            reportSb.AppendLine($"- Deposit Forfeited / Deducted: ${forfeitedDeposit:F2}");
+            reportSb.AppendLine($"- Net Deposit Refund: ${refundAmount:F2}");
+
+            if (maintenanceRecordEntities.Count > 0)
+            {
+                reportSb.AppendLine($"- Maintenance Quarantine: {maintenanceRecordEntities.Sum(m => m.BlockedQuantity)} unit(s) placed into repair downtime.");
+            }
+
+            group.Status = BookingGroupStatus.Completed;
+            group.ReturnedAtUtc = DateTime.UtcNow;
+            group.CompletedAtUtc = DateTime.UtcNow;
+            group.ReturnInspectionNotes = reportSb.ToString().Trim();
+
+            // Save changes to persist maintenance records and generate their primary keys
+            await _dbContext.SaveChangesAsync();
+
+            var createdRecordIds = maintenanceRecordEntities.Select(m => m.Id).ToList();
+
+            _dbContext.AuditLogs.Add(new AuditLog
+            {
+                Action = "ReturnInspectionCompleted",
+                EntityType = nameof(BookingGroup),
+                EntityId = group.Id.ToString(),
+                Details = $"Return inspection completed for Group {group.GroupNumber}. Forfeited Deposit: ${forfeitedDeposit:F2}, Refund: ${refundAmount:F2}, Maintenance Blocks: {createdRecordIds.Count}.",
+                TimestampUtc = DateTime.UtcNow
+            });
+
+            UpdateParentBookingStatus(group.ParentBooking);
+            await _dbContext.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            _logger.LogInformation("Business {BusinessId} completed return & inspection for booking group {GroupNumber}. Net refund: ${Refund:F2}",
+                businessId, group.GroupNumber, refundAmount);
+
+            return ReturnInspectionResultDto.Ok(
+                group.Status,
+                totalDepositHeld,
+                finalDamageFee,
+                refundAmount,
+                forfeitedDeposit,
+                createdRecordIds,
+                inspectionSummaryLines);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Transaction failed while inspecting and completing booking group {GroupId}.", bookingGroupId);
+            return ReturnInspectionResultDto.Fail("An error occurred while saving the return inspection: " + ex.Message);
+        }
     }
 
     public async Task<int> GetAuthoritativeAvailableQuantityAsync(int equipmentId, DateOnly startDate, DateOnly endDate)
@@ -650,26 +872,30 @@ public class BookingService : IBookingService
         if (groups.All(g => g.Status == BookingGroupStatus.CancelledByCustomer || g.Status == BookingGroupStatus.Rejected))
         {
             parent.Status = BookingStatus.Cancelled;
+            parent.UpdatedAtUtc = DateTime.UtcNow;
+            return;
         }
-        // Terminal completed state: all groups completed or finished, with at least one completed
-        else if (groups.All(g => g.Status == BookingGroupStatus.Completed || g.Status == BookingGroupStatus.CancelledByCustomer || g.Status == BookingGroupStatus.Rejected)
-                 && groups.Any(g => g.Status == BookingGroupStatus.Completed))
+
+        // Active groups that were not cancelled or rejected
+        var applicableGroups = groups.Where(g => g.Status != BookingGroupStatus.CancelledByCustomer && g.Status != BookingGroupStatus.Rejected).ToList();
+
+        // Terminal completed state: every applicable accepted subgroup has reached Completed
+        if (applicableGroups.Count > 0 && applicableGroups.All(g => g.Status == BookingGroupStatus.Completed))
         {
             parent.Status = BookingStatus.Completed;
         }
-        // Active state: all non-rejected groups are handed over or completed
-        else if (groups.All(g => g.Status == BookingGroupStatus.HandedOver || g.Status == BookingGroupStatus.Completed || g.Status == BookingGroupStatus.CancelledByCustomer || g.Status == BookingGroupStatus.Rejected)
-                 && groups.Any(g => g.Status == BookingGroupStatus.HandedOver))
+        // Active state: at least one applicable group is HandedOver
+        else if (applicableGroups.Any(g => g.Status == BookingGroupStatus.HandedOver))
         {
             parent.Status = BookingStatus.Active;
         }
-        // Fully confirmed state: all groups are confirmed
+        // Fully confirmed state: all groups in booking are confirmed
         else if (groups.All(g => g.Status == BookingGroupStatus.Confirmed))
         {
             parent.Status = BookingStatus.Confirmed;
         }
-        // Partially confirmed: at least one confirmed/active, with other pending or rejected
-        else if (groups.Any(g => g.Status == BookingGroupStatus.Confirmed || g.Status == BookingGroupStatus.HandedOver || g.Status == BookingGroupStatus.Completed))
+        // Partially confirmed: at least one is Confirmed, HandedOver, or Completed
+        else if (applicableGroups.Any(g => g.Status == BookingGroupStatus.Confirmed || g.Status == BookingGroupStatus.HandedOver || g.Status == BookingGroupStatus.Completed))
         {
             parent.Status = BookingStatus.PartiallyConfirmed;
         }
