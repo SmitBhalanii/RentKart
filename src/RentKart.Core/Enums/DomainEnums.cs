@@ -50,3 +50,23 @@ public enum BookingGroupStatus
     Rejected = 4,
     CancelledByCustomer = 5
 }
+
+public enum NotificationType
+{
+    BookingPlaced = 1,
+    BookingConfirmed = 2,
+    BookingRejected = 3,
+    BookingCancelled = 4,
+    EquipmentHandedOver = 5,
+    EquipmentReturned = 6,
+    DocumentReady = 7,
+    MaintenanceAlert = 8,
+    SystemNotice = 9
+}
+
+public enum RentalDocumentType
+{
+    RentalAgreement = 1,
+    StoreInvoice = 2,
+    ParentBookingInvoice = 3
+}

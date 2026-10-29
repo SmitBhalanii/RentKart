@@ -70,6 +70,13 @@
                 <div style="font-size: var(--rk-font-size-xl); font-weight: 900; color: var(--rk-teal-700);">$@Model.GrandTotal.ToString("F2")</div>
             </div>
         </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: var(--rk-space-4);">
+            <a asp-controller="Documents" asp-action="Index" class="rk-btn rk-btn-outline rk-btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                View Rental Agreements & Invoices
+            </a>
+        </div>
     </div>
 
     <!-- Store Groups -->

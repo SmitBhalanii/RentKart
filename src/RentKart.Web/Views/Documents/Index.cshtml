@@ -1,0 +1,166 @@
+@using RentKart.Core.Enums
+@using RentKart.Core.Interfaces
+@model List<RentalDocumentSummaryDto>
+@{
+    ViewData["Title"] = "Rental Documents & Invoices";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+    bool isBusinessContext = ViewBag.IsBusinessContext ?? false;
+    string shopName = ViewBag.ShopName ?? string.Empty;
+}
+
+<div class="rk-container" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-12);">
+    <!-- Breadcrumb -->
+    <nav class="rk-breadcrumb" aria-label="Breadcrumb" style="margin-bottom: var(--rk-space-4);">
+        <ol>
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li aria-current="page">Rental Documents</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+        <div>
+            <h1 class="rk-page-title" style="margin: 0;">
+                @(isBusinessContext ? $"Store Documents — {shopName}" : "My Rental Agreements & Invoices")
+            </h1>
+            <p class="rk-text-muted" style="margin-top: 0.25rem;">
+                Official legally-binding equipment rental agreements and authoritative pro-forma invoices based on immutable booking snapshots.
+            </p>
+        </div>
+    </div>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="rk-card" style="text-align: center; padding: var(--rk-space-12) var(--rk-space-6);">
+            <div style="font-size: 3rem; margin-bottom: var(--rk-space-3); color: var(--rk-neutral-400);">📄</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">No Documents Found</h3>
+            <p class="rk-text-muted" style="max-width: 450px; margin: 0 auto var(--rk-space-6);">
+                @(isBusinessContext 
+                    ? "Your store does not have any rental agreements or store invoices generated yet."
+                    : "You do not have any rental agreements or invoices yet. Documents are automatically generated when you place equipment reservations.")
+            </p>
+            @if (!isBusinessContext)
+            {
+                <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-primary rk-btn-sm">Browse Equipment Catalog</a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="rk-card" style="padding: 0; overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table class="rk-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1rem;">Document #</th>
+                            <th style="padding: 1rem;">Type</th>
+                            <th style="padding: 1rem;">Scope / Store</th>
+                            <th style="padding: 1rem; text-align: right;">Rental Fee</th>
+                            <th style="padding: 1rem; text-align: right;">Deposit</th>
+                            <th style="padding: 1rem; text-align: right;">Total</th>
+                            <th style="padding: 1rem;">Status</th>
+                            <th style="padding: 1rem;">Generated (UTC)</th>
+                            <th style="padding: 1rem; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doc in Model)
+                        {
+                            <tr style="border-bottom: 1px solid var(--rk-neutral-200);">
+                                <td style="padding: 1rem; font-weight: 600; font-family: monospace;">
+                                    @doc.DocumentNumber
+                                </td>
+                                <td style="padding: 1rem;">
+                                    @switch (doc.DocumentType)
+                                    {
+                                        case RentalDocumentType.RentalAgreement:
+                                            <span class="rk-badge rk-badge-primary">Rental Agreement</span>
+                                            break;
+                                        case RentalDocumentType.StoreInvoice:
+                                            <span class="rk-badge rk-badge-teal">Store Invoice</span>
+                                            break;
+                                        case RentalDocumentType.ParentBookingInvoice:
+                                            <span class="rk-badge rk-badge-info">Consolidated Invoice</span>
+                                            break;
+                                        default:
+                                            <span class="rk-badge rk-badge-secondary">@doc.DocumentType</span>
+                                            break;
+                                    }
+                                </td>
+                                <td style="padding: 1rem;">
+                                    @(doc.BusinessName ?? "Parent Booking Summary")
+                                </td>
+                                <td style="padding: 1rem; text-align: right;">
+                                    $@doc.RentalSubtotal.ToString("F2")
+                                </td>
+                                <td style="padding: 1rem; text-align: right;">
+                                    $@doc.SecurityDeposit.ToString("F2")
+                                </td>
+                                <td style="padding: 1rem; text-align: right; font-weight: 700; color: var(--rk-navy-900);">
+                                    $@doc.GrandTotal.ToString("F2")
+                                </td>
+                                <td style="padding: 1rem;">
+                                    @if (doc.IsGenerated)
+                                    {
+                                        <span class="rk-badge rk-badge-success" style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            Ready
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="rk-badge rk-badge-danger" title="@doc.FailureReason">
+                                            Failed
+                                        </span>
+                                    }
+                                </td>
+                                <td style="padding: 1rem; font-size: 0.875rem; color: var(--rk-neutral-600);">
+                                    @doc.GeneratedAtUtc.ToString("MMM dd, yyyy HH:mm")
+                                </td>
+                                <td style="padding: 1rem; text-align: right;">
+                                    <div style="display: inline-flex; gap: 0.35rem; justify-content: flex-end;">
+                                        @if (doc.IsGenerated)
+                                        {
+                                            <a asp-action="View" asp-route-id="@doc.Id" target="_blank" class="rk-btn rk-btn-outline rk-btn-sm" title="View printable document in new tab">
+                                                View
+                                            </a>
+                                            <a asp-action="Download" asp-route-id="@doc.Id" class="rk-btn rk-btn-teal rk-btn-sm" title="Download HTML document">
+                                                Download
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Retry" asp-route-id="@doc.Id" method="post" style="display: inline; margin: 0;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="rk-btn rk-btn-primary rk-btn-sm" title="Retry document generation">
+                                                    Retry
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div style="display: flex; justify-content: center; align-items: center; gap: var(--rk-space-2); margin-top: var(--rk-space-6);">
+                @if (currentPage > 1)
+                {
+                    <a asp-action="Index" asp-route-page="@(currentPage - 1)" class="rk-btn rk-btn-outline rk-btn-sm">&larr; Previous</a>
+                }
+                <span class="rk-text-muted" style="font-size: 0.875rem;">Page @currentPage of @totalPages</span>
+                @if (currentPage < totalPages)
+                {
+                    <a asp-action="Index" asp-route-page="@(currentPage + 1)" class="rk-btn rk-btn-outline rk-btn-sm">Next &rarr;</a>
+                }
+            </div>
+        }
+    }
+</div>

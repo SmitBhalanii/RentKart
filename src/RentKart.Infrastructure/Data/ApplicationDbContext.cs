@@ -23,6 +23,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<RentalDocument> RentalDocuments => Set<RentalDocument>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

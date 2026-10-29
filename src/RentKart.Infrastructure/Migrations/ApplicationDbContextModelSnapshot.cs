@@ -759,6 +759,163 @@ namespace RentKart.Infrastructure.Migrations
                     b.ToTable("MaintenanceRecords");
                 });
 
+            modelBuilder.Entity("RentKart.Core.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BookingGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("EventKey")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReadAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TargetUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingGroupId");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("CreatedAtUtc");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "EventKey");
+
+                    b.HasIndex("UserId", "IsRead");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("RentKart.Core.Entities.RentalDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BookingGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BusinessId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CustomerUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("GeneratedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<decimal>("GrandTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsGenerated")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("RentalSubtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SecurityDeposit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingGroupId");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("CustomerUserId");
+
+                    b.HasIndex("DocumentNumber")
+                        .IsUnique();
+
+                    b.HasIndex("GeneratedAtUtc");
+
+                    b.ToTable("RentalDocuments");
+                });
+
             modelBuilder.Entity("RentKart.Core.Entities.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -1004,6 +1161,63 @@ namespace RentKart.Infrastructure.Migrations
                     b.Navigation("Equipment");
                 });
 
+            modelBuilder.Entity("RentKart.Core.Entities.Notification", b =>
+                {
+                    b.HasOne("RentKart.Core.Entities.BookingGroup", "BookingGroup")
+                        .WithMany("Notifications")
+                        .HasForeignKey("BookingGroupId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RentKart.Core.Entities.Booking", "Booking")
+                        .WithMany("Notifications")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RentKart.Core.Entities.ApplicationUser", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("BookingGroup");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RentKart.Core.Entities.RentalDocument", b =>
+                {
+                    b.HasOne("RentKart.Core.Entities.BookingGroup", "BookingGroup")
+                        .WithMany("RentalDocuments")
+                        .HasForeignKey("BookingGroupId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RentKart.Core.Entities.Booking", "Booking")
+                        .WithMany("RentalDocuments")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RentKart.Core.Entities.BusinessProfile", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RentKart.Core.Entities.ApplicationUser", "CustomerUser")
+                        .WithMany("RentalDocuments")
+                        .HasForeignKey("CustomerUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("BookingGroup");
+
+                    b.Navigation("Business");
+
+                    b.Navigation("CustomerUser");
+                });
+
             modelBuilder.Entity("RentKart.Core.Entities.Review", b =>
                 {
                     b.HasOne("RentKart.Core.Entities.BookingItem", "BookingItem")
@@ -1058,6 +1272,10 @@ namespace RentKart.Infrastructure.Migrations
 
                     b.Navigation("BusinessProfile");
 
+                    b.Navigation("Notifications");
+
+                    b.Navigation("RentalDocuments");
+
                     b.Navigation("Reviews");
 
                     b.Navigation("WishlistItems");
@@ -1066,11 +1284,19 @@ namespace RentKart.Infrastructure.Migrations
             modelBuilder.Entity("RentKart.Core.Entities.Booking", b =>
                 {
                     b.Navigation("BookingGroups");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("RentalDocuments");
                 });
 
             modelBuilder.Entity("RentKart.Core.Entities.BookingGroup", b =>
                 {
                     b.Navigation("BookingItems");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("RentalDocuments");
                 });
 
             modelBuilder.Entity("RentKart.Core.Entities.BookingItem", b =>

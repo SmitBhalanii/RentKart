@@ -17,4 +17,6 @@ public class Booking
     // Navigation properties
     public virtual ApplicationUser Customer { get; set; } = null!;
     public virtual ICollection<BookingGroup> BookingGroups { get; set; } = new List<BookingGroup>();
+    public virtual ICollection<RentalDocument> RentalDocuments { get; set; } = new List<RentalDocument>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

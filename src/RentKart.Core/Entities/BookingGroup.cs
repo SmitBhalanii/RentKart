@@ -24,4 +24,6 @@ public class BookingGroup
     public virtual Booking ParentBooking { get; set; } = null!;
     public virtual BusinessProfile Business { get; set; } = null!;
     public virtual ICollection<BookingItem> BookingItems { get; set; } = new List<BookingItem>();
+    public virtual ICollection<RentalDocument> RentalDocuments { get; set; } = new List<RentalDocument>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

@@ -17,4 +17,6 @@ public class ApplicationUser : IdentityUser
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
     public virtual ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public virtual ICollection<RentalDocument> RentalDocuments { get; set; } = new List<RentalDocument>();
 }

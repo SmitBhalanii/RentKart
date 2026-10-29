@@ -1,3 +1,7 @@
+using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace RentKart.Tests;
 
 public class ArchitectureBaselineTests

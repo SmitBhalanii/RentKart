@@ -35,7 +35,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var customer = await GetOrCreateCustomerAsync(db);
-        var item = await db.Equipments.Include(e => e.Business).FirstAsync(e => e.IsActive && e.Business.Status == BusinessStatus.Approved);
+        var item = await CreateDedicatedTestEquipmentAsync(db);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(40));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(42));
@@ -108,7 +108,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var customer = await GetOrCreateCustomerAsync(db);
-        var item = await db.Equipments.Include(e => e.Business).FirstAsync(e => e.IsActive && e.Business.Status == BusinessStatus.Approved);
+        var item = await CreateDedicatedTestEquipmentAsync(db);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(45));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(47));
@@ -148,7 +148,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var storeA = businesses[0];
         var storeB = businesses[1];
 
-        var itemA = await db.Equipments.FirstAsync(e => e.BusinessId == storeA.Id && e.IsActive);
+        var itemA = await CreateDedicatedTestEquipmentAsync(db, storeA.Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(50));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(52));
@@ -183,7 +183,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var customer = await GetOrCreateCustomerAsync(db);
-        var item = await db.Equipments.Include(e => e.Business).FirstAsync(e => e.IsActive && e.Business.Status == BusinessStatus.Approved);
+        var item = await CreateDedicatedTestEquipmentAsync(db);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(55));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(57));
@@ -213,7 +213,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var customer = await GetOrCreateCustomerAsync(db);
-        var item = await db.Equipments.Include(e => e.Business).FirstAsync(e => e.IsActive && e.Business.Status == BusinessStatus.Approved);
+        var item = await CreateDedicatedTestEquipmentAsync(db);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(62));
@@ -460,7 +460,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var storeA = businesses[0];
         var storeB = businesses[1];
 
-        var itemA = await db.Equipments.FirstAsync(e => e.BusinessId == storeA.Id && e.IsActive);
+        var itemA = await CreateDedicatedTestEquipmentAsync(db, storeA.Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(90));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(92));
@@ -473,6 +473,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
             }
         });
 
+        Assert.True(createResult.Success, createResult.ErrorMessage);
         var group = await db.BookingGroups.FirstAsync(bg => bg.ParentBookingId == createResult.BookingId!.Value);
         await bookingService.AcceptBookingGroupAsync(group.Id, storeA.Id);
         await bookingService.HandoverBookingGroupAsync(group.Id, storeA.Id, group.PickupVerificationCode, "Handed over by Store A");
@@ -496,13 +497,9 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var customer = await GetOrCreateCustomerAsync(db);
-        var activeItems = await db.Equipments
-            .Include(e => e.Business)
-            .Where(e => e.IsActive && e.Business.Status == BusinessStatus.Approved)
-            .ToListAsync();
-
-        var item1 = activeItems.First();
-        var item2 = activeItems.First(e => e.BusinessId != item1.BusinessId);
+        var businesses = await db.BusinessProfiles.Where(b => b.Status == BusinessStatus.Approved).Take(2).ToListAsync();
+        var item1 = await CreateDedicatedTestEquipmentAsync(db, businesses[0].Id);
+        var item2 = await CreateDedicatedTestEquipmentAsync(db, businesses[1].Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(100));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(102));
@@ -516,7 +513,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
             }
         });
 
-        Assert.True(createResult.Success);
+        Assert.True(createResult.Success, createResult.ErrorMessage);
         var parentBookingId = createResult.BookingId!.Value;
 
         var groups = await db.BookingGroups.Where(bg => bg.ParentBookingId == parentBookingId).ToListAsync();
@@ -564,13 +561,9 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var customer = await GetOrCreateCustomerAsync(db);
-        var activeItems = await db.Equipments
-            .Include(e => e.Business)
-            .Where(e => e.IsActive && e.Business.Status == BusinessStatus.Approved)
-            .ToListAsync();
-
-        var item1 = activeItems.First();
-        var item2 = activeItems.First(e => e.BusinessId != item1.BusinessId);
+        var businesses = await db.BusinessProfiles.Where(b => b.Status == BusinessStatus.Approved).Take(2).ToListAsync();
+        var item1 = await CreateDedicatedTestEquipmentAsync(db, businesses[0].Id);
+        var item2 = await CreateDedicatedTestEquipmentAsync(db, businesses[1].Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(110));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(112));
@@ -584,7 +577,7 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
             }
         });
 
-        Assert.True(createResult.Success);
+        Assert.True(createResult.Success, createResult.ErrorMessage);
         var parentBookingId = createResult.BookingId!.Value;
 
         var groups = await db.BookingGroups.Where(bg => bg.ParentBookingId == parentBookingId).ToListAsync();
@@ -699,5 +692,37 @@ public class HandoverAndReturnLifecycleTests : IClassFixture<WebApplicationFacto
         db.Users.Add(user);
         await db.SaveChangesAsync();
         return user;
+    }
+
+    private static async Task<Equipment> CreateDedicatedTestEquipmentAsync(ApplicationDbContext db, int? businessId = null)
+    {
+        BusinessProfile biz;
+        if (businessId.HasValue)
+        {
+            biz = await db.BusinessProfiles.FirstAsync(b => b.Id == businessId.Value);
+        }
+        else
+        {
+            biz = await db.BusinessProfiles.FirstAsync(b => b.Status == BusinessStatus.Approved);
+        }
+
+        var category = await db.Categories.FirstAsync(c => c.IsActive);
+        var item = new Equipment
+        {
+            BusinessId = biz.Id,
+            CategoryId = category.Id,
+            Title = $"Dedicated Handover Test - {Guid.NewGuid():N}",
+            Description = "Phase 8/9 lifecycle item",
+            DailyRentalRate = 50.00m,
+            SecurityDeposit = 100.00m,
+            TotalQuantity = 10,
+            IsActive = true,
+            Status = EquipmentStatus.Active,
+            Condition = EquipmentCondition.Good,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        db.Equipments.Add(item);
+        await db.SaveChangesAsync();
+        return item;
     }
 }

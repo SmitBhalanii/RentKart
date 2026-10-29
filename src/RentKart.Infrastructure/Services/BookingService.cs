@@ -14,11 +14,19 @@ public class BookingService : IBookingService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<BookingService> _logger;
+    private readonly INotificationService? _notificationService;
+    private readonly IRentalDocumentService? _rentalDocumentService;
 
-    public BookingService(ApplicationDbContext dbContext, ILogger<BookingService> logger)
+    public BookingService(
+        ApplicationDbContext dbContext, 
+        ILogger<BookingService> logger,
+        INotificationService? notificationService = null,
+        IRentalDocumentService? rentalDocumentService = null)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _notificationService = notificationService;
+        _rentalDocumentService = rentalDocumentService;
     }
 
     public async Task<BookingOperationResult> CreateBookingAsync(string customerUserId, CreateBookingRequestDto request)
@@ -209,6 +217,36 @@ public class BookingService : IBookingService
             _logger.LogInformation("Successfully created Booking #{BookingNumber} (ID: {BookingId}) for Customer {CustomerId} across {StoreCount} stores.",
                 parentBooking.BookingNumber, parentBooking.Id, customerUserId, parentBooking.BookingGroups.Count);
 
+            // Phase 9: Automatic notification and document dispatch
+            if (_notificationService != null)
+            {
+                try
+                {
+                    await _notificationService.NotifyBookingCreatedAsync(parentBooking.Id);
+                }
+                catch (Exception nEx)
+                {
+                    _logger.LogWarning(nEx, "Failed to send notifications for booking {BookingId}.", parentBooking.Id);
+                }
+            }
+
+            if (_rentalDocumentService != null)
+            {
+                try
+                {
+                    await _rentalDocumentService.GenerateParentBookingInvoiceAsync(parentBooking.Id);
+                    foreach (var bg in parentBooking.BookingGroups)
+                    {
+                        await _rentalDocumentService.GenerateStoreInvoiceAsync(bg.Id);
+                        await _rentalDocumentService.GenerateRentalAgreementAsync(bg.Id);
+                    }
+                }
+                catch (Exception docEx)
+                {
+                    _logger.LogWarning(docEx, "Failed to generate initial documents for booking {BookingId}.", parentBooking.Id);
+                }
+            }
+
             return BookingOperationResult.Ok(parentBooking.Id, parentBooking.BookingNumber);
         }
         catch (Exception ex)
@@ -361,6 +399,18 @@ public class BookingService : IBookingService
 
         await _dbContext.SaveChangesAsync();
 
+        if (_notificationService != null)
+        {
+            try
+            {
+                await _notificationService.NotifyBookingGroupStatusChangedAsync(group.Id, BookingGroupStatus.CancelledByCustomer, group.RejectionReason);
+            }
+            catch (Exception nEx)
+            {
+                _logger.LogWarning(nEx, "Failed to send cancellation notification for group {GroupId}.", group.Id);
+            }
+        }
+
         _logger.LogInformation("Customer {CustomerId} cancelled booking group {GroupNumber}.", customerUserId, group.GroupNumber);
         return BookingGroupOperationResult.Ok(group.Status);
     }
@@ -491,6 +541,31 @@ public class BookingService : IBookingService
 
         await _dbContext.SaveChangesAsync();
 
+        if (_notificationService != null)
+        {
+            try
+            {
+                await _notificationService.NotifyBookingGroupStatusChangedAsync(group.Id, BookingGroupStatus.Confirmed);
+            }
+            catch (Exception nEx)
+            {
+                _logger.LogWarning(nEx, "Failed to send confirmation notification for group {GroupId}.", group.Id);
+            }
+        }
+
+        if (_rentalDocumentService != null)
+        {
+            try
+            {
+                // Ensure agreement is regenerated/current upon store confirmation
+                await _rentalDocumentService.GenerateRentalAgreementAsync(group.Id);
+            }
+            catch (Exception docEx)
+            {
+                _logger.LogWarning(docEx, "Failed to generate rental agreement on confirmation for group {GroupId}.", group.Id);
+            }
+        }
+
         _logger.LogInformation("Business {BusinessId} accepted booking group {GroupNumber}.", businessId, group.GroupNumber);
         return BookingGroupOperationResult.Ok(group.Status);
     }
@@ -518,6 +593,18 @@ public class BookingService : IBookingService
         UpdateParentBookingStatus(group.ParentBooking);
 
         await _dbContext.SaveChangesAsync();
+
+        if (_notificationService != null)
+        {
+            try
+            {
+                await _notificationService.NotifyBookingGroupStatusChangedAsync(group.Id, BookingGroupStatus.Rejected, group.RejectionReason);
+            }
+            catch (Exception nEx)
+            {
+                _logger.LogWarning(nEx, "Failed to send rejection notification for group {GroupId}.", group.Id);
+            }
+        }
 
         _logger.LogInformation("Business {BusinessId} rejected booking group {GroupNumber}. Reason: {Reason}", businessId, group.GroupNumber, group.RejectionReason);
         return BookingGroupOperationResult.Ok(group.Status);
@@ -621,6 +708,18 @@ public class BookingService : IBookingService
         UpdateParentBookingStatus(group.ParentBooking);
 
         await _dbContext.SaveChangesAsync();
+
+        if (_notificationService != null)
+        {
+            try
+            {
+                await _notificationService.NotifyBookingGroupStatusChangedAsync(group.Id, BookingGroupStatus.HandedOver);
+            }
+            catch (Exception nEx)
+            {
+                _logger.LogWarning(nEx, "Failed to send handover notification for group {GroupId}.", group.Id);
+            }
+        }
 
         _logger.LogInformation("Business {BusinessId} completed handover for booking group {GroupNumber}.", businessId, group.GroupNumber);
         return BookingGroupOperationResult.Ok(group.Status);
@@ -787,6 +886,18 @@ public class BookingService : IBookingService
             await _dbContext.SaveChangesAsync();
 
             await transaction.CommitAsync();
+
+            if (_notificationService != null)
+            {
+                try
+                {
+                    await _notificationService.NotifyBookingGroupStatusChangedAsync(group.Id, BookingGroupStatus.Completed);
+                }
+                catch (Exception nEx)
+                {
+                    _logger.LogWarning(nEx, "Failed to send completion notification for group {GroupId}.", group.Id);
+                }
+            }
 
             _logger.LogInformation("Business {BusinessId} completed return & inspection for booking group {GroupNumber}. Net refund: ${Refund:F2}",
                 businessId, group.GroupNumber, refundAmount);

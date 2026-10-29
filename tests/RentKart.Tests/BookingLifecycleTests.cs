@@ -39,13 +39,9 @@ public class BookingLifecycleTests : IClassFixture<WebApplicationFactory<Program
         var customer = await GetOrCreateCustomerAsync(db);
 
         // 2. Get two items from two different approved businesses
-        var activeItems = await db.Equipments
-            .Include(e => e.Business)
-            .Where(e => e.IsActive && e.Business.Status == BusinessStatus.Approved)
-            .ToListAsync();
-
-        var item1 = activeItems.First();
-        var item2 = activeItems.First(e => e.BusinessId != item1.BusinessId);
+        var businesses = await db.BusinessProfiles.Where(b => b.Status == BusinessStatus.Approved).Take(2).ToListAsync();
+        var item1 = await CreateDedicatedTestEquipmentAsync(db, businesses[0].Id);
+        var item2 = await CreateDedicatedTestEquipmentAsync(db, businesses[1].Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(22)); // 3 days
@@ -118,13 +114,9 @@ public class BookingLifecycleTests : IClassFixture<WebApplicationFactory<Program
 
         var customer = await GetOrCreateCustomerAsync(db);
 
-        var activeItems = await db.Equipments
-            .Include(e => e.Business)
-            .Where(e => e.IsActive && e.Business.Status == BusinessStatus.Approved)
-            .ToListAsync();
-
-        var item1 = activeItems.First();
-        var item2 = activeItems.First(e => e.BusinessId != item1.BusinessId);
+        var businesses = await db.BusinessProfiles.Where(b => b.Status == BusinessStatus.Approved).Take(2).ToListAsync();
+        var item1 = await CreateDedicatedTestEquipmentAsync(db, businesses[0].Id);
+        var item2 = await CreateDedicatedTestEquipmentAsync(db, businesses[1].Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(32));
@@ -450,7 +442,7 @@ public class BookingLifecycleTests : IClassFixture<WebApplicationFactory<Program
         var bizA = await db.BusinessProfiles.FirstAsync(b => b.Status == BusinessStatus.Approved && b.ShopName.Contains("Apex"));
         var bizB = await db.BusinessProfiles.FirstAsync(b => b.Status == BusinessStatus.Approved && b.Id != bizA.Id);
 
-        var itemA = await db.Equipments.FirstAsync(e => e.BusinessId == bizA.Id && e.IsActive);
+        var itemA = await CreateDedicatedTestEquipmentAsync(db, bizA.Id);
 
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(80));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(82));
@@ -651,5 +643,37 @@ public class BookingLifecycleTests : IClassFixture<WebApplicationFactory<Program
         db.Users.Add(user);
         await db.SaveChangesAsync();
         return user;
+    }
+
+    private static async Task<Equipment> CreateDedicatedTestEquipmentAsync(ApplicationDbContext db, int? businessId = null)
+    {
+        BusinessProfile biz;
+        if (businessId.HasValue)
+        {
+            biz = await db.BusinessProfiles.FirstAsync(b => b.Id == businessId.Value);
+        }
+        else
+        {
+            biz = await db.BusinessProfiles.FirstAsync(b => b.Status == BusinessStatus.Approved);
+        }
+
+        var category = await db.Categories.FirstAsync(c => c.IsActive);
+        var item = new Equipment
+        {
+            BusinessId = biz.Id,
+            CategoryId = category.Id,
+            Title = $"Dedicated Booking Test - {Guid.NewGuid():N}",
+            Description = "Phase 7/8/9 booking test equipment listing",
+            DailyRentalRate = 50.00m,
+            SecurityDeposit = 100.00m,
+            TotalQuantity = 10,
+            Condition = EquipmentCondition.Excellent,
+            Status = EquipmentStatus.Active,
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        db.Equipments.Add(item);
+        await db.SaveChangesAsync();
+        return item;
     }
 }

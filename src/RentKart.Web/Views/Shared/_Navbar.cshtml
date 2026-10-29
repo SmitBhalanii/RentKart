@@ -1,8 +1,22 @@
 @using Microsoft.AspNetCore.Identity
 @using RentKart.Core.Entities
+@using RentKart.Core.Interfaces
 @using RentKart.Infrastructure.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject INotificationService NotificationService
+
+@{
+    int unreadNotificationCount = 0;
+    if (SignInManager.IsSignedIn(User))
+    {
+        var currentUserId = UserManager.GetUserId(User);
+        if (!string.IsNullOrEmpty(currentUserId))
+        {
+            unreadNotificationCount = await NotificationService.GetUnreadCountAsync(currentUserId);
+        }
+    }
+}
 
 @*
     RentKart Global Top Navigation
@@ -100,6 +114,18 @@
                             Reservations
                         </a>
                     </li>
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Documents" asp-action="Index">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Documents
+                        </a>
+                    </li>
                 }
                 else if (User.IsInRole(IdentityDataSeeder.RoleCustomer))
                 {
@@ -112,6 +138,18 @@
                                 <line x1="3" y1="10" x2="21" y2="10"></line>
                             </svg>
                             My Bookings
+                        </a>
+                    </li>
+                    <li>
+                        <a class="rk-nav-link" asp-controller="Documents" asp-action="Index">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Documents
                         </a>
                     </li>
                     <li>
@@ -164,7 +202,19 @@
                 </a>
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <div style="display: flex; align-items: center; gap: var(--rk-space-3);">
+                    <div style="display: flex; align-items: center; gap: var(--rk-space-2);">
+                        <a class="rk-btn rk-btn-outline rk-btn-sm" asp-controller="Notifications" asp-action="Index" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0.35rem 0.65rem;" title="Notifications">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            @if (unreadNotificationCount > 0)
+                            {
+                                <span class="rk-badge rk-badge-danger" style="position: absolute; top: -5px; right: -5px; font-size: 0.65rem; padding: 0.15rem 0.35rem; line-height: 1; border-radius: 9999px;">
+                                    @(unreadNotificationCount > 99 ? "99+" : unreadNotificationCount.ToString())
+                                </span>
+                            }
+                        </a>
                         <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0; display: inline;">
                             <button type="submit" class="rk-btn rk-btn-outline rk-btn-sm" title="Sign out of your account">
                                 Sign Out
@@ -219,6 +269,8 @@
                 <a class="rk-nav-link" asp-controller="Customer" asp-action="Dashboard">My Account</a>
                 <a class="rk-nav-link" asp-controller="Customer" asp-action="Profile">Edit Profile</a>
             }
+            <a class="rk-nav-link" asp-controller="Notifications" asp-action="Index">Notifications @(unreadNotificationCount > 0 ? $"({unreadNotificationCount})" : "")</a>
+            <a class="rk-nav-link" asp-controller="Documents" asp-action="Index">Rental Documents</a>
             <div style="padding: 0.5rem 1rem;">
                 <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0;">
                     <button type="submit" class="rk-btn rk-btn-outline" style="width: 100%; justify-content: center;">Sign Out</button>

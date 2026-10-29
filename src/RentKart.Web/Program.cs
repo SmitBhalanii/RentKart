@@ -57,6 +57,8 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IBusinessEquipmentService, BusinessEquipmentService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IRentalDocumentService, RentalDocumentService>();
 
 builder.Services.AddControllersWithViews();
 
