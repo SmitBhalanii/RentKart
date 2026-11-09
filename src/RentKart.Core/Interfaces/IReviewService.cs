@@ -80,3 +80,4 @@ public interface IReviewService
     Task<List<AdminReviewListItemDto>> GetReviewsForAdminAsync(bool? isHiddenFilter = null, int? ratingFilter = null);
     Task<bool> ModerateReviewAsync(int reviewId, bool isHidden, string? reason, string adminUserId, string? ipAddress = null);
 }
+

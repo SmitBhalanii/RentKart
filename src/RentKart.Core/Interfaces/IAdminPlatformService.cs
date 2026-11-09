@@ -301,3 +301,4 @@ public interface IAdminPlatformService
     Task<AdminPlatformAnalyticsDto> GetPlatformAnalyticsAsync();
     Task<(List<AdminAuditLogDto> Items, int TotalCount)> GetAuditLogsAsync(string? actionFilter = null, string? entityTypeFilter = null, int page = 1, int pageSize = 30);
 }
+

@@ -26,3 +26,4 @@ public class ReviewCreateViewModel
     [StringLength(1000, MinimumLength = 5, ErrorMessage = "Review must be between 5 and 1,000 characters.")]
     public string Comment { get; set; } = string.Empty;
 }
+

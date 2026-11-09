@@ -87,3 +87,4 @@ public class ReviewsController : Controller
         return RedirectToAction("Details", "Catalog", new { id = model.EquipmentId });
     }
 }
+
