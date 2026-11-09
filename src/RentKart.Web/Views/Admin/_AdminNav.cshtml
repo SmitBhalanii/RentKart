@@ -1,0 +1,56 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Dashboard";
+}
+
+<div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--rk-border-light); margin-bottom: var(--rk-space-6); overflow-x: auto; padding-bottom: 2px;">
+    <a asp-action="Dashboard" 
+       class="rk-btn rk-btn-sm @(currentAction == "Dashboard" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Dashboard" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Overview
+    </a>
+    <a asp-action="Customers" 
+       class="rk-btn rk-btn-sm @(currentAction == "Customers" || currentAction == "CustomerDetails" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Customers" || currentAction == "CustomerDetails" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Customers
+    </a>
+    <a asp-action="Businesses" 
+       class="rk-btn rk-btn-sm @(currentAction == "Businesses" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Businesses" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Businesses
+    </a>
+    <a asp-action="Categories" 
+       class="rk-btn rk-btn-sm @(currentAction == "Categories" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Categories" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Categories
+    </a>
+    <a asp-action="Equipment" 
+       class="rk-btn rk-btn-sm @(currentAction == "Equipment" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Equipment" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Equipment
+    </a>
+    <a asp-action="Bookings" 
+       class="rk-btn rk-btn-sm @(currentAction == "Bookings" || currentAction == "BookingDetails" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Bookings" || currentAction == "BookingDetails" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Bookings
+    </a>
+    <a asp-action="Reviews" 
+       class="rk-btn rk-btn-sm @(currentAction == "Reviews" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Reviews" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Reviews
+    </a>
+    <a asp-action="DamageReports" 
+       class="rk-btn rk-btn-sm @(currentAction == "DamageReports" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "DamageReports" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Damage Reports
+    </a>
+    <a asp-action="Analytics" 
+       class="rk-btn rk-btn-sm @(currentAction == "Analytics" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "Analytics" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Analytics
+    </a>
+    <a asp-action="AuditLogs" 
+       class="rk-btn rk-btn-sm @(currentAction == "AuditLogs" ? "rk-btn-primary" : "rk-btn-outline")" 
+       style="border-radius: var(--rk-radius-sm); border: none; @(currentAction == "AuditLogs" ? "" : "background: transparent; color: var(--rk-text-secondary);")">
+        Audit Logs
+    </a>
+</div>

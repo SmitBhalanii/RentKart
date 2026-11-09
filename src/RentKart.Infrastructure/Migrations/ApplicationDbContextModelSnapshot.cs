@@ -944,6 +944,18 @@ namespace RentKart.Infrastructure.Migrations
                     b.Property<int>("EquipmentId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModeratedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModerationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -955,6 +967,8 @@ namespace RentKart.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("EquipmentId");
+
+                    b.HasIndex("IsHidden");
 
                     b.HasIndex("Rating");
 

@@ -129,6 +129,9 @@ public class BookingItemDetailDto
     public decimal DailyRentalRate { get; set; }
     public decimal ItemSecurityDeposit { get; set; }
     public decimal TotalItemPrice { get; set; }
+    public bool HasReview { get; set; }
+    public int? ReviewRating { get; set; }
+    public int? ReviewId { get; set; }
 }
 
 public class BusinessBookingGroupListItemDto

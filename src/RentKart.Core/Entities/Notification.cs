@@ -22,3 +22,4 @@ public class Notification
     public virtual Booking? Booking { get; set; }
     public virtual BookingGroup? BookingGroup { get; set; }
 }
+

@@ -1,0 +1,132 @@
+@model RentKart.Web.Models.Admin.AdminDamageReportsViewModel
+@{
+    ViewData["Title"] = "Damage Reports & Maintenance - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Damage Reports & Maintenance Oversight
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Review return inspection damage reports, blocked inventory quantities, and maintenance resolutions
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Filter Controls -->
+        <div class="rk-card" style="padding: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+            <div style="display: flex; gap: var(--rk-space-2); flex-wrap: wrap;">
+                <a asp-action="DamageReports" asp-route-isResolved="" class="rk-btn rk-btn-sm @(!Model.IsResolvedFilter.HasValue ? "rk-btn-primary" : "rk-btn-outline")">
+                    All Incidents
+                </a>
+                <a asp-action="DamageReports" asp-route-isResolved="false" class="rk-btn rk-btn-sm @(Model.IsResolvedFilter == false ? "rk-btn-primary" : "rk-btn-outline")">
+                    Unresolved Damage
+                </a>
+                <a asp-action="DamageReports" asp-route-isResolved="true" class="rk-btn rk-btn-sm @(Model.IsResolvedFilter == true ? "rk-btn-primary" : "rk-btn-outline")">
+                    Resolved & Restored
+                </a>
+            </div>
+        </div>
+
+        <!-- Damage Reports Table Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                    Incident Reports (@Model.DamageReports.Count)
+                </div>
+            </div>
+
+            @if (Model.DamageReports.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Equipment & Store</th>
+                                <th style="text-align: center;">Blocked Qty</th>
+                                <th>Incident / Inspection Notes</th>
+                                <th>Reported</th>
+                                <th style="text-align: right;">Est. Cost</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rep in Model.DamageReports)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@rep.EquipmentId" target="_blank" style="color: inherit; text-decoration: none;">
+                                                @rep.EquipmentTitle &nearr;
+                                            </a>
+                                        </div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                            Merchant: @rep.ShopName &bull; Record #@rep.MaintenanceRecordId
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center; font-weight: 700; color: var(--rk-error);">
+                                        @rep.BlockedQuantity unit(s)
+                                    </td>
+                                    <td>
+                                        <div style="font-size: var(--rk-font-size-sm); color: var(--rk-navy-900); line-height: 1.5; max-width: 340px;">
+                                            @rep.Reason
+                                        </div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 0.25rem;">
+                                            Maintenance Block: @rep.StartDate.ToString("yyyy-MM-dd") to @rep.EndDate.ToString("yyyy-MM-dd")
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">@rep.CreatedAtUtc.ToString("dd MMM yyyy")</span>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 600;">
+                                        @(rep.EstimatedCost.HasValue ? $"${rep.EstimatedCost.Value:F2}" : "—")
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @if (rep.IsResolved)
+                                        {
+                                            <span class="rk-badge rk-badge-success">Resolved (@rep.ResolvedAtUtc?.ToString("MM/dd"))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rk-badge rk-badge-error">Unresolved & Blocked</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        @if (!rep.IsResolved)
+                                        {
+                                            <form asp-action="ResolveDamageReport" method="post" style="display: inline;" onsubmit="return confirm('Mark this damage report as resolved and restore inventory?');">
+                                                <input type="hidden" name="id" value="@rep.MaintenanceRecordId" />
+                                                <input type="hidden" name="resolutionNotes" value="Repairs completed and inspected by admin." />
+                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                                <button type="submit" class="rk-btn rk-btn-sm rk-btn-teal">
+                                                    Mark Resolved
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">Completed</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-6); color: var(--rk-text-muted);">
+                    No damage or maintenance incident records found matching your filter.
+                </div>
+            }
+        </div>
+    </div>
+</div>

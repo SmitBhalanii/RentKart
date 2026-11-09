@@ -1,0 +1,198 @@
+@using RentKart.Core.Enums
+@model RentKart.Core.Interfaces.AdminBookingDetailDto
+@{
+    ViewData["Title"] = $"Booking Inspection: {Model.BookingNumber} - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <a asp-action="Bookings" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+                    &larr; Back to All Bookings
+                </a>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Booking Ref: @Model.BookingNumber
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs); margin-bottom: 0;">
+                    Placed on @Model.CreatedAtUtc.ToString("dd MMM yyyy 'at' HH:mm") UTC &bull; Overall Status: <span class="rk-badge">@Model.Status</span>
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Customer & Financial Snapshot -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Customer</div>
+                <div style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-top: 0.25rem;">
+                    <a asp-action="CustomerDetails" asp-route-id="@Model.CustomerId" style="color: inherit; text-decoration: none;">
+                        @Model.CustomerName &rarr;
+                    </a>
+                </div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@Model.CustomerEmail &bull; @Model.CustomerPhone</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Rental Fee</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">
+                    $@Model.TotalRentalFee.ToString("F2")
+                </div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Security Deposit</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">
+                    $@Model.TotalSecurityDeposit.ToString("F2")
+                </div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-teal-600);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Grand Total Volume</div>
+                <div style="font-size: var(--rk-font-size-2xl); font-weight: 900; color: var(--rk-teal-700); margin-top: 0.25rem;">
+                    $@Model.GrandTotal.ToString("F2")
+                </div>
+            </div>
+        </div>
+
+        <!-- Participating Store Groups -->
+        <div style="display: flex; flex-direction: column; gap: var(--rk-space-6);">
+            <h2 style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 0;">
+                Merchant Fulfillment Subgroups (@Model.Groups.Count)
+            </h2>
+
+            @foreach (var group in Model.Groups)
+            {
+                <div class="rk-card rk-card-elevated" style="padding: 0; overflow: hidden; border: 1px solid var(--rk-border-light);">
+                    <!-- Group Header -->
+                    <div style="background: var(--rk-neutral-50); border-bottom: 1px solid var(--rk-border-light); padding: var(--rk-space-4) var(--rk-space-5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <div style="font-weight: 800; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                                @group.BusinessName
+                            </div>
+                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                Subgroup Ref: <strong>@group.GroupNumber</strong> &bull; Pickup Verification Code: <code style="font-weight: 700; color: var(--rk-teal-700);">@group.PickupVerificationCode</code>
+                            </div>
+                        </div>
+
+                        <div>
+                            @switch (group.Status)
+                            {
+                                case BookingGroupStatus.PendingApproval:
+                                    <span class="rk-badge rk-badge-warning">Pending Store Approval</span>
+                                    break;
+                                case BookingGroupStatus.Confirmed:
+                                    <span class="rk-badge rk-badge-success">Confirmed (Awaiting Pickup)</span>
+                                    break;
+                                case BookingGroupStatus.HandedOver:
+                                    <span class="rk-badge rk-badge-info">Handed Over (In Use)</span>
+                                    break;
+                                case BookingGroupStatus.Completed:
+                                    <span class="rk-badge rk-badge-success">Returned & Inspected</span>
+                                    break;
+                                case BookingGroupStatus.Rejected:
+                                    <span class="rk-badge rk-badge-error">Declined by Merchant</span>
+                                    break;
+                                case BookingGroupStatus.CancelledByCustomer:
+                                    <span class="rk-badge rk-badge-error">Cancelled</span>
+                                    break;
+                                default:
+                                    <span class="rk-badge">@group.Status</span>
+                                    break;
+                            }
+                        </div>
+                    </div>
+
+                    <div style="padding: var(--rk-space-5);">
+                        <!-- Inspection / Handover Log Info -->
+                        @if (group.HandedOverAtUtc.HasValue)
+                        {
+                            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--rk-radius-md); padding: var(--rk-space-3); margin-bottom: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: #1e40af;">
+                                <strong>Handed Over at Counter:</strong> @group.HandedOverAtUtc.Value.ToString("dd MMM yyyy 'at' HH:mm") UTC
+                                @if (!string.IsNullOrWhiteSpace(group.HandoverNotes))
+                                {
+                                    <div style="margin-top: 0.25rem;"><em>Handover Notes:</em> @group.HandoverNotes</div>
+                                }
+                            </div>
+                        }
+
+                        @if (group.ReturnedAtUtc.HasValue)
+                        {
+                            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-3); margin-bottom: var(--rk-space-4); font-size: var(--rk-font-size-xs); color: #166534;">
+                                <strong>Returned & Inspected:</strong> @group.ReturnedAtUtc.Value.ToString("dd MMM yyyy 'at' HH:mm") UTC
+                                @if (!string.IsNullOrWhiteSpace(group.ReturnInspectionNotes))
+                                {
+                                    <div style="margin-top: 0.25rem;"><em>Return Notes:</em> @group.ReturnInspectionNotes</div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Items Table -->
+                        <table class="rk-table" style="width: 100%; margin-bottom: var(--rk-space-3);">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Period</th>
+                                    <th style="text-align: center;">Qty</th>
+                                    <th style="text-align: right;">Daily Rate</th>
+                                    <th style="text-align: right;">Total Price</th>
+                                    <th style="text-align: right;">Review Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in group.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.EquipmentId" target="_blank" style="color: inherit; text-decoration: none;">
+                                                    @item.EquipmentTitle &nearr;
+                                                </a>
+                                            </div>
+                                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                                Item ID: #@item.Id
+                                            </div>
+                                        </td>
+                                        <td style="font-size: var(--rk-font-size-xs);">
+                                            @item.StartDate.ToString("MMM dd") - @item.EndDate.ToString("MMM dd, yyyy") (@item.DaysCount d)
+                                        </td>
+                                        <td style="text-align: center;">
+                                            @item.Quantity
+                                        </td>
+                                        <td style="text-align: right;">
+                                            $@item.DailyRentalRate.ToString("F2")
+                                        </td>
+                                        <td style="text-align: right; font-weight: 700;">
+                                            $@item.TotalItemPrice.ToString("F2")
+                                        </td>
+                                        <td style="text-align: right;">
+                                            @if (item.ReviewId.HasValue)
+                                            {
+                                                <span class="rk-badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">
+                                                    ★ @item.ReviewRating.GetValueOrDefault() @(item.ReviewIsHidden == true ? "(Hidden)" : "(Visible)")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">Not Reviewed</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" style="text-align: right; font-weight: 700;">Store Subtotal:</td>
+                                    <td style="text-align: right; font-weight: 800; color: var(--rk-teal-700);">$@group.SubtotalRentalFee.ToString("F2")</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

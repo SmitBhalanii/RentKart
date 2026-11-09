@@ -12,17 +12,20 @@ public class CatalogController : Controller
 {
     private readonly IEquipmentCatalogService _catalogService;
     private readonly IWishlistService _wishlistService;
+    private readonly IReviewService _reviewService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<CatalogController> _logger;
 
     public CatalogController(
         IEquipmentCatalogService catalogService,
         IWishlistService wishlistService,
+        IReviewService reviewService,
         UserManager<ApplicationUser> userManager,
         ILogger<CatalogController> logger)
     {
         _catalogService = catalogService;
         _wishlistService = wishlistService;
+        _reviewService = reviewService;
         _userManager = userManager;
         _logger = logger;
     }
@@ -148,6 +151,9 @@ public class CatalogController : Controller
             isInWishlist = await _wishlistService.IsInWishlistAsync(currentUserId, equipment.Id);
         }
 
+        var reviewsSummary = await _reviewService.GetEquipmentReviewsSummaryAsync(equipment.Id);
+        var recentReviews = await _reviewService.GetEquipmentReviewsAsync(equipment.Id);
+
         var model = new EquipmentDetailViewModel
         {
             Id = equipment.Id,
@@ -175,7 +181,11 @@ public class CatalogController : Controller
             PickupInstructions = equipment.Business.PickupInstructions,
             BusinessStatus = equipment.Business.Status,
             IsInWishlist = isInWishlist,
-            IsPreview = isPreview
+            IsPreview = isPreview,
+            AverageRating = reviewsSummary.AverageRating,
+            TotalReviews = reviewsSummary.TotalReviews,
+            RatingCounts = reviewsSummary.RatingCounts,
+            Reviews = recentReviews
         };
 
         return View(model);

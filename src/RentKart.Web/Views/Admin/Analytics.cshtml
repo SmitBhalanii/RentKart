@@ -1,0 +1,205 @@
+@model RentKart.Core.Interfaces.AdminPlatformAnalyticsDto
+@{
+    ViewData["Title"] = "Platform Analytics - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Platform Analytics & Operational Performance
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Key performance metrics, rental trends, category demand, and risk analytics
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Key Metrics Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div class="rk-card" style="padding: var(--rk-space-4); border-top: 3px solid var(--rk-teal-600);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Completed Fulfillment Groups</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">
+                    @Model.TotalCompletedRentals
+                </div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 0.25rem;">Full return inspection finalized</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-top: 3px solid var(--rk-error);">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Total Damage Incidents</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-error); margin-top: 0.25rem;">
+                    @Model.TotalDamageIncidents
+                </div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 0.25rem;">Reported during return inspection</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4); border-top: 3px solid #f59e0b;">
+                <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Damage / Incident Rate</div>
+                <div style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">
+                    @Model.DamageIncidentRatePercent.ToString("F1")%
+                </div>
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 0.25rem;">Percentage of rentals encountering damage</div>
+            </div>
+        </div>
+
+        <!-- Monthly Trends & Top Categories -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-6); margin-bottom: var(--rk-space-6); align-items: flex-start;">
+            <!-- Monthly Trends -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                    Booking Volume Trends (Last 6 Months)
+                </h2>
+
+                @if (Model.MonthlyTrends.Any())
+                {
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th style="text-align: center;">Bookings</th>
+                                <th style="text-align: right;">Rental Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.MonthlyTrends)
+                            {
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--rk-navy-900);">@t.MonthLabel</td>
+                                    <td style="text-align: center; font-weight: 700;">@t.BookingsCount</td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--rk-teal-700);">$@t.TotalRentalFeeVolume.ToString("F2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: var(--rk-space-4); color: var(--rk-text-muted);">
+                        No monthly data yet.
+                    </div>
+                }
+            </div>
+
+            <!-- Top Categories -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                    Top Categories by Rental Demand
+                </h2>
+
+                @if (Model.TopCategories.Any())
+                {
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th style="text-align: center;">Items Rented</th>
+                                <th style="text-align: right;">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in Model.TopCategories)
+                            {
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--rk-navy-900);">@cat.CategoryName</td>
+                                    <td style="text-align: center;">@cat.TotalRentalItemsCount</td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--rk-teal-700);">$@cat.RentalFeeVolume.ToString("F2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: var(--rk-space-4); color: var(--rk-text-muted);">
+                        No category rentals recorded yet.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Top Equipment & Top Merchants -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-6); align-items: flex-start;">
+            <!-- Top Equipment -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                    Top Rented Equipment
+                </h2>
+
+                @if (Model.TopEquipment.Any())
+                {
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Equipment</th>
+                                <th>Store</th>
+                                <th style="text-align: right;">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var eq in Model.TopEquipment)
+                            {
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--rk-navy-900);">
+                                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@eq.EquipmentId" target="_blank" style="color: inherit; text-decoration: none;">
+                                            @eq.EquipmentTitle &nearr;
+                                        </a>
+                                    </td>
+                                    <td style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@eq.ShopName</td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--rk-teal-700);">$@eq.RentalRevenue.ToString("F2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: var(--rk-space-4); color: var(--rk-text-muted);">
+                        No equipment rentals recorded yet.
+                    </div>
+                }
+            </div>
+
+            <!-- Top Merchants -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                    Top Performing Merchant Stores
+                </h2>
+
+                @if (Model.TopStores.Any())
+                {
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Store</th>
+                                <th>City</th>
+                                <th style="text-align: center;">Completed</th>
+                                <th style="text-align: right;">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var store in Model.TopStores)
+                            {
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--rk-navy-900);">@store.ShopName</td>
+                                    <td style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@store.City</td>
+                                    <td style="text-align: center; font-weight: 700;">@store.CompletedGroupsCount</td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--rk-teal-700);">$@store.TotalRentalRevenue.ToString("F2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: var(--rk-space-4); color: var(--rk-text-muted);">
+                        No completed store orders recorded yet.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

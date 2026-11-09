@@ -190,6 +190,10 @@
                                 <th style="padding: 0.5rem 0; text-align: right;">Daily Rate</th>
                                 <th style="padding: 0.5rem 0; text-align: right;">Deposit</th>
                                 <th style="padding: 0.5rem 0; text-align: right;">Total Price</th>
+                                @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
+                                {
+                                    <th style="padding: 0.5rem 0; text-align: right;">Review</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -219,6 +223,23 @@
                                     <td style="padding: 0.65rem 0; text-align: right; font-weight: 700; color: var(--rk-navy-900);">
                                         $@item.TotalItemPrice.ToString("F2")
                                     </td>
+                                    @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
+                                    {
+                                        <td style="padding: 0.65rem 0; text-align: right;">
+                                            @if (item.HasReview)
+                                            {
+                                                <span class="rk-badge" style="background: #fef3c7; color: #92400e; font-weight: 700; font-size: 11px;">
+                                                    ★ @item.ReviewRating.GetValueOrDefault() Reviewed
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Reviews" asp-action="Create" asp-route-bookingItemId="@item.Id" class="rk-btn rk-btn-primary rk-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 11px;">
+                                                    Write Review
+                                                </a>
+                                            }
+                                        </td>
+                                    }
                                 </tr>
                             }
                         </tbody>
@@ -233,6 +254,10 @@
                                 <td style="padding-top: 0.65rem; text-align: right; font-weight: 800; color: var(--rk-teal-700);">
                                     $@group.SubtotalRentalFee.ToString("F2")
                                 </td>
+                                @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
+                                {
+                                    <td></td>
+                                }
                             </tr>
                         </tfoot>
                     </table>

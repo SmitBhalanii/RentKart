@@ -1,0 +1,110 @@
+@model RentKart.Web.Models.Admin.AdminAuditLogsViewModel
+@{
+    ViewData["Title"] = "Platform Audit Logs - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Platform Audit Trail & Security Logs
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Immutable forensic log of all administrative actions, store approvals, and moderation decisions
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Filter Controls -->
+        <div class="rk-card" style="padding: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+            <form method="get" asp-action="AuditLogs" style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap; align-items: center;">
+                <input type="text" name="actionFilter" value="@Model.ActionFilter" placeholder="Filter by Action (e.g. ApproveBusiness, HideReview)..." class="rk-form-control" style="flex: 1; min-width: 240px;" />
+                <input type="text" name="entityTypeFilter" value="@Model.EntityTypeFilter" placeholder="Filter by Entity (e.g. Review, Category)..." class="rk-form-control" style="flex: 1; min-width: 200px;" />
+
+                <button type="submit" class="rk-btn rk-btn-primary">
+                    Filter Logs
+                </button>
+                <a asp-action="AuditLogs" class="rk-btn rk-btn-outline">
+                    Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Audit Table Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                    Audit Events (@Model.TotalCount)
+                </div>
+            </div>
+
+            @if (Model.Logs.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Admin / User</th>
+                                <th>Action</th>
+                                <th>Target Entity</th>
+                                <th>Metadata & Audit Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.Logs)
+                            {
+                                <tr>
+                                    <td style="white-space: nowrap; font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">
+                                        @log.TimestampUtc.ToString("dd MMM yyyy, HH:mm:ss") UTC
+                                    </td>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">@log.UserName</div>
+                                        @if (!string.IsNullOrEmpty(log.UserId))
+                                        {
+                                            <div style="font-size: 11px; color: var(--rk-text-muted);">ID: @log.UserId.Substring(0, Math.Min(8, log.UserId.Length))...</div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="rk-badge rk-badge-info" style="font-family: monospace;">@log.Action</span>
+                                    </td>
+                                    <td>
+                                        <div style="font-weight: 600;">@log.EntityType</div>
+                                        <div style="font-size: 11px; color: var(--rk-text-muted);">Ref: @log.EntityId</div>
+                                    </td>
+                                    <td>
+                                        <div style="font-family: monospace; font-size: 11px; color: var(--rk-navy-900); background: var(--rk-neutral-100); padding: 0.35rem 0.6rem; border-radius: var(--rk-radius-sm); word-break: break-all; max-width: 440px;">
+                                            @log.Details
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: var(--rk-space-5);">
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <a asp-action="AuditLogs" asp-route-page="@p" asp-route-actionFilter="@Model.ActionFilter" asp-route-entityTypeFilter="@Model.EntityTypeFilter" class="rk-btn rk-btn-sm @(p == Model.Page ? "rk-btn-primary" : "rk-btn-outline")">
+                                @p
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-6); color: var(--rk-text-muted);">
+                    No audit log records found matching your filters.
+                </div>
+            }
+        </div>
+    </div>
+</div>

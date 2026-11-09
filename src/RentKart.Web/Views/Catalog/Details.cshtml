@@ -49,9 +49,15 @@
 
                 <!-- Product Title & Overview -->
                 <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-5);">
-                    <div style="display: flex; gap: 0.5rem; margin-bottom: var(--rk-space-2);">
+                    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: var(--rk-space-2); flex-wrap: wrap;">
                         <span class="rk-badge rk-badge-info">@Model.CategoryName</span>
                         <span class="rk-badge rk-badge-neutral">Condition: @Model.Condition</span>
+                        @if (Model.TotalReviews > 0)
+                        {
+                            <span class="rk-badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">
+                                ★ @Model.AverageRating.ToString("F1") (@Model.TotalReviews @(Model.TotalReviews == 1 ? "review" : "reviews"))
+                            </span>
+                        }
                     </div>
 
                     <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3); line-height: 1.3;">
@@ -113,16 +119,92 @@
 
                 <!-- Verified Reviews Section (Honest state without fabricated ratings) -->
                 <div class="rk-card" style="padding: var(--rk-space-5);">
-                    <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
-                        Customer Ratings & Feedback
-                    </h3>
-                    <div style="background: var(--rk-neutral-50); border: 1px dashed var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-5); text-align: center;">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--rk-text-muted); margin-bottom: 0.5rem;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <div style="font-weight: 600; color: var(--rk-navy-900); font-size: var(--rk-font-size-sm); margin-bottom: 0.25rem;">No reviews yet</div>
-                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); max-width: 420px; margin: 0 auto;">
-                            RentKart only permits verified reviews from customers who have completed an in-store pickup and return inspection.
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4); flex-wrap: wrap; gap: 0.5rem;">
+                        <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                            Customer Ratings & Feedback
+                        </h3>
+                        @if (Model.TotalReviews > 0)
+                        {
+                            <span class="rk-badge rk-badge-success" style="font-size: var(--rk-font-size-xs);">
+                                Verified Completed Rentals Only
+                            </span>
+                        }
                     </div>
+
+                    @if (Model.TotalReviews > 0)
+                    {
+                        <!-- Summary Rating Card -->
+                        <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-5); display: flex; align-items: center; gap: var(--rk-space-6); flex-wrap: wrap;">
+                            <div style="text-align: center; min-width: 120px;">
+                                <div style="font-size: 2.75rem; font-weight: 900; color: var(--rk-navy-900); line-height: 1;">
+                                    @Model.AverageRating.ToString("F1")
+                                </div>
+                                <div style="color: #f59e0b; font-size: 1.15rem; margin: 0.25rem 0;">
+                                    @for (int s = 1; s <= 5; s++)
+                                    {
+                                        @(s <= Math.Round(Model.AverageRating) ? "★" : "☆")
+                                    }
+                                </div>
+                                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                    @Model.TotalReviews @(Model.TotalReviews == 1 ? "verified review" : "verified reviews")
+                                </div>
+                            </div>
+
+                            <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.35rem; font-size: var(--rk-font-size-xs);">
+                                @for (int star = 5; star >= 1; star--)
+                                {
+                                    var count = Model.RatingCounts.ContainsKey(star) ? Model.RatingCounts[star] : 0;
+                                    var pct = Model.TotalReviews > 0 ? (int)Math.Round((double)count / Model.TotalReviews * 100) : 0;
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="width: 32px; color: var(--rk-text-muted);">@star ★</span>
+                                        <div style="flex: 1; height: 8px; background: var(--rk-neutral-200); border-radius: 4px; overflow: hidden;">
+                                            <div style="width: @pct%; height: 100%; background: #f59e0b; border-radius: 4px;"></div>
+                                        </div>
+                                        <span style="width: 28px; text-align: right; color: var(--rk-text-muted);">@count</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Review Items -->
+                        <div style="display: flex; flex-direction: column; gap: var(--rk-space-4);">
+                            @foreach (var review in Model.Reviews)
+                            {
+                                <div style="border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-4);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                        <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-sm);">
+                                            @review.CustomerName
+                                            <span class="rk-badge rk-badge-success" style="font-size: 10px; padding: 1px 6px; margin-left: 0.35rem;">Verified Renter</span>
+                                        </div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                            @review.CreatedAtUtc.ToString("MMM dd, yyyy")
+                                        </div>
+                                    </div>
+
+                                    <div style="color: #f59e0b; font-size: var(--rk-font-size-sm); margin-bottom: 0.35rem;">
+                                        @for (int s = 1; s <= 5; s++)
+                                        {
+                                            @(s <= review.Rating ? "★" : "☆")
+                                        }
+                                    </div>
+
+                                    <p style="font-size: var(--rk-font-size-sm); color: var(--rk-text-secondary); line-height: 1.6; margin-bottom: 0;">
+                                        @review.Comment
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="background: var(--rk-neutral-50); border: 1px dashed var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-5); text-align: center;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--rk-text-muted); margin-bottom: 0.5rem;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <div style="font-weight: 600; color: var(--rk-navy-900); font-size: var(--rk-font-size-sm); margin-bottom: 0.25rem;">No reviews yet</div>
+                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); max-width: 420px; margin: 0 auto;">
+                                RentKart only permits verified reviews from customers who have completed an in-store pickup and return inspection.
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
 

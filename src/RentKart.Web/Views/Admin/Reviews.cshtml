@@ -1,0 +1,141 @@
+@model RentKart.Web.Models.Admin.AdminReviewsViewModel
+@{
+    ViewData["Title"] = "Customer Reviews Moderation - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Customer Reviews Moderation
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Monitor authentic customer reviews, remove abusive or fraudulent feedback, and maintain catalog trust
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Filter Controls -->
+        <div class="rk-card" style="padding: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+            <form method="get" asp-action="Reviews" style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap; align-items: center;">
+                <select name="isHidden" class="rk-form-control" style="width: auto; min-width: 160px;">
+                    <option value="">All Visibilities</option>
+                    <option value="false" selected="@(Model.IsHiddenFilter == false)">Visible (Published)</option>
+                    <option value="true" selected="@(Model.IsHiddenFilter == true)">Hidden (Moderated)</option>
+                </select>
+
+                <select name="rating" class="rk-form-control" style="width: auto; min-width: 140px;">
+                    <option value="">All Ratings</option>
+                    @for (int r = 5; r >= 1; r--)
+                    {
+                        <option value="@r" selected="@(Model.RatingFilter == r)">@r Stars (★)</option>
+                    }
+                </select>
+
+                <button type="submit" class="rk-btn rk-btn-primary">
+                    Filter Reviews
+                </button>
+                <a asp-action="Reviews" class="rk-btn rk-btn-outline">
+                    Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Reviews Table Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                    Reviews (@Model.Reviews.Count)
+                </div>
+            </div>
+
+            @if (Model.Reviews.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Equipment & Store</th>
+                                <th>Customer</th>
+                                <th style="text-align: center;">Rating</th>
+                                <th>Review & Moderation Reason</th>
+                                <th>Submitted</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: right;">Moderation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.Reviews)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@r.EquipmentId" target="_blank" style="color: inherit; text-decoration: none;">
+                                                @r.EquipmentTitle &nearr;
+                                            </a>
+                                        </div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                            Store: @r.ShopName &bull; Booking Item #@r.BookingItemId
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="font-weight: 600; color: var(--rk-navy-900);">@r.CustomerName</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@r.CustomerEmail</div>
+                                    </td>
+                                    <td style="text-align: center; color: #f59e0b; font-weight: 800; font-size: var(--rk-font-size-base);">
+                                        ★ @r.Rating
+                                    </td>
+                                    <td>
+                                        <div style="font-size: var(--rk-font-size-sm); color: var(--rk-navy-900); line-height: 1.5; max-width: 320px;">
+                                            @r.Comment
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(r.ModerationReason))
+                                        {
+                                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-error); margin-top: 0.25rem;">
+                                                <strong>Moderation Note:</strong> @r.ModerationReason
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">@r.CreatedAtUtc.ToString("dd MMM yyyy")</span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @if (r.IsHidden)
+                                        {
+                                            <span class="rk-badge rk-badge-error">Hidden</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rk-badge rk-badge-success">Visible</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <form asp-action="ToggleReviewVisibility" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to @(r.IsHidden ? "unhide" : "hide") this review?');">
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                            <input type="hidden" name="isHidden" value="@(r.IsHidden ? "false" : "true")" />
+                                            <input type="hidden" name="reason" value="Administrative content policy enforcement" />
+                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                            <button type="submit" class="rk-btn rk-btn-sm @(r.IsHidden ? "rk-btn-teal" : "rk-btn-outline")" style="@(r.IsHidden ? "" : "color: var(--rk-error); border-color: var(--rk-error);")">
+                                                @(r.IsHidden ? "Unhide Review" : "Hide Review")
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-6); color: var(--rk-text-muted);">
+                    No reviews found matching the selected filter.
+                </div>
+            }
+        </div>
+    </div>
+</div>

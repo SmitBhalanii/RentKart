@@ -1,0 +1,169 @@
+@model RentKart.Core.Interfaces.AdminCustomerDetailDto
+@{
+    ViewData["Title"] = $"Customer Profile: {Model.FullName} - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Header & Nav -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <a asp-action="Customers" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+                    &larr; Back to Customers Directory
+                </a>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Customer: @Model.FullName
+                </h1>
+            </div>
+
+            <div>
+                <form asp-action="ToggleCustomerLockout" method="post" onsubmit="return confirm('Are you sure you want to change access status for @Model.FullName?');">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="reason" value="Admin detail action" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="rk-btn @(Model.IsLockedOut ? "rk-btn-teal" : "rk-btn-outline")" style="@(Model.IsLockedOut ? "" : "color: var(--rk-error); border-color: var(--rk-error);")">
+                        @(Model.IsLockedOut ? "Unlock Account Access" : "Lockout Customer Account")
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Info Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Email Address</div>
+                <div style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-top: 0.25rem;">@Model.Email</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Phone Number</div>
+                <div style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-top: 0.25rem;">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Registration Date</div>
+                <div style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-top: 0.25rem;">@Model.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm") UTC</div>
+            </div>
+
+            <div class="rk-card" style="padding: var(--rk-space-4);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Account Status</div>
+                <div style="margin-top: 0.25rem;">
+                    @if (Model.IsLockedOut)
+                    {
+                        <span class="rk-badge rk-badge-error">Locked Out (Until @Model.LockoutEnd?.ToString("yyyy-MM-dd"))</span>
+                    }
+                    else
+                    {
+                        <span class="rk-badge rk-badge-success">Active & Permitted</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental History -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
+            <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4);">
+                Rental Bookings (@Model.Bookings.Count)
+            </h2>
+
+            @if (Model.Bookings.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Booking Number</th>
+                                <th>Date Placed</th>
+                                <th style="text-align: center;">Stores</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Grand Total</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in Model.Bookings)
+                            {
+                                <tr>
+                                    <td style="font-weight: 700; color: var(--rk-navy-900);">
+                                        @b.BookingNumber
+                                    </td>
+                                    <td>
+                                        @b.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm") UTC
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @b.GroupsCount
+                                    </td>
+                                    <td>
+                                        <span class="rk-badge">@b.Status</span>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 700;">
+                                        $@b.GrandTotal.ToString("F2")
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a asp-action="BookingDetails" asp-route-id="@b.Id" class="rk-btn rk-btn-sm rk-btn-outline">
+                                            Inspect &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-4); color: var(--rk-text-muted);">
+                    This customer has not placed any bookings yet.
+                </div>
+            }
+        </div>
+
+        <!-- Customer Reviews -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4);">
+                Customer Reviews (@Model.Reviews.Count)
+            </h2>
+
+            @if (Model.Reviews.Any())
+            {
+                <div style="display: flex; flex-direction: column; gap: var(--rk-space-4);">
+                    @foreach (var rev in Model.Reviews)
+                    {
+                        <div style="border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-4);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                    @rev.EquipmentTitle
+                                    <span style="color: #f59e0b; margin-left: 0.5rem;">★ @rev.Rating</span>
+                                </div>
+                                <div>
+                                    @if (rev.IsHidden)
+                                    {
+                                        <span class="rk-badge rk-badge-error">Hidden by Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="rk-badge rk-badge-success">Visible</span>
+                                    }
+                                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-left: 0.5rem;">
+                                        @rev.CreatedAtUtc.ToString("dd MMM yyyy")
+                                    </span>
+                                </div>
+                            </div>
+                            <p style="font-size: var(--rk-font-size-sm); color: var(--rk-text-secondary); margin-bottom: 0;">
+                                @rev.Comment
+                            </p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-4); color: var(--rk-text-muted);">
+                    No reviews submitted by this customer yet.
+                </div>
+            }
+        </div>
+    </div>
+</div>

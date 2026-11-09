@@ -17,6 +17,13 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .IsRequired()
             .HasMaxLength(1000);
 
+        builder.Property(r => r.IsHidden)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(r => r.ModerationReason)
+            .HasMaxLength(500);
+
         builder.Property(r => r.CreatedAtUtc)
             .HasDefaultValueSql("GETUTCDATE()");
 
@@ -43,5 +50,6 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
         builder.HasIndex(r => r.EquipmentId);
         builder.HasIndex(r => r.CustomerId);
         builder.HasIndex(r => r.Rating);
+        builder.HasIndex(r => r.IsHidden);
     }
 }

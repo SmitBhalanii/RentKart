@@ -59,6 +59,8 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IRentalDocumentService, RentalDocumentService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IAdminPlatformService, AdminPlatformService>();
 
 builder.Services.AddControllersWithViews();
 

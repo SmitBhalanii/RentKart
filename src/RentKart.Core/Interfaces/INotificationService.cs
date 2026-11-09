@@ -73,3 +73,4 @@ public interface INotificationService
     /// </summary>
     Task NotifyBookingGroupStatusChangedAsync(int bookingGroupId, BookingGroupStatus newStatus, string? note = null);
 }
+

@@ -117,3 +117,4 @@ public interface IRentalDocumentService
     /// </summary>
     Task<DocumentOperationResult> RetryDocumentGenerationAsync(int documentId, string currentUserId, bool isAdmin = false);
 }
+

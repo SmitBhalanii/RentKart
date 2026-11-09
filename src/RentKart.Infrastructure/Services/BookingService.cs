@@ -320,6 +320,9 @@ public class BookingService : IBookingService
                 .ThenInclude(bg => bg.BookingItems)
                     .ThenInclude(bi => bi.Equipment)
                         .ThenInclude(e => e.Images)
+            .Include(b => b.BookingGroups)
+                .ThenInclude(bg => bg.BookingItems)
+                    .ThenInclude(bi => bi.Review)
             .FirstOrDefaultAsync(b => b.Id == bookingId && b.CustomerId == customerUserId);
 
         if (booking == null) return null;
@@ -369,7 +372,10 @@ public class BookingService : IBookingService
                     DaysCount = i.DaysCount,
                     DailyRentalRate = i.DailyRentalRate,
                     ItemSecurityDeposit = i.ItemSecurityDeposit,
-                    TotalItemPrice = i.TotalItemPrice
+                    TotalItemPrice = i.TotalItemPrice,
+                    HasReview = i.Review != null,
+                    ReviewRating = i.Review?.Rating,
+                    ReviewId = i.Review?.Id
                 }).ToList()
             }).ToList()
         };

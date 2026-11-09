@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,17 +17,23 @@ public class AdminController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly IBusinessManagementService _businessService;
+    private readonly IAdminPlatformService _adminPlatformService;
+    private readonly IReviewService _reviewService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         ApplicationDbContext context,
         IBusinessManagementService businessService,
+        IAdminPlatformService adminPlatformService,
+        IReviewService reviewService,
         UserManager<ApplicationUser> userManager,
         ILogger<AdminController> logger)
     {
         _context = context;
         _businessService = businessService;
+        _adminPlatformService = adminPlatformService;
+        _reviewService = reviewService;
         _userManager = userManager;
         _logger = logger;
     }
@@ -34,12 +41,7 @@ public class AdminController : Controller
     [HttpGet]
     public async Task<IActionResult> Dashboard()
     {
-        var totalUsers = await _context.Users.CountAsync();
-        var totalCustomers = await _context.Users.CountAsync(u => u.UserType == UserRole.Customer);
-        var totalBusinesses = await _context.BusinessProfiles.CountAsync();
-        var pendingCount = await _context.BusinessProfiles.CountAsync(b => b.Status == BusinessStatus.PendingApproval);
-        var approvedCount = await _context.BusinessProfiles.CountAsync(b => b.Status == BusinessStatus.Approved);
-        var suspendedCount = await _context.BusinessProfiles.CountAsync(b => b.Status == BusinessStatus.Suspended);
+        var metrics = await _adminPlatformService.GetDashboardMetricsAsync();
 
         var pendingBusinesses = await _context.BusinessProfiles
             .Include(b => b.User)
@@ -83,12 +85,7 @@ public class AdminController : Controller
 
         var model = new AdminDashboardViewModel
         {
-            TotalUsers = totalUsers,
-            TotalCustomers = totalCustomers,
-            TotalBusinesses = totalBusinesses,
-            PendingBusinessesCount = pendingCount,
-            ApprovedBusinessesCount = approvedCount,
-            SuspendedBusinessesCount = suspendedCount,
+            Metrics = metrics,
             PendingBusinesses = pendingBusinesses,
             RecentBusinesses = recentBusinesses
         };
@@ -235,5 +232,332 @@ public class AdminController : Controller
         }
 
         return RedirectToAction(nameof(Businesses));
+    }
+
+    // Customer Management
+    [HttpGet]
+    public async Task<IActionResult> Customers(string? search, int page = 1)
+    {
+        if (page < 1) page = 1;
+        var (customers, totalCount) = await _adminPlatformService.GetCustomersAsync(search, page, pageSize: 20);
+
+        var model = new AdminCustomersViewModel
+        {
+            Search = search,
+            Page = page,
+            TotalCount = totalCount,
+            Customers = customers
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CustomerDetails(string id)
+    {
+        var customer = await _adminPlatformService.GetCustomerDetailsAsync(id);
+        if (customer == null)
+        {
+            return NotFound();
+        }
+
+        return View(customer);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleCustomerLockout(string id, string? reason, string? returnUrl = null)
+    {
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var success = await _adminPlatformService.ToggleCustomerLockoutAsync(id, adminId, reason, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Customer account access status was updated successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Could not update customer status.";
+        }
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Customers));
+    }
+
+    // Category Management
+    [HttpGet]
+    public async Task<IActionResult> Categories()
+    {
+        var list = await _adminPlatformService.GetCategoriesAsync();
+        var model = new AdminCategoriesViewModel
+        {
+            Categories = list
+        };
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCategory(AdminCreateCategoryDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Slug))
+        {
+            TempData["ErrorMessage"] = "Category name and slug are required.";
+            return RedirectToAction(nameof(Categories));
+        }
+
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var (success, error, _) = await _adminPlatformService.CreateCategoryAsync(dto, adminId, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = $"Category '{dto.Name}' was created successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to create category.";
+        }
+
+        return RedirectToAction(nameof(Categories));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditCategory(int id, AdminEditCategoryDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Slug))
+        {
+            TempData["ErrorMessage"] = "Category name and slug are required.";
+            return RedirectToAction(nameof(Categories));
+        }
+
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var (success, error) = await _adminPlatformService.UpdateCategoryAsync(id, dto, adminId, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = $"Category '{dto.Name}' was updated successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to update category.";
+        }
+
+        return RedirectToAction(nameof(Categories));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var (success, error) = await _adminPlatformService.DeleteCategoryAsync(id, adminId, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Category was deleted successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to delete category.";
+        }
+
+        return RedirectToAction(nameof(Categories));
+    }
+
+    // Equipment Moderation
+    [HttpGet]
+    public async Task<IActionResult> Equipment(string? search, int? categoryId, bool? isActive, int page = 1)
+    {
+        if (page < 1) page = 1;
+        var (items, totalCount) = await _adminPlatformService.GetEquipmentListingsAsync(search, categoryId, isActive, page, pageSize: 20);
+        var categories = await _adminPlatformService.GetCategoriesAsync();
+
+        var model = new AdminEquipmentViewModel
+        {
+            Search = search,
+            CategoryId = categoryId,
+            IsActive = isActive,
+            Page = page,
+            TotalCount = totalCount,
+            Equipment = items,
+            Categories = categories
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleEquipmentStatus(int id, bool isActive, string? reason, string? returnUrl = null)
+    {
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var (success, error) = await _adminPlatformService.ToggleEquipmentStatusAsync(id, isActive, reason, adminId, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = isActive 
+                ? "Equipment listing has been activated and is now visible." 
+                : "Equipment listing has been suspended from the public catalog.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = error ?? "Failed to update equipment status.";
+        }
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Equipment));
+    }
+
+    // Booking Monitoring
+    [HttpGet]
+    public async Task<IActionResult> Bookings(BookingStatus? status, string? search, int page = 1)
+    {
+        if (page < 1) page = 1;
+        var (items, totalCount) = await _adminPlatformService.GetBookingsAsync(status, search, page, pageSize: 20);
+
+        var model = new AdminBookingsViewModel
+        {
+            StatusFilter = status,
+            Search = search,
+            Page = page,
+            TotalCount = totalCount,
+            Bookings = items
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> BookingDetails(int id)
+    {
+        var booking = await _adminPlatformService.GetBookingDetailsAsync(id);
+        if (booking == null)
+        {
+            return NotFound();
+        }
+
+        return View(booking);
+    }
+
+    // Review Moderation
+    [HttpGet]
+    public async Task<IActionResult> Reviews(bool? isHidden, int? rating)
+    {
+        var list = await _reviewService.GetReviewsForAdminAsync(isHidden, rating);
+        var model = new AdminReviewsViewModel
+        {
+            IsHiddenFilter = isHidden,
+            RatingFilter = rating,
+            Reviews = list
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleReviewVisibility(int id, bool isHidden, string? reason, string? returnUrl = null)
+    {
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var success = await _reviewService.ModerateReviewAsync(id, isHidden, reason, adminId, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = isHidden 
+                ? "Review has been hidden from public catalog display." 
+                : "Review has been unhidden and restored to public catalog display.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Could not update review moderation status.";
+        }
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Reviews));
+    }
+
+    // Damage Reports Moderation
+    [HttpGet]
+    public async Task<IActionResult> DamageReports(bool? isResolved)
+    {
+        var list = await _adminPlatformService.GetDamageReportsAsync(isResolved);
+        var model = new AdminDamageReportsViewModel
+        {
+            IsResolvedFilter = isResolved,
+            DamageReports = list
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResolveDamageReport(int id, string? resolutionNotes, string? returnUrl = null)
+    {
+        var adminId = _userManager.GetUserId(User) ?? "Admin";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var success = await _adminPlatformService.ResolveDamageReportAsync(id, adminId, resolutionNotes, ip);
+        if (success)
+        {
+            TempData["SuccessMessage"] = "Damage incident has been marked as resolved.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Could not resolve damage report.";
+        }
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(DamageReports));
+    }
+
+    // Platform Analytics
+    [HttpGet]
+    public async Task<IActionResult> Analytics()
+    {
+        var analytics = await _adminPlatformService.GetPlatformAnalyticsAsync();
+        return View(analytics);
+    }
+
+    // Audit Logs
+    [HttpGet]
+    public async Task<IActionResult> AuditLogs(string? actionFilter, string? entityTypeFilter, int page = 1)
+    {
+        if (page < 1) page = 1;
+        var (logs, totalCount) = await _adminPlatformService.GetAuditLogsAsync(actionFilter, entityTypeFilter, page, pageSize: 30);
+
+        var model = new AdminAuditLogsViewModel
+        {
+            ActionFilter = actionFilter,
+            EntityTypeFilter = entityTypeFilter,
+            Page = page,
+            TotalCount = totalCount,
+            Logs = logs
+        };
+
+        return View(model);
     }
 }

@@ -1,0 +1,119 @@
+@model RentKart.Web.Models.Reviews.ReviewCreateViewModel
+@{
+    ViewData["Title"] = $"Review {Model.EquipmentTitle} - RentKart";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container" style="max-width: 720px;">
+        <!-- Breadcrumb -->
+        <nav aria-label="Breadcrumb" style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+            <a asp-controller="Booking" asp-action="MyBookings" style="color: var(--rk-teal-600); text-decoration: none;">My Bookings</a>
+            <span style="margin: 0 0.4rem;">/</span>
+            <span style="color: var(--rk-navy-900); font-weight: 600;">Write Verified Review</span>
+        </nav>
+
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6);">
+            <!-- Title & Badge -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4); flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                        Verified Customer Review
+                    </h1>
+                    <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs); margin-bottom: 0;">
+                        Share your authentic rental experience with the community
+                    </p>
+                </div>
+                <span class="rk-badge rk-badge-success" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Completed Rental Verified
+                </span>
+            </div>
+
+            <!-- Item Summary Box -->
+            <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-5); display: flex; gap: var(--rk-space-4); align-items: center;">
+                @if (!string.IsNullOrEmpty(Model.PrimaryImageUrl))
+                {
+                    <img src="@Model.PrimaryImageUrl" alt="@Model.EquipmentTitle" style="width: 72px; height: 72px; object-fit: cover; border-radius: var(--rk-radius-sm);" />
+                }
+                else
+                {
+                    <div style="width: 72px; height: 72px; background: var(--rk-neutral-200); border-radius: var(--rk-radius-sm); display: flex; align-items: center; justify-content: center; color: var(--rk-text-muted);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </div>
+                }
+
+                <div style="flex: 1;">
+                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-teal-700); font-weight: 700; text-transform: uppercase;">
+                        @Model.CategoryName &bull; @Model.ShopName
+                    </div>
+                    <div style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900);">
+                        @Model.EquipmentTitle
+                    </div>
+                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                        Rented @Model.StartDate.ToString("MMM dd") - @Model.EndDate.ToString("MMM dd, yyyy") (@Model.DaysCount days &bull; Qty: @Model.Quantity)
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <input type="hidden" asp-for="BookingItemId" />
+                <input type="hidden" asp-for="EquipmentId" />
+                <input type="hidden" asp-for="EquipmentTitle" />
+                <input type="hidden" asp-for="PrimaryImageUrl" />
+                <input type="hidden" asp-for="CategoryName" />
+                <input type="hidden" asp-for="ShopName" />
+                <input type="hidden" asp-for="DailyRentalRate" />
+                <input type="hidden" asp-for="StartDate" />
+                <input type="hidden" asp-for="EndDate" />
+                <input type="hidden" asp-for="DaysCount" />
+                <input type="hidden" asp-for="Quantity" />
+
+                <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" style="margin-bottom: var(--rk-space-4);"></div>
+
+                <!-- Star Rating Selection -->
+                <div style="margin-bottom: var(--rk-space-5);">
+                    <label style="display: block; font-size: var(--rk-font-size-sm); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                        Overall Rating
+                    </label>
+                    <div style="display: flex; gap: var(--rk-space-3); align-items: center;">
+                        @for (int star = 5; star >= 1; star--)
+                        {
+                            <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; padding: 0.5rem 0.85rem; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); background: #ffffff; font-weight: 600; font-size: var(--rk-font-size-sm);">
+                                <input type="radio" asp-for="Rating" value="@star" style="accent-color: #f59e0b;" />
+                                <span>@star ★</span>
+                            </label>
+                        }
+                    </div>
+                    <span asp-validation-for="Rating" style="color: var(--rk-error); font-size: var(--rk-font-size-xs); display: block; margin-top: 0.25rem;"></span>
+                </div>
+
+                <!-- Review Text Area -->
+                <div style="margin-bottom: var(--rk-space-5);">
+                    <label asp-for="Comment" style="display: block; font-size: var(--rk-font-size-sm); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
+                        Your Review & Feedback
+                    </label>
+                    <textarea asp-for="Comment" rows="5" class="rk-form-control" placeholder="Describe the equipment condition, reliability, performance, and counter service quality..." style="width: 100%; font-family: inherit; font-size: var(--rk-font-size-sm); padding: 0.75rem; border-radius: var(--rk-radius-md); border: 1px solid var(--rk-border-light);"></textarea>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.25rem; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                        <span>Minimum 5 characters. Be honest and constructive.</span>
+                        <span>Max 1,000 characters</span>
+                    </div>
+                    <span asp-validation-for="Comment" style="color: var(--rk-error); font-size: var(--rk-font-size-xs); display: block; margin-top: 0.25rem;"></span>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; justify-content: flex-end; gap: var(--rk-space-3); border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-4);">
+                    <a asp-controller="Booking" asp-action="MyBookings" class="rk-btn rk-btn-outline">
+                        Cancel
+                    </a>
+                    <button type="submit" class="rk-btn rk-btn-primary">
+                        Submit Verified Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,162 @@
+@model RentKart.Web.Models.Admin.AdminCategoriesViewModel
+@{
+    ViewData["Title"] = "Category Management - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Category Management
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Manage equipment catalog taxonomy, taxonomy hierarchy, icons, and listing constraints
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-6); align-items: flex-start;">
+            <!-- Category List -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                    <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                        Active Catalog Categories (@Model.Categories.Count)
+                    </h2>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Slug</th>
+                                <th>Order</th>
+                                <th style="text-align: center;">Listings</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                            @cat.Name
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(cat.ParentCategoryName))
+                                        {
+                                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                                Parent: @cat.ParentCategoryName
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(cat.Description))
+                                        {
+                                            <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                @cat.Description
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <code style="font-size: var(--rk-font-size-xs);">@cat.Slug</code>
+                                    </td>
+                                    <td>
+                                        @cat.DisplayOrder
+                                    </td>
+                                    <td style="text-align: center; font-weight: 700;">
+                                        @cat.EquipmentCount
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @if (cat.IsActive)
+                                        {
+                                            <span class="rk-badge rk-badge-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rk-badge rk-badge-neutral">Disabled</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <form asp-action="DeleteCategory" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete category \'@cat.Name\'? Deletion will fail if equipment listings exist under this category.');">
+                                            <input type="hidden" name="id" value="@cat.Id" />
+                                            <button type="submit" class="rk-btn rk-btn-sm rk-btn-outline" style="color: var(--rk-error); border-color: var(--rk-error);" title="Delete category">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: var(--rk-space-4); background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); line-height: 1.5;">
+                    <strong>Relational Integrity Guard:</strong> Categories with assigned equipment listings cannot be deleted directly to prevent orphaned records. Modify or reassign listings first.
+                </div>
+            </div>
+
+            <!-- Create Category Form -->
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
+                    Create New Category
+                </h2>
+
+                <form asp-action="CreateCategory" method="post">
+                    <div style="margin-bottom: var(--rk-space-3);">
+                        <label style="display: block; font-size: var(--rk-font-size-xs); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 2px;">
+                            Category Name *
+                        </label>
+                        <input type="text" name="Name" required class="rk-form-control" placeholder="e.g. Lawn & Garden" />
+                    </div>
+
+                    <div style="margin-bottom: var(--rk-space-3);">
+                        <label style="display: block; font-size: var(--rk-font-size-xs); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 2px;">
+                            URL Slug *
+                        </label>
+                        <input type="text" name="Slug" required class="rk-form-control" placeholder="e.g. lawn-and-garden" />
+                    </div>
+
+                    <div style="margin-bottom: var(--rk-space-3);">
+                        <label style="display: block; font-size: var(--rk-font-size-xs); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 2px;">
+                            Description
+                        </label>
+                        <textarea name="Description" rows="2" class="rk-form-control" placeholder="Short description of category..."></textarea>
+                    </div>
+
+                    <div style="margin-bottom: var(--rk-space-3);">
+                        <label style="display: block; font-size: var(--rk-font-size-xs); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 2px;">
+                            Icon CSS Class
+                        </label>
+                        <input type="text" name="IconClass" class="rk-form-control" placeholder="e.g. rk-icon-tools" />
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-2); margin-bottom: var(--rk-space-3);">
+                        <div>
+                            <label style="display: block; font-size: var(--rk-font-size-xs); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 2px;">
+                                Display Order
+                            </label>
+                            <input type="number" name="DisplayOrder" value="0" class="rk-form-control" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: var(--rk-font-size-xs); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 2px;">
+                                Active
+                            </label>
+                            <select name="IsActive" class="rk-form-control">
+                                <option value="true" selected>Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="rk-btn rk-btn-primary" style="width: 100%; justify-content: center; margin-top: var(--rk-space-2);">
+                        Add Category
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

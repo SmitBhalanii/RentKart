@@ -815,3 +815,4 @@ public class RentalDocumentService : IRentalDocumentService
         return sb.ToString();
     }
 }
+

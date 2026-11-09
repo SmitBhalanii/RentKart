@@ -111,6 +111,11 @@ public class EquipmentDetailViewModel
 
     public bool IsInWishlist { get; set; }
     public bool IsPreview { get; set; }
+
+    public double AverageRating { get; set; }
+    public int TotalReviews { get; set; }
+    public Dictionary<int, int> RatingCounts { get; set; } = new();
+    public List<RentKart.Core.Interfaces.ReviewDto> Reviews { get; set; } = new();
 }
 
 public class BusinessStorefrontViewModel

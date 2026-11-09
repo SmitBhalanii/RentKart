@@ -28,3 +28,4 @@ public class RentalDocument
     public virtual BusinessProfile? Business { get; set; }
     public virtual ApplicationUser CustomerUser { get; set; } = null!;
 }
+

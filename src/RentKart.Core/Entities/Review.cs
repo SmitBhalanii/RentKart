@@ -8,6 +8,9 @@ public class Review
     public int EquipmentId { get; set; }
     public int Rating { get; set; } // 1 to 5 stars
     public string Comment { get; set; } = string.Empty;
+    public bool IsHidden { get; set; } = false;
+    public string? ModerationReason { get; set; }
+    public DateTime? ModeratedAtUtc { get; set; }
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     // Navigation properties

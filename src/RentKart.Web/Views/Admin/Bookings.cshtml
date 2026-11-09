@@ -1,0 +1,152 @@
+@using RentKart.Core.Enums
+@model RentKart.Web.Models.Admin.AdminBookingsViewModel
+@{
+    ViewData["Title"] = "Platform Bookings Monitoring - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Platform Bookings & Multi-Merchant Reservations
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    Monitor parent orders, track merchant fulfillment states, and inspect handover/return logs
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Status Filter & Search -->
+        <div class="rk-card" style="padding: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+            <form method="get" asp-action="Bookings" style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap; align-items: center;">
+                <input type="text" name="search" value="@Model.Search" placeholder="Search by booking number or customer..." class="rk-form-control" style="flex: 1; min-width: 240px;" />
+
+                <select name="status" class="rk-form-control" style="width: auto; min-width: 160px;">
+                    <option value="">All Statuses</option>
+                    @foreach (BookingStatus st in Enum.GetValues(typeof(BookingStatus)))
+                    {
+                        <option value="@st" selected="@(Model.StatusFilter == st)">@st</option>
+                    }
+                </select>
+
+                <button type="submit" class="rk-btn rk-btn-primary">
+                    Search
+                </button>
+                <a asp-action="Bookings" class="rk-btn rk-btn-outline">
+                    Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Bookings Table Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                    Bookings (@Model.TotalCount)
+                </div>
+            </div>
+
+            @if (Model.Bookings.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Booking Ref</th>
+                                <th>Customer</th>
+                                <th>Placed</th>
+                                <th style="text-align: center;">Stores</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Rental Fee</th>
+                                <th style="text-align: right;">Deposit</th>
+                                <th style="text-align: right;">Grand Total</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in Model.Bookings)
+                            {
+                                <tr>
+                                    <td style="font-weight: 800; color: var(--rk-navy-900);">
+                                        <a asp-action="BookingDetails" asp-route-id="@b.Id" style="color: inherit; text-decoration: none;">
+                                            @b.BookingNumber
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div style="font-weight: 600; color: var(--rk-navy-900);">@b.CustomerName</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.CustomerEmail</div>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">@b.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm") UTC</span>
+                                    </td>
+                                    <td style="text-align: center; font-weight: 700;">
+                                        @b.GroupsCount
+                                    </td>
+                                    <td>
+                                        @switch (b.Status)
+                                        {
+                                            case BookingStatus.Pending:
+                                                <span class="rk-badge rk-badge-warning">Pending</span>
+                                                break;
+                                            case BookingStatus.Confirmed:
+                                                <span class="rk-badge rk-badge-success">Confirmed</span>
+                                                break;
+                                            case BookingStatus.Active:
+                                                <span class="rk-badge rk-badge-info">Active (In Use)</span>
+                                                break;
+                                            case BookingStatus.Completed:
+                                                <span class="rk-badge rk-badge-success">Completed</span>
+                                                break;
+                                            case BookingStatus.Cancelled:
+                                                <span class="rk-badge rk-badge-error">Cancelled</span>
+                                                break;
+                                            default:
+                                                <span class="rk-badge">@b.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        $@b.TotalRentalFee.ToString("F2")
+                                    </td>
+                                    <td style="text-align: right; color: var(--rk-text-muted);">
+                                        $@b.TotalSecurityDeposit.ToString("F2")
+                                    </td>
+                                    <td style="text-align: right; font-weight: 800; color: var(--rk-teal-700);">
+                                        $@b.GrandTotal.ToString("F2")
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a asp-action="BookingDetails" asp-route-id="@b.Id" class="rk-btn rk-btn-sm rk-btn-outline">
+                                            Inspect &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: var(--rk-space-5);">
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <a asp-action="Bookings" asp-route-page="@p" asp-route-search="@Model.Search" asp-route-status="@Model.StatusFilter" class="rk-btn rk-btn-sm @(p == Model.Page ? "rk-btn-primary" : "rk-btn-outline")">
+                                @p
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-6); color: var(--rk-text-muted);">
+                    No bookings found matching your search.
+                </div>
+            }
+        </div>
+    </div>
+</div>

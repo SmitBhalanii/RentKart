@@ -1,0 +1,139 @@
+@model RentKart.Web.Models.Admin.AdminCustomersViewModel
+@{
+    ViewData["Title"] = "Customer Management - Admin";
+}
+
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+    <div class="rk-container">
+        <!-- Title Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+            <div>
+                <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 2px;">
+                    Customer Account Management
+                </h1>
+                <p style="color: var(--rk-text-muted); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                    View registered customers, monitor rental activity, and manage platform access permissions
+                </p>
+            </div>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        <!-- Search Bar -->
+        <div class="rk-card" style="padding: var(--rk-space-4); margin-bottom: var(--rk-space-5);">
+            <form method="get" asp-action="Customers" style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap;">
+                <input type="text" name="search" value="@Model.Search" placeholder="Search by customer name, email, or phone..." class="rk-form-control" style="flex: 1; min-width: 260px;" />
+                <button type="submit" class="rk-btn rk-btn-primary">
+                    Search Customers
+                </button>
+                @if (!string.IsNullOrWhiteSpace(Model.Search))
+                {
+                    <a asp-action="Customers" class="rk-btn rk-btn-outline">
+                        Clear
+                    </a>
+                }
+            </form>
+        </div>
+
+        <!-- Customers Table Card -->
+        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
+                <div style="font-weight: 700; color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">
+                    Customers (@Model.TotalCount)
+                </div>
+            </div>
+
+            @if (Model.Customers.Any())
+            {
+                <div style="overflow-x: auto;">
+                    <table class="rk-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Contact Information</th>
+                                <th>Registered</th>
+                                <th style="text-align: center;">Bookings</th>
+                                <th style="text-align: center;">Reviews</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.Customers)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--rk-navy-900);">
+                                            <a asp-action="CustomerDetails" asp-route-id="@c.Id" style="color: inherit; text-decoration: none;">
+                                                @c.FullName
+                                            </a>
+                                        </div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
+                                            ID: @c.Id.Substring(0, Math.Min(8, c.Id.Length))...
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>@c.Email</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@c.PhoneNumber</div>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">@c.CreatedAtUtc.ToString("dd MMM yyyy")</span>
+                                    </td>
+                                    <td style="text-align: center; font-weight: 700;">
+                                        @c.TotalBookingsCount
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @c.TotalReviewsCount
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @if (c.IsLockedOut)
+                                        {
+                                            <span class="rk-badge rk-badge-error">Locked Out</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rk-badge rk-badge-success">Active</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
+                                            <a asp-action="CustomerDetails" asp-route-id="@c.Id" class="rk-btn rk-btn-sm rk-btn-outline">
+                                                View
+                                            </a>
+                                            <form asp-action="ToggleCustomerLockout" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to @(c.IsLockedOut ? "unlock" : "lock out") this customer?');">
+                                                <input type="hidden" name="id" value="@c.Id" />
+                                                <input type="hidden" name="reason" value="Admin manual toggle" />
+                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                                <button type="submit" class="rk-btn rk-btn-sm @(c.IsLockedOut ? "rk-btn-teal" : "rk-btn-outline")" style="@(c.IsLockedOut ? "" : "color: var(--rk-error); border-color: var(--rk-error);")">
+                                                    @(c.IsLockedOut ? "Unlock Access" : "Lock Access")
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: var(--rk-space-5);">
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <a asp-action="Customers" asp-route-page="@p" asp-route-search="@Model.Search" class="rk-btn rk-btn-sm @(p == Model.Page ? "rk-btn-primary" : "rk-btn-outline")">
+                                @p
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="text-align: center; padding: var(--rk-space-6); color: var(--rk-text-muted);">
+                    No customers found matching your criteria.
+                </div>
+            }
+        </div>
+    </div>
+</div>
