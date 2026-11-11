@@ -21,6 +21,18 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         builder.Property(u => u.CreatedAtUtc)
             .HasDefaultValueSql("GETUTCDATE()");
 
+        // India-wide customer address properties
+        builder.Property(u => u.AddressLine1).HasMaxLength(200);
+        builder.Property(u => u.AddressLine2).HasMaxLength(200);
+        builder.Property(u => u.Landmark).HasMaxLength(150);
+        builder.Property(u => u.City).HasMaxLength(100);
+        builder.Property(u => u.District).HasMaxLength(100);
+        builder.Property(u => u.State).HasMaxLength(100);
+        builder.Property(u => u.PostalCode).HasMaxLength(20);
+        builder.Property(u => u.Country).HasMaxLength(10).HasDefaultValue("IN");
+
+        builder.Ignore(u => u.FullFormattedAddress);
+
         builder.HasIndex(u => u.FullName);
     }
 }

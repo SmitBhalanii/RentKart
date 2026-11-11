@@ -98,8 +98,14 @@ public class BookingGroupDetailDto
     public int BusinessId { get; set; }
     public string BusinessName { get; set; } = string.Empty;
     public string BusinessAddressLine { get; set; } = string.Empty;
+    public string? BusinessAddressLine2 { get; set; }
+    public string? BusinessLandmark { get; set; }
+    public string? BusinessDistrict { get; set; }
     public string BusinessCity { get; set; } = string.Empty;
+    public string BusinessState { get; set; } = string.Empty;
     public string BusinessPostalCode { get; set; } = string.Empty;
+    public string BusinessCountry { get; set; } = "IN";
+    public string BusinessFullAddress { get; set; } = string.Empty;
     public string BusinessPhone { get; set; } = string.Empty;
     public string OperatingHours { get; set; } = string.Empty;
     public string PickupVerificationCode { get; set; } = string.Empty;

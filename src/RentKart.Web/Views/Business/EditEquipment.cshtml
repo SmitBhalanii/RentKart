@@ -121,12 +121,23 @@
             </div>
 
             <!-- Form Action Buttons -->
-            <div style="display: flex; justify-content: flex-end; gap: var(--rk-space-3); margin-bottom: var(--rk-space-6);">
-                <a asp-action="Equipment" class="rk-btn rk-btn-outline">Cancel</a>
-                <button type="submit" class="rk-btn rk-btn-teal" style="padding-left: var(--rk-space-6); padding-right: var(--rk-space-6); font-weight: 700;">
-                    Save Changes
-                </button>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--rk-space-3); margin-bottom: var(--rk-space-6);">
+                <div>
+                    <button type="submit" form="deleteEquipmentForm" class="rk-btn rk-btn-outline" style="color: #dc2626; border-color: #fca5a5;" onclick="return confirm('Are you sure you want to delete this equipment listing?');">
+                        Delete Listing
+                    </button>
+                </div>
+                <div style="display: flex; gap: var(--rk-space-3);">
+                    <a asp-action="Equipment" class="rk-btn rk-btn-outline">Cancel</a>
+                    <button type="submit" class="rk-btn rk-btn-teal" style="padding-left: var(--rk-space-6); padding-right: var(--rk-space-6); font-weight: 700;">
+                        Save Changes
+                    </button>
+                </div>
             </div>
+        </form>
+
+        <form id="deleteEquipmentForm" method="post" asp-action="DeleteEquipment" asp-route-id="@Model.EquipmentId" style="display: none;">
+            @Html.AntiForgeryToken()
         </form>
 
         <!-- Media & Photo Gallery Manager -->

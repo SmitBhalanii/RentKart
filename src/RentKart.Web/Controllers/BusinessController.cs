@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using RentKart.Core.Entities;
 using RentKart.Core.Enums;
 using RentKart.Core.Interfaces;
+using RentKart.Core.Utilities;
+using RentKart.Core.Validation;
 using RentKart.Infrastructure.Data;
 using RentKart.Infrastructure.Identity;
 using RentKart.Web.Models.Business;
@@ -69,7 +71,7 @@ public class BusinessController : Controller
             OwnerName = user.FullName,
             Email = user.Email ?? string.Empty,
             ContactPhone = business.ContactPhone,
-            Address = $"{business.AddressLine}, {business.City}, {business.State} {business.PostalCode}",
+            Address = business.FullFormattedAddress,
             OperatingHours = business.OperatingHours,
             Status = business.Status,
             CreatedAtUtc = business.CreatedAtUtc,
@@ -115,10 +117,14 @@ public class BusinessController : Controller
             ShopName = business.ShopName,
             RegistrationNumber = business.RegistrationNumber,
             ContactPhone = business.ContactPhone,
-            AddressLine = business.AddressLine,
+            AddressLine1 = business.AddressLine,
+            AddressLine2 = business.AddressLine2,
+            Landmark = business.Landmark,
+            District = business.District,
             City = business.City,
             State = business.State,
             PostalCode = business.PostalCode,
+            Country = business.Country,
             OperatingHours = business.OperatingHours,
             PickupInstructions = business.PickupInstructions,
             Status = business.Status
@@ -157,15 +163,21 @@ public class BusinessController : Controller
         }
 
         // Update permitted business profile fields (business owner cannot change Status!)
-        business.ShopName = model.ShopName;
-        business.RegistrationNumber = model.RegistrationNumber;
-        business.ContactPhone = model.ContactPhone;
-        business.AddressLine = model.AddressLine;
-        business.City = model.City;
-        business.State = model.State;
-        business.PostalCode = model.PostalCode;
-        business.OperatingHours = model.OperatingHours;
-        business.PickupInstructions = model.PickupInstructions;
+        var addressLine1 = !string.IsNullOrWhiteSpace(model.AddressLine1) ? model.AddressLine1.Trim() : model.AddressLine.Trim();
+
+        business.ShopName = model.ShopName.Trim();
+        business.RegistrationNumber = string.IsNullOrWhiteSpace(model.RegistrationNumber) ? null : model.RegistrationNumber.Trim();
+        business.ContactPhone = IndianPhoneNumberAttribute.Normalize(model.ContactPhone);
+        business.AddressLine = addressLine1;
+        business.AddressLine2 = string.IsNullOrWhiteSpace(model.AddressLine2) ? null : model.AddressLine2.Trim();
+        business.Landmark = string.IsNullOrWhiteSpace(model.Landmark) ? null : model.Landmark.Trim();
+        business.District = string.IsNullOrWhiteSpace(model.District) ? null : model.District.Trim();
+        business.City = model.City.Trim();
+        business.State = model.State.Trim();
+        business.PostalCode = model.PostalCode.Trim();
+        business.Country = string.IsNullOrWhiteSpace(model.Country) ? "IN" : model.Country.Trim();
+        business.OperatingHours = model.OperatingHours.Trim();
+        business.PickupInstructions = string.IsNullOrWhiteSpace(model.PickupInstructions) ? null : model.PickupInstructions.Trim();
 
         await _context.SaveChangesAsync();
         _logger.LogInformation("Business profile {BusinessId} updated by user {UserId}.", business.Id, user.Id);
@@ -411,6 +423,27 @@ public class BusinessController : Controller
         }
 
         TempData["SuccessMessage"] = $"Listing '{model.Title}' updated successfully.";
+        return RedirectToAction(nameof(Equipment));
+    }
+
+    [HttpPost]
+    [Route("Business/Equipment/Delete/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteEquipment(int id)
+    {
+        var business = await GetCurrentBusinessAsync();
+        if (business == null) return RedirectToAction(nameof(Dashboard));
+
+        var result = await _equipmentService.DeleteEquipmentAsync(id, business.Id);
+        if (!result.Succeeded)
+        {
+            TempData["ErrorMessage"] = result.ErrorMessage;
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "Equipment listing removed successfully.";
+        }
+
         return RedirectToAction(nameof(Equipment));
     }
 
@@ -680,6 +713,14 @@ public class BusinessController : Controller
         ViewBag.Business = business;
 
         return View(items);
+    }
+
+    [HttpGet]
+    [Route("Business/BookingDetails/{id:int}")]
+    [Route("Business/Bookings/{id:int}")]
+    public IActionResult BookingDetails(int id)
+    {
+        return RedirectToAction(nameof(BookingGroupDetails), new { id });
     }
 
     [HttpGet]

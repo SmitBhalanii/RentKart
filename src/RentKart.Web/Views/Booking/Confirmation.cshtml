@@ -40,7 +40,7 @@
                             @group.BusinessName
                         </div>
                         <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
-                            Group Ref: <strong>@group.GroupNumber</strong> &bull; Address: @group.BusinessAddressLine, @group.BusinessCity
+                            Group Ref: <strong>@group.GroupNumber</strong> &bull; Address: @(!string.IsNullOrEmpty(group.BusinessFullAddress) ? group.BusinessFullAddress : $"{group.BusinessAddressLine}, {group.BusinessCity}")
                         </div>
                     </div>
                     <div>

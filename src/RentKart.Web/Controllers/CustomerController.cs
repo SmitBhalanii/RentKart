@@ -84,7 +84,15 @@ public class CustomerController : Controller
         {
             FullName = user.FullName,
             Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber ?? string.Empty
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
+            AddressLine1 = user.AddressLine1,
+            AddressLine2 = user.AddressLine2,
+            Landmark = user.Landmark,
+            City = user.City,
+            District = user.District,
+            State = user.State,
+            PostalCode = user.PostalCode,
+            Country = user.Country ?? "IN"
         };
 
         return View(model);
@@ -108,6 +116,14 @@ public class CustomerController : Controller
 
         user.FullName = model.FullName.Trim();
         user.PhoneNumber = IndianPhoneNumberAttribute.Normalize(model.PhoneNumber);
+        user.AddressLine1 = string.IsNullOrWhiteSpace(model.AddressLine1) ? null : model.AddressLine1.Trim();
+        user.AddressLine2 = string.IsNullOrWhiteSpace(model.AddressLine2) ? null : model.AddressLine2.Trim();
+        user.Landmark = string.IsNullOrWhiteSpace(model.Landmark) ? null : model.Landmark.Trim();
+        user.City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim();
+        user.District = string.IsNullOrWhiteSpace(model.District) ? null : model.District.Trim();
+        user.State = string.IsNullOrWhiteSpace(model.State) ? null : model.State.Trim();
+        user.PostalCode = string.IsNullOrWhiteSpace(model.PostalCode) ? null : model.PostalCode.Trim();
+        user.Country = string.IsNullOrWhiteSpace(model.Country) ? "IN" : model.Country.Trim();
         user.UpdatedAtUtc = DateTime.UtcNow;
 
         var result = await _userManager.UpdateAsync(user);

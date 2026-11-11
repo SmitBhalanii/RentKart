@@ -33,8 +33,15 @@ public class BusinessListItemViewModel
     public string OwnerEmail { get; set; } = string.Empty;
     public string ShopName { get; set; } = string.Empty;
     public string ContactPhone { get; set; } = string.Empty;
+    public string AddressLine { get; set; } = string.Empty;
+    public string? AddressLine2 { get; set; }
+    public string? Landmark { get; set; }
+    public string? District { get; set; }
     public string City { get; set; } = string.Empty;
     public string State { get; set; } = string.Empty;
+    public string PostalCode { get; set; } = string.Empty;
+    public string Country { get; set; } = "IN";
+    public string FullAddress { get; set; } = string.Empty;
     public string OperatingHours { get; set; } = string.Empty;
     public BusinessStatus Status { get; set; }
     public DateTime CreatedAtUtc { get; set; }

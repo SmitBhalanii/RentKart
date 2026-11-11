@@ -94,6 +94,22 @@
                 </div>
             </div>
         }
+        else if (Model.Status == BusinessStatus.Rejected)
+        {
+            <div class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-6); display: flex; gap: var(--rk-space-3); align-items: flex-start;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                <div>
+                    <strong style="font-size: var(--rk-font-size-sm); display: block; margin-bottom: 2px;">Application Rejected</strong>
+                    <div style="font-size: var(--rk-font-size-xs); line-height: 1.5;">
+                        Your business registration was reviewed and rejected by platform administration. Equipment listing creation and customer orders are disabled. If you have questions or updated verification documentation, please contact RentKart Support.
+                    </div>
+                </div>
+            </div>
+        }
 
         <!-- Operation KPI Metrics -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
@@ -187,7 +203,7 @@
                                             <span class="rk-badge" style="font-size: 11px;">@group.Status</span>
                                         </td>
                                         <td style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">
-                                            <a asp-action="BookingDetails" asp-route-id="@group.Id" class="rk-btn rk-btn-primary rk-btn-sm" style="font-size: 11px; padding: 0.25rem 0.5rem;">
+                                            <a asp-action="BookingGroupDetails" asp-route-id="@group.Id" class="rk-btn rk-btn-primary rk-btn-sm" style="font-size: 11px; padding: 0.25rem 0.5rem;">
                                                 Manage
                                             </a>
                                         </td>

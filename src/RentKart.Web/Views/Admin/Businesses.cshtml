@@ -65,8 +65,9 @@
                                         <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.ContactPhone</div>
                                     </td>
                                     <td>
-                                        <div>@b.City, @b.State</div>
-                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.OperatingHours</div>
+                                        <div style="font-weight: 600; color: var(--rk-navy-900);">@b.City, @b.State (@b.PostalCode)</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@b.FullAddress</div>
+                                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">Hours: @b.OperatingHours</div>
                                     </td>
                                     <td>
                                         @switch (b.Status)

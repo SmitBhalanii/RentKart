@@ -102,9 +102,15 @@ public class EquipmentDetailViewModel
     public string ShopName { get; set; } = string.Empty;
     public string ContactPhone { get; set; } = string.Empty;
     public string AddressLine { get; set; } = string.Empty;
+    public string? AddressLine2 { get; set; }
+    public string? Landmark { get; set; }
+    public string? District { get; set; }
     public string City { get; set; } = string.Empty;
     public string State { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
+    public string Country { get; set; } = "IN";
+    public string FullFormattedAddress =>
+        RentKart.Core.Utilities.IndianLocations.FormatFullAddress(AddressLine, AddressLine2, Landmark, City, District, State, PostalCode, Country);
     public string OperatingHours { get; set; } = string.Empty;
     public string? PickupInstructions { get; set; }
     public BusinessStatus BusinessStatus { get; set; }
@@ -125,9 +131,15 @@ public class BusinessStorefrontViewModel
     public string? RegistrationNumber { get; set; }
     public string ContactPhone { get; set; } = string.Empty;
     public string AddressLine { get; set; } = string.Empty;
+    public string? AddressLine2 { get; set; }
+    public string? Landmark { get; set; }
+    public string? District { get; set; }
     public string City { get; set; } = string.Empty;
     public string State { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
+    public string Country { get; set; } = "IN";
+    public string FullFormattedAddress =>
+        RentKart.Core.Utilities.IndianLocations.FormatFullAddress(AddressLine, AddressLine2, Landmark, City, District, State, PostalCode, Country);
     public string OperatingHours { get; set; } = string.Empty;
     public string? PickupInstructions { get; set; }
     public BusinessStatus Status { get; set; }

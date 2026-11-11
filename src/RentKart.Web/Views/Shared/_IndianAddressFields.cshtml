@@ -1,0 +1,58 @@
+@using RentKart.Core.Utilities
+@model RentKart.Web.Models.Shared.IndianAddressViewModel
+
+<div class="rk-address-section">
+    <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+        <label asp-for="AddressLine1" class="rk-form-label"></label>
+        <input asp-for="AddressLine1" class="rk-form-control" placeholder="e.g. Shop 12, Ground Floor, Titanium Complex" autocomplete="address-line1" required />
+        <span asp-validation-for="AddressLine1" class="rk-form-feedback is-error"></span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+        <div class="rk-form-group">
+            <label asp-for="AddressLine2" class="rk-form-label"></label>
+            <input asp-for="AddressLine2" class="rk-form-control" placeholder="e.g. Link Road, Andheri West" autocomplete="address-line2" />
+            <span asp-validation-for="AddressLine2" class="rk-form-feedback is-error"></span>
+        </div>
+        <div class="rk-form-group">
+            <label asp-for="Landmark" class="rk-form-label"></label>
+            <input asp-for="Landmark" class="rk-form-control" placeholder="e.g. Near Metro Pillar 142" />
+            <span asp-validation-for="Landmark" class="rk-form-feedback is-error"></span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+        <div class="rk-form-group">
+            <label asp-for="State" class="rk-form-label"></label>
+            <select asp-for="State" class="rk-form-control" required>
+                <option value="">-- Select State / Union Territory --</option>
+                @foreach (var state in IndianLocations.StatesAndUnionTerritories)
+                {
+                    <option value="@state">@state</option>
+                }
+            </select>
+            <span asp-validation-for="State" class="rk-form-feedback is-error"></span>
+        </div>
+        <div class="rk-form-group">
+            <label asp-for="District" class="rk-form-label"></label>
+            <input asp-for="District" class="rk-form-control" placeholder="e.g. Mumbai Suburban, Ahmedabad" />
+            <span asp-validation-for="District" class="rk-form-feedback is-error"></span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-4); margin-bottom: var(--rk-space-4);">
+        <div class="rk-form-group">
+            <label asp-for="City" class="rk-form-label"></label>
+            <input asp-for="City" class="rk-form-control" placeholder="e.g. Mumbai, Bengaluru, Delhi, Ahmedabad" autocomplete="address-level2" required />
+            <span asp-validation-for="City" class="rk-form-feedback is-error"></span>
+        </div>
+        <div class="rk-form-group">
+            <label asp-for="PostalCode" class="rk-form-label"></label>
+            <input asp-for="PostalCode" class="rk-form-control" placeholder="e.g. 400053" maxlength="6" autocomplete="postal-code" required />
+            <span asp-validation-for="PostalCode" class="rk-form-feedback is-error"></span>
+        </div>
+    </div>
+
+    <input type="hidden" asp-for="Country" value="@IndianLocations.DefaultCountryCode" />
+</div>
+

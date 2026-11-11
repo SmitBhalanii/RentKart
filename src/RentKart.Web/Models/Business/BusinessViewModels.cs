@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using RentKart.Core.Enums;
 using RentKart.Core.Interfaces;
+using RentKart.Core.Utilities;
 using RentKart.Core.Validation;
 
 namespace RentKart.Web.Models.Business;
@@ -54,25 +55,47 @@ public class BusinessProfileViewModel
     [Display(Name = "Store Mobile / Phone Number")]
     public string ContactPhone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Store address is required for customer equipment pickups.")]
-    [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
-    [Display(Name = "Store Address (Street & Locality)")]
-    public string AddressLine { get; set; } = string.Empty;
+    // India-wide store address
+    [Required(ErrorMessage = "Address Line 1 is required for customer equipment pickups.")]
+    [StringLength(200, ErrorMessage = "Address Line 1 cannot exceed 200 characters.")]
+    [Display(Name = "Address Line 1 (Building, Shop / Flat No., Complex)")]
+    public string AddressLine1 { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "City is required.")]
+    public string AddressLine
+    {
+        get => AddressLine1;
+        set => AddressLine1 = value;
+    }
+
+    [StringLength(200, ErrorMessage = "Address Line 2 cannot exceed 200 characters.")]
+    [Display(Name = "Address Line 2 (Street, Area, Road, Sector)")]
+    public string? AddressLine2 { get; set; }
+
+    [StringLength(150, ErrorMessage = "Landmark cannot exceed 150 characters.")]
+    [Display(Name = "Landmark (e.g. Near Metro Station, Opp. City Mall)")]
+    public string? Landmark { get; set; }
+
+    [Required(ErrorMessage = "City / Town / Village is required.")]
     [StringLength(100, ErrorMessage = "City cannot exceed 100 characters.")]
-    [Display(Name = "City")]
+    [Display(Name = "City / Town / Village")]
     public string City { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "State is required.")]
-    [StringLength(100, ErrorMessage = "State cannot exceed 100 characters.")]
-    [Display(Name = "State")]
+    [StringLength(100, ErrorMessage = "District cannot exceed 100 characters.")]
+    [Display(Name = "District (Optional)")]
+    public string? District { get; set; }
+
+    [Required(ErrorMessage = "State / Union Territory is required.")]
+    [StringLength(100, ErrorMessage = "State / UT is required.")]
+    [Display(Name = "State / Union Territory")]
     public string State { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Postal PIN code is required.")]
     [RegularExpression(@"^[1-9][0-9]{5}$", ErrorMessage = "Please enter a valid 6-digit Indian PIN code (e.g. 400001).")]
     [Display(Name = "PIN Code")]
     public string PostalCode { get; set; } = string.Empty;
+
+    [Display(Name = "Country")]
+    public string Country { get; set; } = "IN";
 
     [Required(ErrorMessage = "Operating hours are required.")]
     [StringLength(100, ErrorMessage = "Operating hours cannot exceed 100 characters.")]
@@ -85,4 +108,7 @@ public class BusinessProfileViewModel
 
     [Display(Name = "Account Status")]
     public BusinessStatus Status { get; set; }
+
+    public string ToFullFormattedAddress() =>
+        IndianLocations.FormatFullAddress(AddressLine1, AddressLine2, Landmark, City, District, State, PostalCode, Country);
 }

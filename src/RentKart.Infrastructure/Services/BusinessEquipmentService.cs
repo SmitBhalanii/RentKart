@@ -288,6 +288,58 @@ public class BusinessEquipmentService : IBusinessEquipmentService
         return EquipmentOperationResult.Success(equipment.Id);
     }
 
+    public async Task<EquipmentOperationResult> DeleteEquipmentAsync(int equipmentId, int businessId)
+    {
+        var business = await _context.BusinessProfiles.FindAsync(businessId);
+        if (business == null || business.Status != BusinessStatus.Approved)
+        {
+            return EquipmentOperationResult.Failed("Only approved businesses can manage equipment listings.");
+        }
+
+        var equipment = await _context.Equipments
+            .Include(e => e.Images)
+            .Include(e => e.BookingItems)
+            .Include(e => e.MaintenanceRecords)
+            .FirstOrDefaultAsync(e => e.Id == equipmentId && e.BusinessId == businessId);
+
+        if (equipment == null)
+        {
+            return EquipmentOperationResult.Failed("Equipment listing not found or unauthorized.");
+        }
+
+        // Validate whether active or confirmed reservations exist
+        var hasActiveBookings = await _context.BookingItems
+            .Include(bi => bi.BookingGroup)
+            .AnyAsync(bi => bi.EquipmentId == equipmentId &&
+                            (bi.BookingGroup.Status == BookingGroupStatus.PendingApproval ||
+                             bi.BookingGroup.Status == BookingGroupStatus.Confirmed ||
+                             bi.BookingGroup.Status == BookingGroupStatus.HandedOver));
+
+        if (hasActiveBookings)
+        {
+            return EquipmentOperationResult.Failed("Cannot delete equipment that has active reservations or ongoing rentals. Please deactivate the listing instead.");
+        }
+
+        if (equipment.BookingItems.Any())
+        {
+            // Preserve historical booking records through soft decommissioning
+            equipment.IsActive = false;
+            equipment.Status = EquipmentStatus.Decommissioned;
+            equipment.UpdatedAtUtc = DateTime.UtcNow;
+        }
+        else
+        {
+            // Safe removal if no booking history exists
+            _context.MaintenanceRecords.RemoveRange(equipment.MaintenanceRecords);
+            _context.EquipmentImages.RemoveRange(equipment.Images);
+            _context.Equipments.Remove(equipment);
+        }
+
+        await _context.SaveChangesAsync();
+        _logger.LogInformation("Equipment {EquipmentId} deleted/decommissioned by business {BusinessId}.", equipmentId, businessId);
+        return EquipmentOperationResult.Success(equipmentId);
+    }
+
     public async Task<EquipmentOperationResult> AddEquipmentImageAsync(int equipmentId, int businessId, string imageUrl, bool isPrimary = false)
     {
         var business = await _context.BusinessProfiles.FindAsync(businessId);

@@ -545,7 +545,7 @@ public class RentalDocumentService : IRentalDocumentService
         sb.AppendLine("<div>");
         sb.AppendLine("<div class=\"party-title\">Lessor (Equipment Store)</div>");
         sb.AppendLine($"<div class=\"party-name\">{group.Business.ShopName}</div>");
-        sb.AppendLine($"<div class=\"party-info\">{group.Business.AddressLine}, {group.Business.City}, {group.Business.PostalCode}</div>");
+        sb.AppendLine($"<div class=\"party-info\">{group.Business.FullFormattedAddress}</div>");
         sb.AppendLine($"<div class=\"party-info\">Phone: {group.Business.ContactPhone}</div>");
         sb.AppendLine($"<div class=\"party-info\">Hours: {group.Business.OperatingHours}</div>");
         sb.AppendLine("</div>");
@@ -669,7 +669,7 @@ public class RentalDocumentService : IRentalDocumentService
         sb.AppendLine("<div>");
         sb.AppendLine("<div style=\"font-size: 11px; text-transform: uppercase; font-weight: 700; color: #94a3b8;\">Store Location</div>");
         sb.AppendLine($"<div style=\"font-weight: 700;\">{group.Business.ShopName}</div>");
-        sb.AppendLine($"<div>{group.Business.AddressLine}, {group.Business.City}</div>");
+        sb.AppendLine($"<div>{group.Business.FullFormattedAddress}</div>");
         sb.AppendLine($"<div>Phone: {group.Business.ContactPhone}</div>");
         sb.AppendLine("</div>");
         sb.AppendLine("<div>");

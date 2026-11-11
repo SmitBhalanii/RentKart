@@ -236,3 +236,43 @@
   font-size: var(--rk-font-size-base);
   color: var(--rk-text-muted);
 }
+
+/* ASP.NET Core MVC & jQuery Unobtrusive Validation Styles */
+.field-validation-error,
+.rk-form-feedback.is-error {
+  color: #dc2626 !important;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.field-validation-valid {
+  display: none !important;
+}
+
+.input-validation-error {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+
+.input-validation-error:focus {
+  outline: none;
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+}
+
+.validation-summary-errors {
+  color: #991b1b;
+  background-color: #fee2e2;
+  border: 1px solid #f87171;
+  border-radius: var(--rk-radius-md, 0.5rem);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.validation-summary-errors ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}

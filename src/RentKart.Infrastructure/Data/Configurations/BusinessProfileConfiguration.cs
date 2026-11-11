@@ -29,8 +29,17 @@ public class BusinessProfileConfiguration : IEntityTypeConfiguration<BusinessPro
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(b => b.AddressLine2)
+            .HasMaxLength(200);
+
+        builder.Property(b => b.Landmark)
+            .HasMaxLength(150);
+
         builder.Property(b => b.City)
             .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(b => b.District)
             .HasMaxLength(100);
 
         builder.Property(b => b.State)
@@ -40,6 +49,14 @@ public class BusinessProfileConfiguration : IEntityTypeConfiguration<BusinessPro
         builder.Property(b => b.PostalCode)
             .IsRequired()
             .HasMaxLength(20);
+
+        builder.Property(b => b.Country)
+            .IsRequired()
+            .HasMaxLength(10)
+            .HasDefaultValue("IN");
+
+        builder.Ignore(b => b.AddressLine1);
+        builder.Ignore(b => b.FullFormattedAddress);
 
         builder.Property(b => b.OperatingHours)
             .IsRequired()

@@ -271,6 +271,8 @@ public class AccountController : Controller
 
         // 3. Create Identity user
         var normalizedPhone = IndianPhoneNumberAttribute.Normalize(model.ContactPhone);
+        var addressLine1 = !string.IsNullOrWhiteSpace(model.AddressLine1) ? model.AddressLine1.Trim() : model.AddressLine.Trim();
+
         var user = new ApplicationUser
         {
             UserName = normalizedEmail,
@@ -280,7 +282,15 @@ public class AccountController : Controller
             UserType = UserRole.Business,
             IsActive = true,
             EmailConfirmed = true,
-            CreatedAtUtc = DateTime.UtcNow
+            CreatedAtUtc = DateTime.UtcNow,
+            AddressLine1 = addressLine1,
+            AddressLine2 = string.IsNullOrWhiteSpace(model.AddressLine2) ? null : model.AddressLine2.Trim(),
+            Landmark = string.IsNullOrWhiteSpace(model.Landmark) ? null : model.Landmark.Trim(),
+            City = model.City.Trim(),
+            District = string.IsNullOrWhiteSpace(model.District) ? null : model.District.Trim(),
+            State = model.State.Trim(),
+            PostalCode = model.PostalCode.Trim(),
+            Country = string.IsNullOrWhiteSpace(model.Country) ? "IN" : model.Country.Trim()
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -308,7 +318,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        // 5. Create Business Profile
+        // 5. Create Business Profile with India-wide address
         try
         {
             var businessProfile = new BusinessProfile
@@ -317,10 +327,14 @@ public class AccountController : Controller
                 ShopName = model.ShopName.Trim(),
                 RegistrationNumber = string.IsNullOrWhiteSpace(model.RegistrationNumber) ? null : model.RegistrationNumber.Trim(),
                 ContactPhone = normalizedPhone,
-                AddressLine = model.AddressLine.Trim(),
+                AddressLine = addressLine1,
+                AddressLine2 = string.IsNullOrWhiteSpace(model.AddressLine2) ? null : model.AddressLine2.Trim(),
+                Landmark = string.IsNullOrWhiteSpace(model.Landmark) ? null : model.Landmark.Trim(),
                 City = model.City.Trim(),
+                District = string.IsNullOrWhiteSpace(model.District) ? null : model.District.Trim(),
                 State = model.State.Trim(),
                 PostalCode = model.PostalCode.Trim(),
+                Country = string.IsNullOrWhiteSpace(model.Country) ? "IN" : model.Country.Trim(),
                 OperatingHours = model.OperatingHours.Trim(),
                 PickupInstructions = string.IsNullOrWhiteSpace(model.PickupInstructions) ? null : model.PickupInstructions.Trim(),
                 Status = BusinessStatus.PendingApproval, // Pending approval by default
@@ -342,7 +356,8 @@ public class AccountController : Controller
 
         // 6. Sign in and redirect to Business Dashboard
         await _signInManager.SignInAsync(user, isPersistent: false);
-        TempData["InfoMessage"] = "Your business profile was created and is currently pending administrator verification.";
+        TempData["SuccessMessage"] = "Your business profile was successfully registered! An administrator will review your account.";
+        TempData["InfoMessage"] = "Your business profile is currently pending administrator verification.";
         return RedirectToAction("Dashboard", "Business");
     }
 

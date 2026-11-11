@@ -30,10 +30,65 @@
                     <span asp-validation-for="FullName" class="rk-form-feedback is-error"></span>
                 </div>
 
-                <div class="rk-form-group" style="margin-bottom: var(--rk-space-5);">
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
                     <label asp-for="PhoneNumber" class="rk-form-label"></label>
                     <input asp-for="PhoneNumber" class="rk-form-control" required />
                     <span asp-validation-for="PhoneNumber" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin: var(--rk-space-5) 0 var(--rk-space-3); padding-bottom: var(--rk-space-2); border-bottom: 1px solid var(--rk-border-light);">
+                    Rental & Billing Address (India)
+                </h3>
+
+                <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
+                    <label asp-for="AddressLine1" class="rk-form-label"></label>
+                    <input asp-for="AddressLine1" class="rk-form-control" placeholder="e.g. Flat 302, Gokul Enclave" />
+                    <span asp-validation-for="AddressLine1" class="rk-form-feedback is-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-3); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="AddressLine2" class="rk-form-label"></label>
+                        <input asp-for="AddressLine2" class="rk-form-control" placeholder="e.g. Link Road, Andheri West" />
+                        <span asp-validation-for="AddressLine2" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="Landmark" class="rk-form-label"></label>
+                        <input asp-for="Landmark" class="rk-form-control" placeholder="e.g. Near Infinity Mall" />
+                        <span asp-validation-for="Landmark" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--rk-space-3); margin-bottom: var(--rk-space-4);">
+                    <div class="rk-form-group">
+                        <label asp-for="State" class="rk-form-label"></label>
+                        <select asp-for="State" class="rk-form-control">
+                            <option value="">-- Select State / UT --</option>
+                            @foreach (var s in RentKart.Core.Utilities.IndianLocations.StatesAndUnionTerritories)
+                            {
+                                <option value="@s">@s</option>
+                            }
+                        </select>
+                        <span asp-validation-for="State" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="District" class="rk-form-label"></label>
+                        <input asp-for="District" class="rk-form-control" placeholder="e.g. Mumbai Suburban" />
+                        <span asp-validation-for="District" class="rk-form-feedback is-error"></span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-3); margin-bottom: var(--rk-space-5);">
+                    <div class="rk-form-group">
+                        <label asp-for="City" class="rk-form-label"></label>
+                        <input asp-for="City" class="rk-form-control" placeholder="e.g. Mumbai" />
+                        <span asp-validation-for="City" class="rk-form-feedback is-error"></span>
+                    </div>
+                    <div class="rk-form-group">
+                        <label asp-for="PostalCode" class="rk-form-label"></label>
+                        <input asp-for="PostalCode" class="rk-form-control" placeholder="e.g. 400053" maxlength="6" />
+                        <span asp-validation-for="PostalCode" class="rk-form-feedback is-error"></span>
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: var(--rk-space-3); justify-content: flex-end;">

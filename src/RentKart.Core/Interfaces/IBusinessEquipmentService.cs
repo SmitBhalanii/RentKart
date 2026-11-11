@@ -75,6 +75,7 @@ public interface IBusinessEquipmentService
     Task<EquipmentOperationResult> CreateEquipmentAsync(int businessId, CreateEquipmentDto dto);
     Task<EquipmentOperationResult> UpdateEquipmentAsync(int equipmentId, int businessId, UpdateEquipmentDto dto);
     Task<EquipmentOperationResult> ToggleEquipmentStatusAsync(int equipmentId, int businessId);
+    Task<EquipmentOperationResult> DeleteEquipmentAsync(int equipmentId, int businessId);
     Task<EquipmentOperationResult> AddEquipmentImageAsync(int equipmentId, int businessId, string imageUrl, bool isPrimary = false);
     Task<EquipmentOperationResult> DeleteEquipmentImageAsync(int imageId, int equipmentId, int businessId);
     Task<EquipmentOperationResult> SetPrimaryImageAsync(int imageId, int equipmentId, int businessId);
