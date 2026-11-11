@@ -306,6 +306,21 @@ public class EquipmentDiscoveryTests : IClassFixture<WebApplicationFactory<Progr
 
         var pendingBusiness = await db.BusinessProfiles
             .FirstOrDefaultAsync(b => b.Status == BusinessStatus.PendingApproval);
+        if (pendingBusiness == null)
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var pendingUser = await userManager.FindByEmailAsync("store.pending@rentkart.local");
+            if (pendingUser != null)
+            {
+                pendingBusiness = await db.BusinessProfiles.FirstOrDefaultAsync(b => b.UserId == pendingUser.Id);
+                if (pendingBusiness != null)
+                {
+                    pendingBusiness.Status = BusinessStatus.PendingApproval;
+                    pendingBusiness.ApprovedAtUtc = null;
+                    await db.SaveChangesAsync();
+                }
+            }
+        }
 
         Assert.NotNull(pendingBusiness);
 
@@ -447,7 +462,23 @@ public class EquipmentDiscoveryTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(HttpStatusCode.NotFound, draftResponse.StatusCode);
 
         // 9. Security: Unapproved business storefront returns 404 to anonymous web user
-        var pendingBiz = await db.BusinessProfiles.FirstAsync(b => b.Status == BusinessStatus.PendingApproval);
+        var pendingBiz = await db.BusinessProfiles.FirstOrDefaultAsync(b => b.Status == BusinessStatus.PendingApproval);
+        if (pendingBiz == null)
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var pendingUser = await userManager.FindByEmailAsync("store.pending@rentkart.local");
+            if (pendingUser != null)
+            {
+                pendingBiz = await db.BusinessProfiles.FirstOrDefaultAsync(b => b.UserId == pendingUser.Id);
+                if (pendingBiz != null)
+                {
+                    pendingBiz.Status = BusinessStatus.PendingApproval;
+                    pendingBiz.ApprovedAtUtc = null;
+                    await db.SaveChangesAsync();
+                }
+            }
+        }
+        Assert.NotNull(pendingBiz);
         var pendingStoreResponse = await client.GetAsync($"/Store/{pendingBiz.Id}");
         Assert.Equal(HttpStatusCode.NotFound, pendingStoreResponse.StatusCode);
 

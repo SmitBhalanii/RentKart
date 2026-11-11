@@ -106,8 +106,8 @@
                                         Dates: @g.EarliestStartDate.ToString("MMM dd") - @g.LatestEndDate.ToString("MMM dd, yyyy")
                                     </div>
                                     <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--rk-border-light); padding-top: 0.35rem; color: var(--rk-text-secondary);">
-                                        <span>Fee: $@g.SubtotalRentalFee.ToString("F2")</span>
-                                        <span>Dep: $@g.SubtotalSecurityDeposit.ToString("F2")</span>
+                                        <span>Fee: @g.SubtotalRentalFee.ToInr()</span>
+                                        <span>Dep: @g.SubtotalSecurityDeposit.ToInr()</span>
                                     </div>
                                 </div>
                             }
@@ -116,9 +116,9 @@
                         <!-- Footer Total & Action -->
                         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-4); flex-wrap: wrap; gap: 0.5rem;">
                             <div style="font-size: var(--rk-font-size-sm); color: var(--rk-text-secondary);">
-                                Total: <strong style="color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">$@booking.GrandTotal.ToString("F2")</strong>
+                                Total: <strong style="color: var(--rk-navy-900); font-size: var(--rk-font-size-base);">@booking.GrandTotal.ToInr()</strong>
                                 <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-left: 0.5rem;">
-                                    (Rental: $@booking.TotalRentalFee.ToString("F2") + Deposit: $@booking.TotalSecurityDeposit.ToString("F2"))
+                                    (Rental: @booking.TotalRentalFee.ToInr() + Deposit: @booking.TotalSecurityDeposit.ToInr())
                                 </span>
                             </div>
 

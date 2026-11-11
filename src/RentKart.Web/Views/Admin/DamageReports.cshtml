@@ -86,7 +86,7 @@
                                         <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">@rep.CreatedAtUtc.ToString("dd MMM yyyy")</span>
                                     </td>
                                     <td style="text-align: right; font-weight: 600;">
-                                        @(rep.EstimatedCost.HasValue ? $"${rep.EstimatedCost.Value:F2}" : "—")
+                                        @(rep.EstimatedCost.HasValue ? rep.EstimatedCost.Value.ToInr() : "—")
                                     </td>
                                     <td style="text-align: center;">
                                         @if (rep.IsResolved)

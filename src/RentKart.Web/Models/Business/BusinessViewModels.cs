@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using RentKart.Core.Enums;
+using RentKart.Core.Interfaces;
+using RentKart.Core.Validation;
 
 namespace RentKart.Web.Models.Business;
 
@@ -18,6 +20,20 @@ public class BusinessDashboardViewModel
     public DateTime? SuspendedAtUtc { get; set; }
 
     public bool CanPublishListings => Status == BusinessStatus.Approved;
+
+    // Inventory & Catalog Metrics
+    public int TotalListings { get; set; }
+    public int ActiveListings { get; set; }
+    public int TotalUnits { get; set; }
+    public int UnderMaintenanceUnits { get; set; }
+
+    // Booking Lifecycle Counters
+    public int PendingApprovalCount { get; set; }
+    public int ConfirmedCount { get; set; }
+    public int ActiveRentalsCount { get; set; }
+    public int CompletedCount { get; set; }
+
+    public List<BusinessBookingGroupListItemDto> RecentBookingGroups { get; set; } = new();
 }
 
 public class BusinessProfileViewModel
@@ -30,17 +46,17 @@ public class BusinessProfileViewModel
     public string ShopName { get; set; } = string.Empty;
 
     [StringLength(50, ErrorMessage = "Registration number cannot exceed 50 characters.")]
-    [Display(Name = "Registration / License Number (Optional)")]
+    [Display(Name = "Registration / License / GSTIN (Optional)")]
     public string? RegistrationNumber { get; set; }
 
     [Required(ErrorMessage = "Contact phone number is required.")]
-    [Phone(ErrorMessage = "Please enter a valid phone number.")]
-    [Display(Name = "Store Phone Number")]
+    [IndianPhoneNumber]
+    [Display(Name = "Store Mobile / Phone Number")]
     public string ContactPhone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Store address is required.")]
+    [Required(ErrorMessage = "Store address is required for customer equipment pickups.")]
     [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
-    [Display(Name = "Store Address (Street & Suite)")]
+    [Display(Name = "Store Address (Street & Locality)")]
     public string AddressLine { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "City is required.")]
@@ -48,14 +64,14 @@ public class BusinessProfileViewModel
     [Display(Name = "City")]
     public string City { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "State / Province is required.")]
+    [Required(ErrorMessage = "State is required.")]
     [StringLength(100, ErrorMessage = "State cannot exceed 100 characters.")]
     [Display(Name = "State")]
     public string State { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Postal code is required.")]
-    [StringLength(20, ErrorMessage = "Postal code cannot exceed 20 characters.")]
-    [Display(Name = "Postal / ZIP Code")]
+    [Required(ErrorMessage = "Postal PIN code is required.")]
+    [RegularExpression(@"^[1-9][0-9]{5}$", ErrorMessage = "Please enter a valid 6-digit Indian PIN code (e.g. 400001).")]
+    [Display(Name = "PIN Code")]
     public string PostalCode { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Operating hours are required.")]

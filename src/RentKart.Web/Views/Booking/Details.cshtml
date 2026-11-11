@@ -59,15 +59,15 @@
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--rk-space-4); background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); text-align: center;">
             <div>
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Rental Fee</div>
-                <div style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900);">$@Model.TotalRentalFee.ToString("F2")</div>
+                <div style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900);">@Model.TotalRentalFee.ToInr()</div>
             </div>
             <div>
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Security Deposit (Refundable)</div>
-                <div style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900);">$@Model.TotalSecurityDeposit.ToString("F2")</div>
+                <div style="font-size: var(--rk-font-size-lg); font-weight: 800; color: var(--rk-navy-900);">@Model.TotalSecurityDeposit.ToInr()</div>
             </div>
             <div>
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Grand Total</div>
-                <div style="font-size: var(--rk-font-size-xl); font-weight: 900; color: var(--rk-teal-700);">$@Model.GrandTotal.ToString("F2")</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 900; color: var(--rk-teal-700);">@Model.GrandTotal.ToInr()</div>
             </div>
         </div>
 
@@ -215,13 +215,13 @@
                                         @item.Quantity
                                     </td>
                                     <td style="padding: 0.65rem 0; text-align: right;">
-                                        $@item.DailyRentalRate.ToString("F2")
+                                        @item.DailyRentalRate.ToInr()
                                     </td>
                                     <td style="padding: 0.65rem 0; text-align: right; color: var(--rk-text-muted);">
-                                        $@item.ItemSecurityDeposit.ToString("F2")
+                                        @item.ItemSecurityDeposit.ToInr()
                                     </td>
                                     <td style="padding: 0.65rem 0; text-align: right; font-weight: 700; color: var(--rk-navy-900);">
-                                        $@item.TotalItemPrice.ToString("F2")
+                                        @item.TotalItemPrice.ToInr()
                                     </td>
                                     @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
                                     {
@@ -249,10 +249,10 @@
                                     Store Subtotals:
                                 </td>
                                 <td style="padding-top: 0.65rem; text-align: right; color: var(--rk-text-muted); font-weight: 600;">
-                                    $@group.SubtotalSecurityDeposit.ToString("F2")
+                                    @group.SubtotalSecurityDeposit.ToInr()
                                 </td>
                                 <td style="padding-top: 0.65rem; text-align: right; font-weight: 800; color: var(--rk-teal-700);">
-                                    $@group.SubtotalRentalFee.ToString("F2")
+                                    @group.SubtotalRentalFee.ToInr()
                                 </td>
                                 @if (group.Status == RentKart.Core.Enums.BookingGroupStatus.Completed)
                                 {

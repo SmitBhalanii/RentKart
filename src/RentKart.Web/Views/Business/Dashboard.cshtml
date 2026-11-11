@@ -4,7 +4,7 @@
     ViewData["Title"] = "Business Dashboard";
 }
 
-<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-8);">
+<div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-10);">
     <div class="rk-container">
         <!-- Store Header Banner -->
         <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-teal-900) 100%); color: #ffffff;">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
 
-                <div style="display: flex; gap: var(--rk-space-3);">
+                <div style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap;">
                     <a asp-action="Profile" class="rk-btn rk-btn-outline" style="border-color: rgba(255, 255, 255, 0.4); color: #ffffff;">
                         Edit Store Details
                     </a>
@@ -95,60 +95,168 @@
             </div>
         }
 
-        <!-- Store Overview & Inventory Shell Grid -->
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-5); margin-bottom: var(--rk-space-6);">
-            <!-- Inventory & Rental Status Card -->
-            <div class="rk-card" style="padding: var(--rk-space-5);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-4);">
-                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">Equipment Catalog & Inventory</h2>
-                    <a asp-action="Equipment" class="rk-btn rk-btn-teal rk-btn-sm">
-                        Manage Equipment &rarr;
-                    </a>
+        <!-- Operation KPI Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--rk-space-4); margin-bottom: var(--rk-space-6);">
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-navy-900);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">Active Listings</div>
+                <div style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 4px;">
+                    @Model.ActiveListings <span style="font-size: var(--rk-font-size-sm); font-weight: normal; color: var(--rk-text-muted);">/ @Model.TotalListings total</span>
                 </div>
-                <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); line-height: 1.6; margin-bottom: var(--rk-space-4);">
-                    Manage your rental inventory units, daily pricing, security deposits, and maintenance downtime schedules.
-                </p>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--rk-space-3); background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); text-align: center;">
-                    <div>
-                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Listings</div>
-                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">@ViewBag.TotalListings</div>
-                    </div>
-                    <div>
-                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Active</div>
-                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-teal-700);">@ViewBag.ActiveListings</div>
-                    </div>
-                    <div>
-                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Inventory Units</div>
-                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">@ViewBag.TotalUnits</div>
-                    </div>
-                    <div>
-                        <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Maintenance</div>
-                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: #b45309;">@ViewBag.UnderMaintenance</div>
-                    </div>
-                </div>
+                <div style="font-size: 11px; color: var(--rk-text-muted); margin-top: 2px;">@Model.TotalUnits total inventory units</div>
             </div>
 
-            <!-- Store Location & Counter Info Card -->
-            <div class="rk-card" style="padding: var(--rk-space-5);">
-                <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">Pickup Counter Info</h2>
-                <div style="display: flex; flex-direction: column; gap: var(--rk-space-3); font-size: var(--rk-font-size-sm);">
-                    <div>
-                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Store Phone</div>
-                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.ContactPhone</div>
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-4); border-left: 4px solid #f59e0b;">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">Pending Approval</div>
+                <div style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #b45309; margin-top: 4px;">
+                    @Model.PendingApprovalCount
+                </div>
+                <div style="font-size: 11px; color: var(--rk-text-muted); margin-top: 2px;"><a asp-action="Bookings" style="color: inherit; text-decoration: underline;">Review requests</a></div>
+            </div>
+
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-teal-600);">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">Awaiting Handover</div>
+                <div style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-teal-700); margin-top: 4px;">
+                    @Model.ConfirmedCount
+                </div>
+                <div style="font-size: 11px; color: var(--rk-text-muted); margin-top: 2px;">Ready for counter pickup</div>
+            </div>
+
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-4); border-left: 4px solid #3b82f6;">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">Active on Rent</div>
+                <div style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #1d4ed8; margin-top: 4px;">
+                    @Model.ActiveRentalsCount
+                </div>
+                <div style="font-size: 11px; color: var(--rk-text-muted); margin-top: 2px;">In customer possession</div>
+            </div>
+
+            <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-4); border-left: 4px solid #ef4444;">
+                <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">In Maintenance</div>
+                <div style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #b91c1c; margin-top: 4px;">
+                    @Model.UnderMaintenanceUnits
+                </div>
+                <div style="font-size: 11px; color: var(--rk-text-muted); margin-top: 2px;">Units blocked for service</div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Split Grid -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--rk-space-5); margin-bottom: var(--rk-space-6); align-items: flex-start;">
+            <!-- Left: Recent Store Orders -->
+            <div class="rk-card rk-card-elevated" style="padding: 0; overflow: hidden;">
+                <div style="padding: var(--rk-space-4) var(--rk-space-5); border-bottom: 1px solid var(--rk-border-light); background: var(--rk-neutral-50); display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: 0;">
+                        Store Rental Bookings & Vouchers
+                    </h2>
+                    <a asp-action="Bookings" class="rk-btn rk-btn-outline rk-btn-sm" style="font-size: 12px;">
+                        Manage All Orders &rarr;
+                    </a>
+                </div>
+
+                @if (Model.RecentBookingGroups != null && Model.RecentBookingGroups.Any())
+                {
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--rk-font-size-sm);">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--rk-border-light); background: var(--rk-neutral-50); color: var(--rk-text-secondary); font-size: var(--rk-font-size-xs); text-transform: uppercase;">
+                                    <th style="padding: var(--rk-space-3) var(--rk-space-4);">Group #</th>
+                                    <th style="padding: var(--rk-space-3) var(--rk-space-4);">Customer</th>
+                                    <th style="padding: var(--rk-space-3) var(--rk-space-4);">Rental Window</th>
+                                    <th style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">Rental (₹)</th>
+                                    <th style="padding: var(--rk-space-3) var(--rk-space-4);">Status</th>
+                                    <th style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var group in Model.RecentBookingGroups)
+                                {
+                                    <tr style="border-bottom: 1px solid var(--rk-border-light); vertical-align: middle;">
+                                        <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700; color: var(--rk-navy-900);">
+                                            #@group.GroupNumber
+                                            <div style="font-size: 11px; color: var(--rk-text-muted);">@group.CreatedAtUtc.ToString("dd MMM yyyy")</div>
+                                        </td>
+                                        <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                            <div style="font-weight: 600; color: var(--rk-navy-900);">@group.CustomerName</div>
+                                            <div style="font-size: 11px; color: var(--rk-text-muted);">@group.ItemsCount item(s)</div>
+                                        </td>
+                                        <td style="padding: var(--rk-space-3) var(--rk-space-4); font-size: var(--rk-font-size-xs);">
+                                            @group.EarliestStartDate.ToString("dd MMM") &rarr; @group.LatestEndDate.ToString("dd MMM yyyy")
+                                        </td>
+                                        <td style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right; font-weight: 700; color: var(--rk-teal-700);">
+                                            @group.SubtotalRentalFee.ToInr()
+                                        </td>
+                                        <td style="padding: var(--rk-space-3) var(--rk-space-4);">
+                                            <span class="rk-badge" style="font-size: 11px;">@group.Status</span>
+                                        </td>
+                                        <td style="padding: var(--rk-space-3) var(--rk-space-4); text-align: right;">
+                                            <a asp-action="BookingDetails" asp-route-id="@group.Id" class="rk-btn rk-btn-primary rk-btn-sm" style="font-size: 11px; padding: 0.25rem 0.5rem;">
+                                                Manage
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Physical Address</div>
-                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.Address</div>
+                }
+                else
+                {
+                    <div style="padding: var(--rk-space-8); text-align: center;">
+                        <div style="font-size: 32px; margin-bottom: var(--rk-space-2);">📋</div>
+                        <div style="font-size: var(--rk-font-size-base); font-weight: 600; color: var(--rk-navy-900); margin-bottom: 4px;">No rental orders yet</div>
+                        <p style="font-size: var(--rk-font-size-sm); color: var(--rk-text-muted); margin-bottom: var(--rk-space-4);">
+                            When customers book equipment from your storefront, orders appear here for approval and counter handover.
+                        </p>
+                        <a asp-action="Equipment" class="rk-btn rk-btn-teal rk-btn-sm">
+                            View Equipment Listings
+                        </a>
                     </div>
-                    <div>
-                        <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Operating Hours</div>
-                        <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.OperatingHours</div>
+                }
+            </div>
+
+            <!-- Right: Store Location & Quick Links -->
+            <div style="display: flex; flex-direction: column; gap: var(--rk-space-5);">
+                <!-- Store Pickup Location Card -->
+                <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5);">
+                    <h2 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">Store Counter Info</h2>
+                    <div style="display: flex; flex-direction: column; gap: var(--rk-space-3); font-size: var(--rk-font-size-sm);">
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Phone</div>
+                            <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.ContactPhone</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Physical Storefront Address</div>
+                            <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.Address</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">Operating Hours</div>
+                            <div style="font-weight: 600; color: var(--rk-navy-900);">@Model.OperatingHours</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: var(--rk-space-4); border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3);">
+                        <a asp-action="Profile" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-xs); font-weight: 600; text-decoration: none;">
+                            Update Store Details &rarr;
+                        </a>
                     </div>
                 </div>
-                <div style="margin-top: var(--rk-space-4); border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3);">
-                    <a asp-action="Profile" style="color: var(--rk-teal-600); font-size: var(--rk-font-size-xs); font-weight: 600; text-decoration: none;">
-                        Update Store Details &rarr;
-                    </a>
+
+                <!-- Fast Actions Card -->
+                <div class="rk-card" style="padding: var(--rk-space-5);">
+                    <h3 style="font-size: var(--rk-font-size-sm); font-weight: 700; color: var(--rk-navy-900); text-transform: uppercase; margin-bottom: var(--rk-space-3);">
+                        Quick Actions
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: var(--rk-space-2); font-size: var(--rk-font-size-sm);">
+                        <a asp-action="Equipment" style="display: flex; align-items: center; justify-content: space-between; padding: var(--rk-space-2) 0; color: var(--rk-navy-900); text-decoration: none; border-bottom: 1px solid var(--rk-border-light);">
+                            <span>Manage Equipment & Photos</span>
+                            <span style="color: var(--rk-teal-600);">&rarr;</span>
+                        </a>
+                        <a asp-action="Bookings" style="display: flex; align-items: center; justify-content: space-between; padding: var(--rk-space-2) 0; color: var(--rk-navy-900); text-decoration: none; border-bottom: 1px solid var(--rk-border-light);">
+                            <span>Pending Reservation Orders</span>
+                            <span style="color: var(--rk-teal-600);">&rarr;</span>
+                        </a>
+                        <a asp-controller="Documents" asp-action="Index" style="display: flex; align-items: center; justify-content: space-between; padding: var(--rk-space-2) 0; color: var(--rk-navy-900); text-decoration: none;">
+                            <span>Store Rental Agreements & Invoices</span>
+                            <span style="color: var(--rk-teal-600);">&rarr;</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

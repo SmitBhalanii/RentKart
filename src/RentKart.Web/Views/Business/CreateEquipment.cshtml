@@ -8,38 +8,38 @@
     <div class="rk-container" style="max-width: 840px;">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" style="margin-bottom: var(--rk-space-3);">
-            <ol style="display: flex; gap: var(--rk-space-2); list-style: none; padding: 0; margin: 0; font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
-                <li><a asp-action="Dashboard" style="color: var(--rk-teal-600); text-decoration: none;">Dashboard</a></li>
+            <ol style="display: flex; gap: var(--rk-space-2); list-style: none; padding: 0; margin: 0; font-size: var(--rk-font-size-xs); color: var(--rk-color-slate-500);">
+                <li><a asp-action="Dashboard" style="color: var(--rk-color-teal-600); text-decoration: none;">Dashboard</a></li>
                 <li>&rsaquo;</li>
-                <li><a asp-action="Equipment" style="color: var(--rk-teal-600); text-decoration: none;">Equipment</a></li>
+                <li><a asp-action="Equipment" style="color: var(--rk-color-teal-600); text-decoration: none;">Equipment</a></li>
                 <li>&rsaquo;</li>
-                <li style="color: var(--rk-text-primary); font-weight: 600;">Add Equipment</li>
+                <li style="color: var(--rk-color-navy-900); font-weight: 600;">Add Equipment</li>
             </ol>
         </nav>
 
         <div style="margin-bottom: var(--rk-space-5);">
-            <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-navy-900); margin-bottom: 4px;">
+            <h1 style="font-size: var(--rk-font-size-3xl); font-weight: 800; color: var(--rk-color-navy-900); margin-bottom: 4px;">
                 Publish New Equipment Listing
             </h1>
-            <p style="color: var(--rk-text-secondary); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
-                Add item details, pricing rates, rentable inventory counts, and photos for customer discovery.
+            <p style="color: var(--rk-color-slate-500); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                Add item details, rental rates in Indian Rupees (₹), available stock, and photos for customer discovery.
             </p>
         </div>
 
-        <form method="post" asp-action="CreateEquipment" novalidate>
+        <form method="post" asp-action="CreateEquipment" enctype="multipart/form-data" novalidate>
             @Html.AntiForgeryToken()
 
             <div asp-validation-summary="ModelOnly" class="rk-alert rk-alert-error" role="alert" style="margin-bottom: var(--rk-space-5);"></div>
 
             <!-- Card 1: Listing Information -->
             <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5);">
-                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
+                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-color-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
                     1. Basic Equipment Information
                 </h2>
 
                 <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
                     <label asp-for="Title" class="rk-form-label"></label>
-                    <input asp-for="Title" class="rk-form-control" placeholder="e.g. Sony FX3 Cinema Line Full-Frame Camera" />
+                    <input asp-for="Title" class="rk-form-control" placeholder="e.g. Sony Alpha a7 IV Hybrid Camera / Bosch Rotary Hammer Drill" />
                     <span asp-validation-for="Title" class="rk-form-error"></span>
                 </div>
 
@@ -66,17 +66,17 @@
 
                 <div class="rk-form-group" style="margin-bottom: 0;">
                     <label asp-for="Description" class="rk-form-label"></label>
-                    <textarea asp-for="Description" class="rk-form-control" rows="5" placeholder="Specify equipment details, key technical specs, included accessories (batteries, cables, carry case), and operating guidelines..."></textarea>
+                    <textarea asp-for="Description" class="rk-form-control" rows="4" placeholder="Specify equipment technical specs, included accessories (batteries, charger, protective case, cables), and operating instructions..."></textarea>
                     <span asp-validation-for="Description" class="rk-form-error"></span>
-                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 4px; display: block;">
-                        Clear technical specifications help customers make informed booking decisions.
+                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-color-slate-500); margin-top: 4px; display: block;">
+                        Accurate technical details help customers choose the right gear for their projects.
                     </span>
                 </div>
             </div>
 
-            <!-- Card 2: Pricing & Inventory Quantity -->
+            <!-- Card 2: Pricing (₹ INR) & Inventory Quantity -->
             <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5);">
-                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
+                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-color-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
                     2. Pricing & Rentable Inventory Capacity
                 </h2>
 
@@ -84,8 +84,8 @@
                     <div class="rk-form-group">
                         <label asp-for="DailyRentalRate" class="rk-form-label"></label>
                         <div style="position: relative;">
-                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">$</span>
-                            <input asp-for="DailyRentalRate" class="rk-form-control" type="number" step="0.01" min="0.01" style="padding-left: 28px;" placeholder="50.00" />
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-color-slate-500); font-weight: 700; font-size: 1.1rem;">₹</span>
+                            <input asp-for="DailyRentalRate" class="rk-form-control" type="number" step="1" min="1" style="padding-left: 28px;" placeholder="1500" />
                         </div>
                         <span asp-validation-for="DailyRentalRate" class="rk-form-error"></span>
                     </div>
@@ -93,8 +93,8 @@
                     <div class="rk-form-group">
                         <label asp-for="SecurityDeposit" class="rk-form-label"></label>
                         <div style="position: relative;">
-                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">$</span>
-                            <input asp-for="SecurityDeposit" class="rk-form-control" type="number" step="0.01" min="0.00" style="padding-left: 28px;" placeholder="150.00" />
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-color-slate-500); font-weight: 700; font-size: 1.1rem;">₹</span>
+                            <input asp-for="SecurityDeposit" class="rk-form-control" type="number" step="1" min="0" style="padding-left: 28px;" placeholder="5000" />
                         </div>
                         <span asp-validation-for="SecurityDeposit" class="rk-form-error"></span>
                     </div>
@@ -106,41 +106,55 @@
                     </div>
                 </div>
 
-                <div style="background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary);">
-                    <strong>Inventory Rules:</strong> RentKart automatically tracks your active reservations and scheduled maintenance downtime against this total quantity. Customers can never book more than your simultaneously available units.
+                <div style="background: var(--rk-color-slate-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); font-size: var(--rk-font-size-xs); color: var(--rk-color-slate-600);">
+                    <strong>Inventory & Availability:</strong> RentKart automatically tracks your active customer reservations and maintenance downtime against this inventory count to prevent double booking.
                 </div>
             </div>
 
-            <!-- Card 3: Images & Activation -->
+            <!-- Card 3: Images & Upload -->
             <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6);">
-                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
-                    3. Photos & Catalog Visibility
+                <h2 style="font-size: var(--rk-font-size-lg); font-weight: 700; color: var(--rk-color-navy-900); margin-bottom: var(--rk-space-4); border-bottom: 1px solid var(--rk-border-light); padding-bottom: var(--rk-space-2);">
+                    3. Equipment Photos & Presentation
                 </h2>
 
                 <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
-                    <label asp-for="PrimaryImageUrl" class="rk-form-label"></label>
-                    <input asp-for="PrimaryImageUrl" class="rk-form-control" placeholder="https://example.com/photos/item-primary.jpg" />
-                    <span asp-validation-for="PrimaryImageUrl" class="rk-form-error"></span>
-                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 4px; display: block;">
-                        This will be shown as the primary card image in catalog discovery results.
+                    <label asp-for="PrimaryImageFile" class="rk-form-label"></label>
+                    <input asp-for="PrimaryImageFile" type="file" class="rk-form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-color-slate-500); margin-top: 4px; display: block;">
+                        Select a high-resolution primary photo from your computer (JPG, PNG, WebP up to 5MB).
                     </span>
+                    <span asp-validation-for="PrimaryImageFile" class="rk-form-error"></span>
                 </div>
 
                 <div class="rk-form-group" style="margin-bottom: var(--rk-space-4);">
-                    <label asp-for="AdditionalImageUrls" class="rk-form-label"></label>
-                    <textarea asp-for="AdditionalImageUrls" class="rk-form-control" rows="3" placeholder="https://example.com/photos/item-side.jpg&#10;https://example.com/photos/item-case.jpg"></textarea>
-                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 4px; display: block;">
-                        Enter one URL per line for the equipment detail gallery.
+                    <label asp-for="AdditionalImageFiles" class="rk-form-label"></label>
+                    <input asp-for="AdditionalImageFiles" type="file" multiple class="rk-form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-color-slate-500); margin-top: 4px; display: block;">
+                        Optional: Upload multiple angles, carrying case, or accessory photos together.
                     </span>
                 </div>
 
+                <details style="margin-top: var(--rk-space-3); font-size: var(--rk-font-size-sm); color: var(--rk-color-slate-600);">
+                    <summary style="cursor: pointer; font-weight: 600; color: var(--rk-color-teal-700);">Or supply external photo URLs (Advanced)</summary>
+                    <div style="margin-top: var(--rk-space-3); padding: var(--rk-space-3); background: var(--rk-color-slate-50); border-radius: var(--rk-radius-md);">
+                        <div class="rk-form-group" style="margin-bottom: var(--rk-space-3);">
+                            <label asp-for="PrimaryImageUrl" class="rk-form-label"></label>
+                            <input asp-for="PrimaryImageUrl" class="rk-form-control" placeholder="https://example.com/photos/item-primary.jpg" />
+                        </div>
+                        <div class="rk-form-group">
+                            <label asp-for="AdditionalImageUrls" class="rk-form-label"></label>
+                            <textarea asp-for="AdditionalImageUrls" class="rk-form-control" rows="2" placeholder="https://example.com/photos/side.jpg"></textarea>
+                        </div>
+                    </div>
+                </details>
+
                 <div style="margin-top: var(--rk-space-4); padding-top: var(--rk-space-3); border-top: 1px solid var(--rk-border-light);">
-                    <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: var(--rk-font-size-sm); font-weight: 600; color: var(--rk-navy-900);">
-                        <input asp-for="IsActive" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--rk-teal-600);" />
+                    <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: var(--rk-font-size-sm); font-weight: 600; color: var(--rk-color-navy-900);">
+                        <input asp-for="IsActive" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--rk-color-teal-600);" />
                         <span>Publish immediately to catalog (Active)</span>
                     </label>
-                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-left: 26px; display: block;">
-                        Uncheck to save as a draft listing that only you and admins can preview.
+                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-color-slate-500); margin-left: 26px; display: block;">
+                        Uncheck to save as a private draft listing.
                     </span>
                 </div>
             </div>
@@ -148,7 +162,7 @@
             <!-- Form Actions -->
             <div style="display: flex; justify-content: flex-end; gap: var(--rk-space-3);">
                 <a asp-action="Equipment" class="rk-btn rk-btn-outline">Cancel</a>
-                <button type="submit" class="rk-btn rk-btn-teal" style="padding-left: var(--rk-space-6); padding-right: var(--rk-space-6);">
+                <button type="submit" class="rk-btn rk-btn-teal" style="padding-left: var(--rk-space-6); padding-right: var(--rk-space-6); font-weight: 700;">
                     Publish Equipment Listing
                 </button>
             </div>

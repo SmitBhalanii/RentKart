@@ -61,24 +61,33 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IRentalDocumentService, RentalDocumentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAdminPlatformService, AdminPlatformService>();
+builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Seed identity roles and administrator account
+// Migrate and seed database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+        if (dbContext.Database.IsSqlServer())
+        {
+            logger.LogInformation("Applying any pending database migrations...");
+            await dbContext.Database.MigrateAsync();
+            logger.LogInformation("Database migrations verified and up to date.");
+        }
+
         await IdentityDataSeeder.SeedRolesAndAdminAsync(services);
         await CatalogDataSeeder.SeedCatalogDataAsync(services);
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding Identity roles and catalog data.");
+        logger.LogError(ex, "An error occurred while initializing database migrations, Identity roles, or catalog data. Check SQL Server connection string.");
     }
 }
 

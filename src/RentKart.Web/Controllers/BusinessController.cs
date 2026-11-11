@@ -19,6 +19,7 @@ public class BusinessController : Controller
     private readonly IBusinessEquipmentService _equipmentService;
     private readonly IEquipmentCatalogService _catalogService;
     private readonly IBookingService _bookingService;
+    private readonly IImageUploadService _imageUploadService;
     private readonly ApplicationDbContext _context;
     private readonly ILogger<BusinessController> _logger;
 
@@ -28,6 +29,7 @@ public class BusinessController : Controller
         IBusinessEquipmentService equipmentService,
         IEquipmentCatalogService catalogService,
         IBookingService bookingService,
+        IImageUploadService imageUploadService,
         ApplicationDbContext context,
         ILogger<BusinessController> logger)
     {
@@ -36,6 +38,7 @@ public class BusinessController : Controller
         _equipmentService = equipmentService;
         _catalogService = catalogService;
         _bookingService = bookingService;
+        _imageUploadService = imageUploadService;
         _context = context;
         _logger = logger;
     }
@@ -57,6 +60,7 @@ public class BusinessController : Controller
         }
 
         var equipmentList = await _equipmentService.GetBusinessEquipmentAsync(business.Id);
+        var (bookingGroups, totalGroups) = await _bookingService.GetBusinessBookingGroupsAsync(business.Id, page: 1, pageSize: 50);
 
         var model = new BusinessDashboardViewModel
         {
@@ -70,13 +74,22 @@ public class BusinessController : Controller
             Status = business.Status,
             CreatedAtUtc = business.CreatedAtUtc,
             ApprovedAtUtc = business.ApprovedAtUtc,
-            SuspendedAtUtc = business.SuspendedAtUtc
+            SuspendedAtUtc = business.SuspendedAtUtc,
+            TotalListings = equipmentList.Count,
+            ActiveListings = equipmentList.Count(e => e.IsActive),
+            TotalUnits = equipmentList.Sum(e => e.TotalQuantity),
+            UnderMaintenanceUnits = equipmentList.Sum(e => e.ActiveMaintenanceBlockedQuantity),
+            PendingApprovalCount = bookingGroups.Count(g => g.Status == BookingGroupStatus.PendingApproval),
+            ConfirmedCount = bookingGroups.Count(g => g.Status == BookingGroupStatus.Confirmed),
+            ActiveRentalsCount = bookingGroups.Count(g => g.Status == BookingGroupStatus.HandedOver),
+            CompletedCount = bookingGroups.Count(g => g.Status == BookingGroupStatus.Completed),
+            RecentBookingGroups = bookingGroups.Take(5).ToList()
         };
 
-        ViewBag.TotalListings = equipmentList.Count;
-        ViewBag.ActiveListings = equipmentList.Count(e => e.IsActive);
-        ViewBag.TotalUnits = equipmentList.Sum(e => e.TotalQuantity);
-        ViewBag.UnderMaintenance = equipmentList.Sum(e => e.ActiveMaintenanceBlockedQuantity);
+        ViewBag.TotalListings = model.TotalListings;
+        ViewBag.ActiveListings = model.ActiveListings;
+        ViewBag.TotalUnits = model.TotalUnits;
+        ViewBag.UnderMaintenance = model.UnderMaintenanceUnits;
 
         return View(model);
     }
@@ -230,13 +243,53 @@ public class BusinessController : Controller
             return View(model);
         }
 
-        // Parse images
+        // Handle uploaded images and URLs
         var imageUrls = new List<string>();
-        if (!string.IsNullOrWhiteSpace(model.PrimaryImageUrl))
+
+        // 1. Primary Image File Upload
+        if (model.PrimaryImageFile != null && model.PrimaryImageFile.Length > 0)
+        {
+            await using var stream = model.PrimaryImageFile.OpenReadStream();
+            var uploadRes = await _imageUploadService.UploadEquipmentImageAsync(
+                stream, model.PrimaryImageFile.FileName, model.PrimaryImageFile.ContentType, model.PrimaryImageFile.Length);
+
+            if (uploadRes.Success && !string.IsNullOrEmpty(uploadRes.ImageUrl))
+            {
+                imageUrls.Add(uploadRes.ImageUrl);
+            }
+            else
+            {
+                ModelState.AddModelError(nameof(model.PrimaryImageFile), uploadRes.ErrorMessage ?? "Failed to upload primary image.");
+                model.AvailableCategories = await GetActiveCategoryOptionsAsync();
+                return View(model);
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(model.PrimaryImageUrl))
         {
             imageUrls.Add(model.PrimaryImageUrl.Trim());
         }
 
+        // 2. Additional Image Files Upload
+        if (model.AdditionalImageFiles != null && model.AdditionalImageFiles.Count > 0)
+        {
+            foreach (var extraFile in model.AdditionalImageFiles.Where(f => f.Length > 0))
+            {
+                await using var stream = extraFile.OpenReadStream();
+                var uploadRes = await _imageUploadService.UploadEquipmentImageAsync(
+                    stream, extraFile.FileName, extraFile.ContentType, extraFile.Length);
+
+                if (uploadRes.Success && !string.IsNullOrEmpty(uploadRes.ImageUrl))
+                {
+                    imageUrls.Add(uploadRes.ImageUrl);
+                }
+                else
+                {
+                    _logger.LogWarning("Additional image upload failed: {Error}", uploadRes.ErrorMessage);
+                }
+            }
+        }
+
+        // 3. Additional Image URLs (fallback)
         if (!string.IsNullOrWhiteSpace(model.AdditionalImageUrls))
         {
             var extraLines = model.AdditionalImageUrls.Split(new[] { '\r', '\n', ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -527,19 +580,40 @@ public class BusinessController : Controller
     [HttpPost]
     [Route("Business/Equipment/Images/Add/{equipmentId:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddImage(int equipmentId, string imageUrl, bool isPrimary = false)
+    public async Task<IActionResult> AddImage(int equipmentId, IFormFile? imageFile, string? imageUrl, bool isPrimary = false)
     {
         var business = await GetCurrentBusinessAsync();
         if (business == null) return RedirectToAction(nameof(Dashboard));
 
-        var result = await _equipmentService.AddEquipmentImageAsync(equipmentId, business.Id, imageUrl, isPrimary);
+        string finalUrl = imageUrl?.Trim() ?? string.Empty;
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            await using var stream = imageFile.OpenReadStream();
+            var uploadRes = await _imageUploadService.UploadEquipmentImageAsync(
+                stream, imageFile.FileName, imageFile.ContentType, imageFile.Length);
+
+            if (!uploadRes.Success)
+            {
+                TempData["ErrorMessage"] = uploadRes.ErrorMessage;
+                return RedirectToAction(nameof(EditEquipment), new { id = equipmentId });
+            }
+            finalUrl = uploadRes.ImageUrl!;
+        }
+
+        if (string.IsNullOrWhiteSpace(finalUrl))
+        {
+            TempData["ErrorMessage"] = "Please select an image file or enter a valid photo URL.";
+            return RedirectToAction(nameof(EditEquipment), new { id = equipmentId });
+        }
+
+        var result = await _equipmentService.AddEquipmentImageAsync(equipmentId, business.Id, finalUrl, isPrimary);
         if (!result.Succeeded)
         {
             TempData["ErrorMessage"] = result.ErrorMessage;
         }
         else
         {
-            TempData["SuccessMessage"] = "Image added successfully.";
+            TempData["SuccessMessage"] = "Equipment image added successfully.";
         }
 
         return RedirectToAction(nameof(EditEquipment), new { id = equipmentId });

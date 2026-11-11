@@ -100,10 +100,10 @@
                                 @g.EarliestStartDate.ToString("MMM dd") - @g.LatestEndDate.ToString("MMM dd, yyyy")
                             </td>
                             <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 700; color: var(--rk-navy-900);">
-                                $@g.SubtotalRentalFee.ToString("F2")
+                                @g.SubtotalRentalFee.ToInr()
                             </td>
                             <td style="padding: var(--rk-space-3) var(--rk-space-4); color: var(--rk-text-muted); font-size: var(--rk-font-size-xs);">
-                                $@g.SubtotalSecurityDeposit.ToString("F2")
+                                @g.SubtotalSecurityDeposit.ToInr()
                             </td>
                             <td style="padding: var(--rk-space-3) var(--rk-space-4);">
                                 @switch (g.Status)

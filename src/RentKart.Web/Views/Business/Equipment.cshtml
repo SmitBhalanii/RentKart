@@ -117,13 +117,11 @@
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4);">
                                         @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
                                         {
-                                            <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 56px; height: 42px; object-fit: cover; border-radius: var(--rk-radius-sm); border: 1px solid var(--rk-border-light);" />
+                                            <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 56px; height: 42px; object-fit: cover; border-radius: var(--rk-radius-sm); border: 1px solid var(--rk-border-light);" onerror="this.src='/images/placeholder-equipment.svg'" />
                                         }
                                         else
                                         {
-                                            <div style="width: 56px; height: 42px; background: var(--rk-neutral-100); border-radius: var(--rk-radius-sm); display: flex; align-items: center; justify-content: center; color: var(--rk-text-muted); font-size: 10px;">
-                                                No Photo
-                                            </div>
+                                            <img src="/images/placeholder-equipment.svg" alt="@item.Title" style="width: 56px; height: 42px; object-fit: cover; border-radius: var(--rk-radius-sm); border: 1px solid var(--rk-border-light);" />
                                         }
                                     </td>
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4);">
@@ -137,10 +135,10 @@
                                         </div>
                                     </td>
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4); font-weight: 600; color: var(--rk-navy-900);">
-                                        $@item.DailyRentalRate.ToString("F2")<span style="font-size: var(--rk-font-size-xs); font-weight: normal; color: var(--rk-text-muted);">/day</span>
+                                        @item.DailyRentalRate.ToInr()<span style="font-size: var(--rk-font-size-xs); font-weight: normal; color: var(--rk-text-muted);">/day</span>
                                     </td>
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4); color: var(--rk-text-secondary);">
-                                        $@item.SecurityDeposit.ToString("F2")
+                                        @item.SecurityDeposit.ToInr()
                                     </td>
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4);">
                                         <div style="display: flex; align-items: center; gap: 0.35rem;">

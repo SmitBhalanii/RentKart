@@ -38,21 +38,21 @@
             <div class="rk-card" style="padding: var(--rk-space-4);">
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Rental Fee</div>
                 <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">
-                    $@Model.TotalRentalFee.ToString("F2")
+                    @Model.TotalRentalFee.ToInr()
                 </div>
             </div>
 
             <div class="rk-card" style="padding: var(--rk-space-4);">
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Total Security Deposit</div>
                 <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900); margin-top: 0.25rem;">
-                    $@Model.TotalSecurityDeposit.ToString("F2")
+                    @Model.TotalSecurityDeposit.ToInr()
                 </div>
             </div>
 
             <div class="rk-card" style="padding: var(--rk-space-4); border-left: 4px solid var(--rk-teal-600);">
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Grand Total Volume</div>
                 <div style="font-size: var(--rk-font-size-2xl); font-weight: 900; color: var(--rk-teal-700); margin-top: 0.25rem;">
-                    $@Model.GrandTotal.ToString("F2")
+                    @Model.GrandTotal.ToInr()
                 </div>
             </div>
         </div>
@@ -162,10 +162,10 @@
                                             @item.Quantity
                                         </td>
                                         <td style="text-align: right;">
-                                            $@item.DailyRentalRate.ToString("F2")
+                                            @item.DailyRentalRate.ToInr()
                                         </td>
                                         <td style="text-align: right; font-weight: 700;">
-                                            $@item.TotalItemPrice.ToString("F2")
+                                            @item.TotalItemPrice.ToInr()
                                         </td>
                                         <td style="text-align: right;">
                                             @if (item.ReviewId.HasValue)
@@ -185,7 +185,7 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="4" style="text-align: right; font-weight: 700;">Store Subtotal:</td>
-                                    <td style="text-align: right; font-weight: 800; color: var(--rk-teal-700);">$@group.SubtotalRentalFee.ToString("F2")</td>
+                                    <td style="text-align: right; font-weight: 800; color: var(--rk-teal-700);">@group.SubtotalRentalFee.ToInr()</td>
                                     <td></td>
                                 </tr>
                             </tfoot>

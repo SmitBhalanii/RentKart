@@ -72,10 +72,10 @@
             <div class="rk-card" style="padding: var(--rk-space-4); border-top: 3px solid var(--rk-teal-700);">
                 <div style="font-size: var(--rk-font-size-xs); font-weight: 600; color: var(--rk-text-muted); text-transform: uppercase;">Platform Turnover</div>
                 <div style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: var(--rk-teal-700); margin-top: 0.25rem;">
-                    $@Model.Metrics.TotalPlatformTurnover.ToString("F2")
+                    @Model.Metrics.TotalPlatformTurnover.ToInr()
                 </div>
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); margin-top: 0.25rem;">
-                    Rental: $@Model.Metrics.TotalRentalFeeVolume.ToString("F2") &bull; Deposit: $@Model.Metrics.TotalSecurityDepositVolume.ToString("F2")
+                    Rental: @Model.Metrics.TotalRentalFeeVolume.ToInr() &bull; Deposit: @Model.Metrics.TotalSecurityDepositVolume.ToInr()
                 </div>
             </div>
 

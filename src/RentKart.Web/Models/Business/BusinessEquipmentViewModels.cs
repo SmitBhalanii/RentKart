@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using RentKart.Core.Entities;
 using RentKart.Core.Enums;
 using RentKart.Core.Interfaces;
@@ -35,15 +36,15 @@ public class CreateEquipmentViewModel
     public int CategoryId { get; set; }
 
     [Required(ErrorMessage = "Daily rental rate is required.")]
-    [Range(0.01, 100000.00, ErrorMessage = "Daily rental rate must be greater than $0.00.")]
+    [Range(0.01, 1000000.00, ErrorMessage = "Daily rental rate must be greater than ₹0.00.")]
     [DataType(DataType.Currency)]
-    [Display(Name = "Daily Rental Rate ($)")]
+    [Display(Name = "Daily Rental Rate (₹/day)")]
     public decimal DailyRentalRate { get; set; }
 
     [Required(ErrorMessage = "Security deposit amount is required.")]
-    [Range(0.00, 100000.00, ErrorMessage = "Security deposit cannot be negative.")]
+    [Range(0.00, 1000000.00, ErrorMessage = "Security deposit cannot be negative.")]
     [DataType(DataType.Currency)]
-    [Display(Name = "Refundable Security Deposit ($)")]
+    [Display(Name = "Refundable Security Deposit (₹)")]
     public decimal SecurityDeposit { get; set; }
 
     [Required(ErrorMessage = "Total rentable quantity is required.")]
@@ -58,11 +59,16 @@ public class CreateEquipmentViewModel
     [Display(Name = "Publish Immediately (Active)")]
     public bool IsActive { get; set; } = true;
 
-    [Url(ErrorMessage = "Please enter a valid absolute image URL (http or https).")]
-    [Display(Name = "Primary Photo URL")]
+    [Display(Name = "Upload Primary Photo (JPG, PNG, WebP — max 5MB)")]
+    public IFormFile? PrimaryImageFile { get; set; }
+
+    [Display(Name = "Upload Additional Photos")]
+    public List<IFormFile>? AdditionalImageFiles { get; set; }
+
+    [Display(Name = "Or Image URL (Optional)")]
     public string? PrimaryImageUrl { get; set; }
 
-    [Display(Name = "Additional Photo URLs (one per line)")]
+    [Display(Name = "Additional Image URLs (Optional, one per line)")]
     public string? AdditionalImageUrls { get; set; }
 
     public List<CategorySelectOption> AvailableCategories { get; set; } = new();
@@ -87,15 +93,15 @@ public class EditEquipmentViewModel
     public int CategoryId { get; set; }
 
     [Required(ErrorMessage = "Daily rental rate is required.")]
-    [Range(0.01, 100000.00, ErrorMessage = "Daily rental rate must be greater than $0.00.")]
+    [Range(0.01, 1000000.00, ErrorMessage = "Daily rental rate must be greater than ₹0.00.")]
     [DataType(DataType.Currency)]
-    [Display(Name = "Daily Rental Rate ($)")]
+    [Display(Name = "Daily Rental Rate (₹/day)")]
     public decimal DailyRentalRate { get; set; }
 
     [Required(ErrorMessage = "Security deposit amount is required.")]
-    [Range(0.00, 100000.00, ErrorMessage = "Security deposit cannot be negative.")]
+    [Range(0.00, 1000000.00, ErrorMessage = "Security deposit cannot be negative.")]
     [DataType(DataType.Currency)]
-    [Display(Name = "Refundable Security Deposit ($)")]
+    [Display(Name = "Refundable Security Deposit (₹)")]
     public decimal SecurityDeposit { get; set; }
 
     [Required(ErrorMessage = "Total rentable quantity is required.")]
@@ -109,6 +115,12 @@ public class EditEquipmentViewModel
 
     [Display(Name = "Listing Status (Active)")]
     public bool IsActive { get; set; }
+
+    [Display(Name = "Upload New Photo (JPG, PNG, WebP)")]
+    public IFormFile? NewImageFile { get; set; }
+
+    [Display(Name = "Set as Primary Image")]
+    public bool IsNewImagePrimary { get; set; }
 
     public byte[]? RowVersion { get; set; }
 
@@ -165,9 +177,9 @@ public class AddMaintenanceRecordInput
     [Display(Name = "Reason / Maintenance Notes")]
     public string Reason { get; set; } = string.Empty;
 
-    [Range(0.00, 100000.00, ErrorMessage = "Estimated cost cannot be negative.")]
+    [Range(0.00, 1000000.00, ErrorMessage = "Estimated cost cannot be negative.")]
     [DataType(DataType.Currency)]
-    [Display(Name = "Estimated Repair / Service Cost ($)")]
+    [Display(Name = "Estimated Repair / Service Cost (₹)")]
     public decimal? EstimatedCost { get; set; }
 }
 

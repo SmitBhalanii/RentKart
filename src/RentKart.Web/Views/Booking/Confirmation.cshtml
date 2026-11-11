@@ -19,9 +19,9 @@
             Your reservation request has been dispatched to each participating store. Present your pickup verification code when collecting equipment.
         </p>
         <div style="display: inline-flex; gap: var(--rk-space-6); background: var(--rk-neutral-50); padding: var(--rk-space-3) var(--rk-space-6); border-radius: var(--rk-radius-md); font-size: var(--rk-font-size-xs);">
-            <div>Total Rental Fee: <strong style="color: var(--rk-navy-900);">$@Model.TotalRentalFee.ToString("F2")</strong></div>
-            <div>Refundable Deposit: <strong style="color: var(--rk-navy-900);">$@Model.TotalSecurityDeposit.ToString("F2")</strong></div>
-            <div>Grand Total: <strong style="color: var(--rk-teal-700); font-size: var(--rk-font-size-sm);">$@Model.GrandTotal.ToString("F2")</strong></div>
+            <div>Total Rental Fee: <strong style="color: var(--rk-navy-900);">@Model.TotalRentalFee.ToInr()</strong></div>
+            <div>Refundable Deposit: <strong style="color: var(--rk-navy-900);">@Model.TotalSecurityDeposit.ToInr()</strong></div>
+            <div>Grand Total: <strong style="color: var(--rk-teal-700); font-size: var(--rk-font-size-sm);">@Model.GrandTotal.ToInr()</strong></div>
         </div>
     </div>
 
@@ -95,7 +95,7 @@
                                     </span>
                                 </div>
                                 <div style="font-weight: 700; color: var(--rk-navy-900);">
-                                    $@item.TotalItemPrice.ToString("F2")
+                                    @item.TotalItemPrice.ToInr()
                                 </div>
                             </div>
                         }

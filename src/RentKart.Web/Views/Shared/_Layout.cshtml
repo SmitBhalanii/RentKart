@@ -36,7 +36,8 @@
     <!-- Master Footer -->
     <partial name="_Footer" />
 
-    <!-- Core Interactive Scripts -->
+    <!-- Core Interactive Scripts & Libraries -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

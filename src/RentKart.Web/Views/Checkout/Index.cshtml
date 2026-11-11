@@ -89,10 +89,10 @@
                                                 @item.Quantity
                                             </td>
                                             <td style="padding: 0.65rem 0; text-align: right; font-weight: 600; color: var(--rk-navy-900);">
-                                                $@item.ItemRentalSubtotal.ToString("F2")
+                                                @item.ItemRentalSubtotal.ToInr()
                                             </td>
                                             <td style="padding: 0.65rem 0; text-align: right; color: var(--rk-text-muted);">
-                                                $@item.ItemDepositSubtotal.ToString("F2")
+                                                @item.ItemDepositSubtotal.ToInr()
                                             </td>
                                         </tr>
                                     }
@@ -103,10 +103,10 @@
                                             Store Subtotal:
                                         </td>
                                         <td style="padding-top: 0.65rem; font-weight: 800; color: var(--rk-navy-900); text-align: right;">
-                                            $@group.GroupRentalSubtotal.ToString("F2")
+                                            @group.GroupRentalSubtotal.ToInr()
                                         </td>
                                         <td style="padding-top: 0.65rem; font-weight: 600; color: var(--rk-text-muted); text-align: right;">
-                                            $@group.GroupDepositSubtotal.ToString("F2")
+                                            @group.GroupDepositSubtotal.ToInr()
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -157,15 +157,15 @@
                         </div>
                         <div style="display: flex; justify-content: space-between; color: var(--rk-text-secondary);">
                             <span>Total Rental Fees</span>
-                            <span style="font-weight: 600; color: var(--rk-navy-900);">$@Model.TotalRentalFee.ToString("F2")</span>
+                            <span style="font-weight: 600; color: var(--rk-navy-900);">@Model.TotalRentalFee.ToInr()</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; color: var(--rk-text-secondary);">
                             <span>Refundable Deposits</span>
-                            <span style="font-weight: 600; color: var(--rk-navy-900);">$@Model.TotalSecurityDeposit.ToString("F2")</span>
+                            <span style="font-weight: 600; color: var(--rk-navy-900);">@Model.TotalSecurityDeposit.ToInr()</span>
                         </div>
                         <div style="border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3); display: flex; justify-content: space-between; font-size: var(--rk-font-size-base);">
                             <span style="font-weight: 700; color: var(--rk-navy-900);">Total to Pay at Pickup</span>
-                            <span style="font-weight: 800; color: var(--rk-teal-700); font-size: var(--rk-font-size-xl);">$@Model.GrandTotal.ToString("F2")</span>
+                            <span style="font-weight: 800; color: var(--rk-teal-700); font-size: var(--rk-font-size-xl);">@Model.GrandTotal.ToInr()</span>
                         </div>
                     </div>
 

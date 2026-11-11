@@ -99,7 +99,7 @@
                                         <span class="rk-badge">@b.Status</span>
                                     </td>
                                     <td style="text-align: right; font-weight: 700;">
-                                        $@b.GrandTotal.ToString("F2")
+                                        @b.GrandTotal.ToInr()
                                     </td>
                                     <td style="text-align: right;">
                                         <a asp-action="BookingDetails" asp-route-id="@b.Id" class="rk-btn rk-btn-sm rk-btn-outline">

@@ -83,7 +83,7 @@
                     <div class="rk-form-group">
                         <label asp-for="NewRecord.EstimatedCost" class="rk-form-label"></label>
                         <div style="position: relative;">
-                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">$</span>
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rk-text-muted); font-weight: 600;">₹</span>
                             <input asp-for="NewRecord.EstimatedCost" class="rk-form-control" type="number" step="0.01" min="0" style="padding-left: 28px;" placeholder="Optional" />
                         </div>
                         <span asp-validation-for="NewRecord.EstimatedCost" class="rk-form-error"></span>
@@ -135,7 +135,7 @@
                                         <div style="font-size: 11px; color: var(--rk-text-muted);">Logged on @record.CreatedAtUtc.ToString("MMM d, yyyy")</div>
                                     </td>
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4); color: var(--rk-text-secondary);">
-                                        @(record.EstimatedCost.HasValue ? $"${record.EstimatedCost.Value:F2}" : "—")
+                                        @(record.EstimatedCost.HasValue ? record.EstimatedCost.Value.ToInr() : "—")
                                     </td>
                                     <td style="padding: var(--rk-space-3) var(--rk-space-4);">
                                         @if (record.IsResolved)

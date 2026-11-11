@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using RentKart.Core.Entities;
 using RentKart.Core.Enums;
 using RentKart.Core.Interfaces;
+using RentKart.Core.Utilities;
 using RentKart.Infrastructure.Data;
 
 namespace RentKart.Infrastructure.Services;
@@ -578,9 +579,9 @@ public class RentalDocumentService : IRentalDocumentService
             sb.AppendLine($"<td><strong>{item.Equipment.Title}</strong><div style=\"font-size: 11px; color: #64748b;\">{item.Equipment.Category?.Name}</div></td>");
             sb.AppendLine($"<td style=\"text-align: center;\">{item.Quantity}</td>");
             sb.AppendLine($"<td>{item.StartDate:MMM dd, yyyy} &rarr; {item.EndDate:MMM dd, yyyy}<div style=\"font-size: 11px; color: #64748b;\">({item.DaysCount} days)</div></td>");
-            sb.AppendLine($"<td style=\"text-align: right;\">${item.DailyRentalRate:F2}</td>");
-            sb.AppendLine($"<td style=\"text-align: right;\">${item.ItemSecurityDeposit:F2}</td>");
-            sb.AppendLine($"<td style=\"text-align: right; font-weight: 700;\">${item.TotalItemPrice:F2}</td>");
+            sb.AppendLine($"<td style=\"text-align: right;\">{item.DailyRentalRate.ToInr()}</td>");
+            sb.AppendLine($"<td style=\"text-align: right;\">{item.ItemSecurityDeposit.ToInr()}</td>");
+            sb.AppendLine($"<td style=\"text-align: right; font-weight: 700;\">{item.TotalItemPrice.ToInr()}</td>");
             sb.AppendLine("</tr>");
         }
 
@@ -589,9 +590,9 @@ public class RentalDocumentService : IRentalDocumentService
 
         // Financial Totals
         sb.AppendLine("<div class=\"totals-box\">");
-        sb.AppendLine("<div class=\"totals-row\"><span>Rental Charges Subtotal:</span><span>$" + group.SubtotalRentalFee.ToString("F2") + "</span></div>");
-        sb.AppendLine("<div class=\"totals-row\"><span>Refundable Security Deposit:</span><span>$" + group.SubtotalSecurityDeposit.ToString("F2") + "</span></div>");
-        sb.AppendLine("<div class=\"totals-row grand\"><span>Agreed Total Payable:</span><span>$" + (group.SubtotalRentalFee + group.SubtotalSecurityDeposit).ToString("F2") + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row\"><span>Rental Charges Subtotal:</span><span>" + group.SubtotalRentalFee.ToInr() + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row\"><span>Refundable Security Deposit:</span><span>" + group.SubtotalSecurityDeposit.ToInr() + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row grand\"><span>Agreed Total Payable:</span><span>" + (group.SubtotalRentalFee + group.SubtotalSecurityDeposit).ToInr() + "</span></div>");
         sb.AppendLine("</div>");
 
         // Legal Clauses
@@ -691,18 +692,18 @@ public class RentalDocumentService : IRentalDocumentService
             sb.AppendLine($"<td><strong>{item.Equipment.Title}</strong></td>");
             sb.AppendLine($"<td style=\"text-align: center;\">{item.Quantity}</td>");
             sb.AppendLine($"<td>{item.DaysCount} days</td>");
-            sb.AppendLine($"<td style=\"text-align: right;\">${item.DailyRentalRate:F2}</td>");
-            sb.AppendLine($"<td style=\"text-align: right;\">${item.ItemSecurityDeposit:F2}</td>");
-            sb.AppendLine($"<td style=\"text-align: right; font-weight: 700;\">${item.TotalItemPrice:F2}</td>");
+            sb.AppendLine($"<td style=\"text-align: right;\">{item.DailyRentalRate.ToInr()}</td>");
+            sb.AppendLine($"<td style=\"text-align: right;\">{item.ItemSecurityDeposit.ToInr()}</td>");
+            sb.AppendLine($"<td style=\"text-align: right; font-weight: 700;\">{item.TotalItemPrice.ToInr()}</td>");
             sb.AppendLine("</tr>");
         }
         sb.AppendLine("</tbody>");
         sb.AppendLine("</table>");
 
         sb.AppendLine("<div class=\"totals-box\">");
-        sb.AppendLine("<div class=\"totals-row\"><span>Rental Fee:</span><span>$" + group.SubtotalRentalFee.ToString("F2") + "</span></div>");
-        sb.AppendLine("<div class=\"totals-row\"><span>Refundable Deposit:</span><span>$" + group.SubtotalSecurityDeposit.ToString("F2") + "</span></div>");
-        sb.AppendLine("<div class=\"totals-row grand\"><span>Agreed Payable:</span><span>$" + (group.SubtotalRentalFee + group.SubtotalSecurityDeposit).ToString("F2") + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row\"><span>Rental Fee:</span><span>" + group.SubtotalRentalFee.ToInr() + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row\"><span>Refundable Deposit:</span><span>" + group.SubtotalSecurityDeposit.ToInr() + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row grand\"><span>Agreed Payable:</span><span>" + (group.SubtotalRentalFee + group.SubtotalSecurityDeposit).ToInr() + "</span></div>");
         sb.AppendLine("</div>");
 
         sb.AppendLine("<div class=\"notice\">");
@@ -786,22 +787,22 @@ public class RentalDocumentService : IRentalDocumentService
                 sb.AppendLine($"<td><strong>{item.Equipment.Title}</strong></td>");
                 sb.AppendLine($"<td style=\"text-align: center;\">{item.Quantity}</td>");
                 sb.AppendLine($"<td>{item.StartDate:MMM dd} - {item.EndDate:MMM dd}</td>");
-                sb.AppendLine($"<td style=\"text-align: right;\">${item.DailyRentalRate:F2}</td>");
-                sb.AppendLine($"<td style=\"text-align: right; font-weight: 700;\">${item.TotalItemPrice:F2}</td>");
+                sb.AppendLine($"<td style=\"text-align: right;\">{item.DailyRentalRate.ToInr()}</td>");
+                sb.AppendLine($"<td style=\"text-align: right; font-weight: 700;\">{item.TotalItemPrice.ToInr()}</td>");
                 sb.AppendLine("</tr>");
             }
             sb.AppendLine("</tbody>");
             sb.AppendLine("</table>");
 
-            sb.AppendLine($"<div style=\"text-align: right; font-size: 12px; margin-top: 10px; color: #475569;\">Store Subtotal: Rental <strong>${group.SubtotalRentalFee:F2}</strong> + Deposit <strong>${group.SubtotalSecurityDeposit:F2}</strong> = <strong>${(group.SubtotalRentalFee + group.SubtotalSecurityDeposit):F2}</strong></div>");
+            sb.AppendLine($"<div style=\"text-align: right; font-size: 12px; margin-top: 10px; color: #475569;\">Store Subtotal: Rental <strong>{group.SubtotalRentalFee.ToInr()}</strong> + Deposit <strong>{group.SubtotalSecurityDeposit.ToInr()}</strong> = <strong>{(group.SubtotalRentalFee + group.SubtotalSecurityDeposit).ToInr()}</strong></div>");
             sb.AppendLine("</div>");
         }
 
         // Consolidated Totals
         sb.AppendLine("<div class=\"totals-box\">");
-        sb.AppendLine("<div class=\"totals-row\"><span>Total Rental Fees:</span><span>$" + booking.TotalRentalFee.ToString("F2") + "</span></div>");
-        sb.AppendLine("<div class=\"totals-row\"><span>Total Security Deposits:</span><span>$" + booking.TotalSecurityDeposit.ToString("F2") + "</span></div>");
-        sb.AppendLine("<div class=\"totals-row grand\"><span>Grand Total Agreed:</span><span>$" + booking.GrandTotal.ToString("F2") + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row\"><span>Total Rental Fees:</span><span>" + booking.TotalRentalFee.ToInr() + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row\"><span>Total Security Deposits:</span><span>" + booking.TotalSecurityDeposit.ToInr() + "</span></div>");
+        sb.AppendLine("<div class=\"totals-row grand\"><span>Grand Total Agreed:</span><span>" + booking.GrandTotal.ToInr() + "</span></div>");
         sb.AppendLine("</div>");
 
         sb.AppendLine("<div style=\"margin-top: 32px; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px; text-align: center;\">");

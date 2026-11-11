@@ -92,7 +92,23 @@ public class BusinessEquipmentManagementTests : IClassFixture<WebApplicationFact
 
         // 1. Pending approval business
         var pendingBiz = await db.BusinessProfiles
-            .FirstAsync(b => b.Status == BusinessStatus.PendingApproval);
+            .FirstOrDefaultAsync(b => b.Status == BusinessStatus.PendingApproval);
+        if (pendingBiz == null)
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var pendingUser = await userManager.FindByEmailAsync("store.pending@rentkart.local");
+            if (pendingUser != null)
+            {
+                pendingBiz = await db.BusinessProfiles.FirstOrDefaultAsync(b => b.UserId == pendingUser.Id);
+                if (pendingBiz != null)
+                {
+                    pendingBiz.Status = BusinessStatus.PendingApproval;
+                    pendingBiz.ApprovedAtUtc = null;
+                    await db.SaveChangesAsync();
+                }
+            }
+        }
+        Assert.NotNull(pendingBiz);
 
         var category = await db.Categories.FirstAsync(c => c.IsActive);
 

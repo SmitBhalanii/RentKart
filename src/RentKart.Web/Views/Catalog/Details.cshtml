@@ -36,14 +36,11 @@
                 <div class="rk-card" style="padding: 0; overflow: hidden; height: 380px; background: var(--rk-neutral-100); display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-4);">
                     @if (Model.ImageUrls.Any())
                     {
-                        <img src="@Model.ImageUrls.First()" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover;" />
+                        <img src="@Model.ImageUrls.First()" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/placeholder-equipment.svg'" />
                     }
                     else
                     {
-                        <div style="text-align: center; color: var(--rk-text-muted);">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <div style="font-size: var(--rk-font-size-xs); margin-top: 0.5rem;">No photo uploaded yet</div>
-                        </div>
+                        <img src="/images/placeholder-equipment.svg" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover;" />
                     }
                 </div>
 
@@ -216,7 +213,7 @@
                         <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase; font-weight: 600;">Daily Rental Rate</div>
                         <div style="display: flex; align-items: baseline; gap: 0.35rem;">
                             <span style="font-size: var(--rk-font-size-4xl); font-weight: 800; color: var(--rk-navy-900);">
-                                $@Model.DailyRentalRate.ToString("F2")
+                                @Model.DailyRentalRate.ToInr()
                             </span>
                             <span style="font-size: var(--rk-font-size-sm); color: var(--rk-text-muted);">/ calendar day</span>
                         </div>
@@ -226,7 +223,7 @@
                     <div style="background: var(--rk-neutral-50); border-radius: var(--rk-radius-md); padding: var(--rk-space-3); margin-bottom: var(--rk-space-5); font-size: var(--rk-font-size-xs); color: var(--rk-text-secondary); line-height: 1.5;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
                             <span>Security Deposit (Refundable):</span>
-                            <strong style="color: var(--rk-navy-900);">$@Model.SecurityDeposit.ToString("F2")</strong>
+                            <strong style="color: var(--rk-navy-900);">@Model.SecurityDeposit.ToInr()</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>Available Units:</span>

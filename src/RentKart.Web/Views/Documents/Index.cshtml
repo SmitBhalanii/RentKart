@@ -93,13 +93,13 @@
                                     @(doc.BusinessName ?? "Parent Booking Summary")
                                 </td>
                                 <td style="padding: 1rem; text-align: right;">
-                                    $@doc.RentalSubtotal.ToString("F2")
+                                    @doc.RentalSubtotal.ToInr()
                                 </td>
                                 <td style="padding: 1rem; text-align: right;">
-                                    $@doc.SecurityDeposit.ToString("F2")
+                                    @doc.SecurityDeposit.ToInr()
                                 </td>
                                 <td style="padding: 1rem; text-align: right; font-weight: 700; color: var(--rk-navy-900);">
-                                    $@doc.GrandTotal.ToString("F2")
+                                    @doc.GrandTotal.ToInr()
                                 </td>
                                 <td style="padding: 1rem;">
                                     @if (doc.IsGenerated)

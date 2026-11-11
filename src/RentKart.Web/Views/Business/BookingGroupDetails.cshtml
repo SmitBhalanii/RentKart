@@ -60,11 +60,11 @@
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--rk-space-4); background: var(--rk-neutral-50); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-md); padding: var(--rk-space-4); text-align: center;">
             <div>
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Store Rental Subtotal</div>
-                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">$@Model.SubtotalRentalFee.ToString("F2")</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">@Model.SubtotalRentalFee.ToInr()</div>
             </div>
             <div>
                 <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted); text-transform: uppercase;">Security Deposit (Refundable)</div>
-                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-teal-700);">$@Model.SubtotalSecurityDeposit.ToString("F2")</div>
+                <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-teal-700);">@Model.SubtotalSecurityDeposit.ToInr()</div>
             </div>
         </div>
 
@@ -110,10 +110,10 @@
                             @item.Quantity
                         </td>
                         <td style="padding: 0.65rem 0; text-align: right;">
-                            $@item.DailyRentalRate.ToString("F2")
+                            @item.DailyRentalRate.ToInr()
                         </td>
                         <td style="padding: 0.65rem 0; text-align: right; font-weight: 700; color: var(--rk-navy-900);">
-                            $@item.TotalItemPrice.ToString("F2")
+                            @item.TotalItemPrice.ToInr()
                         </td>
                     </tr>
                 }
@@ -292,7 +292,7 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--rk-space-3); border-bottom: 1px dashed var(--rk-border-light); padding-bottom: 0.5rem;">
                                 <div>
                                     <strong style="color: var(--rk-navy-900); font-size: var(--rk-font-size-sm);">@itm.EquipmentTitle</strong>
-                                    <span style="font-size: 11px; color: var(--rk-text-muted); margin-left: 0.5rem;">Total Out: @itm.Quantity unit(s) &bull; Security Deposit: $@itm.ItemSecurityDeposit.ToString("F2")</span>
+                                    <span style="font-size: 11px; color: var(--rk-text-muted); margin-left: 0.5rem;">Total Out: @itm.Quantity unit(s) &bull; Security Deposit: @itm.ItemSecurityDeposit.ToInr()</span>
                                 </div>
                             </div>
 
@@ -341,7 +341,7 @@
 
                             <div style="display: grid; grid-template-columns: 140px 1fr auto; gap: var(--rk-space-3); align-items: center; background: #fff; padding: var(--rk-space-2) var(--rk-space-3); border-radius: var(--rk-radius-sm); border: 1px solid var(--rk-border-light);">
                                 <div>
-                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Est. Repair Cost ($)</label>
+                                    <label style="font-size: 10px; font-weight: 700; color: var(--rk-text-muted); text-transform: uppercase; display: block; margin-bottom: 2px;">Est. Repair Cost (₹)</label>
                                     <input type="number" 
                                            step="0.01" 
                                            name="Items[@i].EstimatedRepairCost" 
@@ -375,14 +375,14 @@
                 <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--rk-radius-md); padding: var(--rk-space-4); margin-bottom: var(--rk-space-5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4);">
                     <div>
                         <div style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: 700;">Security Deposit Held for Store</div>
-                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: #166534;">$@Model.SubtotalSecurityDeposit.ToString("F2")</div>
+                        <div style="font-size: var(--rk-font-size-xl); font-weight: 800; color: #166534;">@Model.SubtotalSecurityDeposit.ToInr()</div>
                         <div style="font-size: 11px; color: var(--rk-text-muted);">Assessed damages/missing fees are deducted against this deposit automatically.</div>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
                         <div>
                             <label for="assessedDamageFee" style="font-size: 10px; font-weight: 700; color: #166534; text-transform: uppercase; display: block; margin-bottom: 2px;">
-                                Total Damage Fee Override ($)
+                                Total Damage Fee Override (₹)
                             </label>
                             <input type="number" 
                                    step="0.01" 

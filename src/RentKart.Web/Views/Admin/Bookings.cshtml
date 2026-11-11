@@ -110,13 +110,13 @@
                                         }
                                     </td>
                                     <td style="text-align: right;">
-                                        $@b.TotalRentalFee.ToString("F2")
+                                        @b.TotalRentalFee.ToInr()
                                     </td>
                                     <td style="text-align: right; color: var(--rk-text-muted);">
-                                        $@b.TotalSecurityDeposit.ToString("F2")
+                                        @b.TotalSecurityDeposit.ToInr()
                                     </td>
                                     <td style="text-align: right; font-weight: 800; color: var(--rk-teal-700);">
-                                        $@b.GrandTotal.ToString("F2")
+                                        @b.GrandTotal.ToInr()
                                     </td>
                                     <td style="text-align: right;">
                                         <a asp-action="BookingDetails" asp-route-id="@b.Id" class="rk-btn rk-btn-sm rk-btn-outline">
