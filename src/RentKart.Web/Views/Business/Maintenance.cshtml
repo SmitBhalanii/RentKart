@@ -19,20 +19,20 @@
         </nav>
 
         <!-- Equipment Overview Header -->
-        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-5); margin-bottom: var(--rk-space-5); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-navy-800) 100%); color: #ffffff;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-3);">
+        <div class="rk-store-banner">
+            <div class="rk-store-banner-inner">
                 <div>
-                    <span class="rk-badge" style="background: var(--rk-teal-500); color: #ffffff; font-size: 11px; margin-bottom: 4px;">Inventory Capacity Controller</span>
-                    <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #ffffff; margin-bottom: 2px;">
+                    <span class="rk-badge" style="background: var(--rk-teal-500); color: #ffffff; font-size: 11px; margin-bottom: 6px;">Inventory Capacity Controller</span>
+                    <h1 class="rk-store-banner-title">
                         @Model.EquipmentTitle
                     </h1>
-                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-neutral-300);">
+                    <div class="rk-store-banner-subtitle" style="margin-top: 0.25rem;">
                         Total Owned Units: <strong>@Model.TotalQuantity</strong> &bull; Current Active Reservations: <strong>@Model.ActiveReservedCount</strong>
                     </div>
                 </div>
 
                 <div>
-                    <a asp-action="EditEquipment" asp-route-id="@Model.EquipmentId" class="rk-btn rk-btn-outline" style="border-color: rgba(255,255,255,0.4); color: #ffffff;">
+                    <a asp-action="EditEquipment" asp-route-id="@Model.EquipmentId" class="rk-store-banner-btn-secondary">
                         &larr; Back to Listing
                     </a>
                 </div>

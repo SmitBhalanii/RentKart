@@ -7,18 +7,18 @@
 <div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-10);">
     <div class="rk-container">
         <!-- Store Header Banner -->
-        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-5); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-teal-900) 100%); color: #ffffff;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4);">
-                <div style="display: flex; align-items: center; gap: var(--rk-space-4);">
-                    <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-lg); background: var(--rk-teal-500); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--rk-font-size-xl);">
+        <div class="rk-store-banner">
+            <div class="rk-store-banner-inner">
+                <div class="rk-store-banner-info">
+                    <div class="rk-store-banner-icon">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                         </svg>
                     </div>
                     <div>
-                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2px;">
-                            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #ffffff; margin-bottom: 0;">@Model.ShopName</h1>
+                        <div class="rk-store-banner-title-row">
+                            <h1 class="rk-store-banner-title">@Model.ShopName</h1>
                             @switch (Model.Status)
                             {
                                 case BusinessStatus.Approved:
@@ -35,25 +35,37 @@
                                     break;
                             }
                         </div>
-                        <p style="color: var(--rk-neutral-300); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
-                            Owner: @Model.OwnerName &bull; @Model.Email &bull; Store ID #@Model.BusinessId
+                        <p class="rk-store-banner-subtitle">
+                            Owner: <strong>@Model.OwnerName</strong> &bull; @Model.Email &bull; Store ID #@Model.BusinessId
                         </p>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap;">
-                    <a asp-action="Profile" class="rk-btn rk-btn-outline" style="border-color: rgba(255, 255, 255, 0.4); color: #ffffff;">
+                <div class="rk-store-banner-actions">
+                    <a asp-action="Profile" class="rk-store-banner-btn-secondary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
                         Edit Store Details
                     </a>
                     @if (Model.CanPublishListings)
                     {
-                        <a asp-action="CreateEquipment" class="rk-btn rk-btn-teal">
+                        <a asp-action="CreateEquipment" class="rk-store-banner-btn-primary">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
                             + List Equipment
                         </a>
                     }
                     else
                     {
-                        <button class="rk-btn rk-btn-teal" disabled style="opacity: 0.6; cursor: not-allowed;" title="Approval required before listing equipment">
+                        <button class="rk-store-banner-btn-primary" disabled title="Approval required before listing equipment">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
                             + List Equipment (Locked)
                         </button>
                     }

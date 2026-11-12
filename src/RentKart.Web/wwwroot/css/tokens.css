@@ -12,6 +12,8 @@
   --rk-color-navy-700: #293556;
   --rk-color-navy-600: #3A4A73;
 
+  --rk-color-teal-900: #134E4A;
+  --rk-color-teal-800: #115E59;
   --rk-color-teal-700: #0F766E;
   --rk-color-teal-600: #0D9488;
   --rk-color-teal-500: #14B8A6;
@@ -76,6 +78,8 @@
   --rk-navy-800:        var(--rk-color-navy-800);
   --rk-navy-700:        var(--rk-color-navy-700);
   --rk-navy-600:        var(--rk-color-navy-600);
+  --rk-teal-900:        var(--rk-color-teal-900);
+  --rk-teal-800:        var(--rk-color-teal-800);
   --rk-teal-700:        var(--rk-color-teal-700);
   --rk-teal-600:        var(--rk-color-teal-600);
   --rk-teal-500:        var(--rk-color-teal-500);

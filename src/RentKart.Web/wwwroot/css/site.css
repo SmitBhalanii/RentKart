@@ -653,3 +653,173 @@
   color: #64748B;
   margin-top: 0.15rem;
 }
+
+/* ==========================================================================
+   Storefront & Business Dashboard Profile Header Banner
+   ========================================================================== */
+.rk-store-banner {
+  background: linear-gradient(135deg, #070B19 0%, #0B132B 55%, #162447 100%) !important;
+  color: #FFFFFF !important;
+  border-radius: var(--rk-radius-lg, 14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  padding: 1.5rem 1.75rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 4px 20px -2px rgba(11, 19, 43, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.rk-store-banner::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -5%;
+  width: 380px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.22) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.rk-store-banner-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.rk-store-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.rk-store-banner-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background-color: #0D9488 !important;
+  color: #FFFFFF !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+}
+
+.rk-store-banner-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.rk-store-banner-title {
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  margin: 0 !important;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.rk-store-banner-subtitle {
+  color: #CBD5E1 !important;
+  font-size: 0.875rem !important;
+  margin: 0 !important;
+  line-height: 1.5;
+}
+
+.rk-store-banner-subtitle strong {
+  color: #FFFFFF !important;
+}
+
+.rk-store-banner-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rk-store-banner-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--rk-radius-md, 10px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.rk-store-banner-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  color: #FFFFFF !important;
+}
+
+.rk-store-banner-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--rk-radius-md, 10px);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #FFFFFF !important;
+  background-color: #0D9488 !important;
+  border: 1px solid #0D9488 !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.4);
+  transition: all 0.2s ease;
+}
+
+.rk-store-banner-btn-primary:hover:not(:disabled) {
+  background-color: #0F766E !important;
+  border-color: #0F766E !important;
+}
+
+.rk-store-banner-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Radiant High-Contrast Badges on Dark Banner */
+.rk-store-banner .rk-badge-warning {
+  background-color: rgba(245, 158, 11, 0.22) !important;
+  color: #FCD34D !important;
+  border: 1px solid rgba(251, 191, 36, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+.rk-store-banner .rk-badge-success {
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  color: #34D399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+.rk-store-banner .rk-badge-error {
+  background-color: rgba(239, 68, 68, 0.22) !important;
+  color: #F87171 !important;
+  border: 1px solid rgba(248, 113, 113, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+.rk-store-banner .rk-badge-info {
+  background-color: rgba(59, 130, 246, 0.22) !important;
+  color: #93C5FD !important;
+  border: 1px solid rgba(147, 197, 253, 0.5) !important;
+  font-weight: 700 !important;
+}
+

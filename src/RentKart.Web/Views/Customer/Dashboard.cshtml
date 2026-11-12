@@ -6,28 +6,28 @@
 <div class="rk-section" style="padding-top: var(--rk-space-6); padding-bottom: var(--rk-space-10);">
     <div class="rk-container">
         <!-- Header Profile Banner -->
-        <div class="rk-card rk-card-elevated" style="padding: var(--rk-space-6); margin-bottom: var(--rk-space-6); background: linear-gradient(135deg, var(--rk-navy-900) 0%, var(--rk-navy-800) 100%); color: #ffffff;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--rk-space-4);">
-                <div style="display: flex; align-items: center; gap: var(--rk-space-4);">
-                    <div style="width: 56px; height: 56px; border-radius: var(--rk-radius-full); background: var(--rk-teal-500); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--rk-font-size-xl);">
+        <div class="rk-store-banner">
+            <div class="rk-store-banner-inner">
+                <div class="rk-store-banner-info">
+                    <div class="rk-store-banner-icon" style="border-radius: var(--rk-radius-full);">
                         @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName[..1].ToUpper())
                     </div>
                     <div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2px;">
-                            <h1 style="font-size: var(--rk-font-size-2xl); font-weight: 800; color: #ffffff; margin-bottom: 0;">Welcome, @Model.FullName</h1>
-                            <span class="rk-badge rk-badge-info" style="font-size: 0.75rem; background: rgba(255, 255, 255, 0.15); color: #ffffff;">Verified Customer</span>
+                        <div class="rk-store-banner-title-row">
+                            <h1 class="rk-store-banner-title">Welcome, @Model.FullName</h1>
+                            <span class="rk-badge rk-badge-info" style="font-size: 0.75rem;">Verified Customer</span>
                         </div>
-                        <p style="color: var(--rk-neutral-300); font-size: var(--rk-font-size-sm); margin-bottom: 0;">
+                        <p class="rk-store-banner-subtitle">
                             @Model.Email &bull; Member since @Model.MemberSinceUtc.ToString("MMMM yyyy")
                         </p>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: var(--rk-space-3); flex-wrap: wrap;">
-                    <a asp-action="Profile" class="rk-btn rk-btn-outline" style="border-color: rgba(255, 255, 255, 0.4); color: #ffffff;">
+                <div class="rk-store-banner-actions">
+                    <a asp-action="Profile" class="rk-store-banner-btn-secondary">
                         Edit Profile
                     </a>
-                    <a asp-controller="Catalog" asp-action="Index" class="rk-btn rk-btn-teal">
+                    <a asp-controller="Catalog" asp-action="Index" class="rk-store-banner-btn-primary">
                         Browse Equipment
                     </a>
                 </div>
