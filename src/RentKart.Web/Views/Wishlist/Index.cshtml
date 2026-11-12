@@ -24,15 +24,24 @@
                 @foreach (var item in Model.Items)
                 {
                     <div class="rk-card rk-card-elevated" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
-                        <div style="position: relative; height: 180px; background: var(--rk-neutral-100); overflow: hidden;">
-                            <img src="@item.DisplayImageUrl" alt="@item.CleanTitle" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.src='@item.FallbackImageUrl'" />
+                        <div style="position: relative; height: 180px; background: #F8FAFC; overflow: hidden;">
+                            @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
+                            {
+                                <img src="@item.PrimaryImageUrl" alt="@item.CleanTitle" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94A3B8;">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                            }
 
-                            <div style="position: absolute; top: 0.5rem; left: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                            <div style="position: absolute; top: 0.5rem; left: 0.5rem;">
                                 <span class="rk-badge rk-badge-info" style="font-size: 0.68rem;">@item.CategoryName</span>
-                                @if (!item.HasRealImage)
-                                {
-                                    <span class="rk-badge-visual-indicator" style="font-size: 0.6rem; padding: 2px 6px;">Category Visual</span>
-                                }
                             </div>
 
                             <div style="position: absolute; top: 0.5rem; right: 0.5rem;">

@@ -32,32 +32,37 @@
         <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--rk-space-6); align-items: flex-start;">
             <!-- Left Column: Media & Specifications -->
             <div>
-                <!-- Primary Image Display with Gallery Support -->
-                @{
-                    var primaryImg = Model.DisplayImageUrls.FirstOrDefault() ?? Model.FallbackImageUrl;
-                }
-                <div class="rk-card" style="padding: 0; overflow: hidden; position: relative; height: 380px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-3); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
-                    <img id="mainEquipmentImage" src="@primaryImg" alt="@Model.CleanTitle" style="width: 100%; height: 100%; object-fit: cover; max-height: 380px;" onerror="this.src='@Model.FallbackImageUrl'" />
-                    @if (!Model.HasRealImage)
+                <!-- Primary Image Display -->
+                <div class="rk-card" style="padding: 0; overflow: hidden; position: relative; height: 380px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-3); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
+                    @if (Model.ImageUrls.Any())
                     {
-                        <div style="position: absolute; top: 12px; left: 12px; z-index: 2;">
-                            <span class="rk-badge-visual-indicator">Category Visual &bull; Illustrative Guide</span>
+                        <img id="mainEquipmentImage" src="@Model.ImageUrls.First()" alt="@Model.CleanTitle" style="width: 100%; height: 100%; object-fit: cover; max-height: 380px;" />
+                    }
+                    else
+                    {
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; color: #94A3B8; gap: 0.5rem;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span style="font-size: 0.8125rem;">No photograph uploaded</span>
                         </div>
                     }
                 </div>
 
-                @if (Model.DisplayImageUrls.Count > 1)
+                @if (Model.ImageUrls.Count > 1)
                 {
                     <!-- Multi-image Thumbnail Selector -->
                     <div class="rk-thumbnail-gallery" style="display: flex; gap: 0.5rem; margin-bottom: var(--rk-space-4); overflow-x: auto; padding-bottom: 4px;">
-                        @for (int i = 0; i < Model.DisplayImageUrls.Count; i++)
+                        @for (int i = 0; i < Model.ImageUrls.Count; i++)
                         {
-                            var thumbUrl = Model.DisplayImageUrls[i];
+                            var thumbUrl = Model.ImageUrls[i];
                             <button type="button" 
                                     onclick="document.getElementById('mainEquipmentImage').src = '@thumbUrl'; document.querySelectorAll('.rk-thumb-btn').forEach(function(b){ b.style.borderColor='var(--rk-border-light)'; }); this.style.borderColor='var(--rk-teal-500)';" 
                                     class="rk-thumb-btn" 
                                     style="border: 2px solid @(i == 0 ? "var(--rk-teal-500)" : "var(--rk-border-light)"); border-radius: var(--rk-radius-md); padding: 2px; background: #F8FAFC; cursor: pointer; width: 68px; height: 68px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s ease;">
-                                <img src="@thumbUrl" alt="View @(i + 1)" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='@Model.FallbackImageUrl'" />
+                                <img src="@thumbUrl" alt="View @(i + 1)" style="width: 100%; height: 100%; object-fit: cover;" />
                             </button>
                         }
                     </div>

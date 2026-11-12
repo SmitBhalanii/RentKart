@@ -31,6 +31,9 @@ public class EquipmentCatalogService : IEquipmentCatalogService
                      && e.Status == EquipmentStatus.Active 
                      && e.Business.Status == BusinessStatus.Approved
                      && !e.Title.StartsWith("Dedicated Test Item")
+                     && !e.Title.StartsWith("Dedicated Booking Test")
+                     && !e.Title.StartsWith("Exclusive Camera")
+                     && !e.Title.StartsWith("Generator - ")
                      && !e.Title.StartsWith("Image Management Test")
                      && !e.Title.StartsWith("Maintenance Test Gear")
                      && !e.Title.StartsWith("Updated Title Safely")
@@ -140,9 +143,33 @@ public class EquipmentCatalogService : IEquipmentCatalogService
         var query = _context.BusinessProfiles
             .AsNoTracking()
             .Include(b => b.User)
-            .Include(b => b.Equipments.Where(e => e.IsActive && e.Status == EquipmentStatus.Active))
+            .Include(b => b.Equipments.Where(e => e.IsActive 
+                                               && e.Status == EquipmentStatus.Active
+                                               && !e.Title.StartsWith("Dedicated Test Item")
+                                               && !e.Title.StartsWith("Dedicated Booking Test")
+                                               && !e.Title.StartsWith("Exclusive Camera")
+                                               && !e.Title.StartsWith("Generator - ")
+                                               && !e.Title.StartsWith("Image Management Test")
+                                               && !e.Title.StartsWith("Maintenance Test Gear")
+                                               && !e.Title.StartsWith("Updated Title Safely")
+                                               && !e.Title.Contains(" - Test ")
+                                               && !e.Title.StartsWith("Milwaukee M18")
+                                               && !e.Title.StartsWith("Hidden Pending Store")
+                                               && !e.Title.StartsWith("Draft Inactive")))
                 .ThenInclude(e => e.Category)
-            .Include(b => b.Equipments.Where(e => e.IsActive && e.Status == EquipmentStatus.Active))
+            .Include(b => b.Equipments.Where(e => e.IsActive 
+                                               && e.Status == EquipmentStatus.Active
+                                               && !e.Title.StartsWith("Dedicated Test Item")
+                                               && !e.Title.StartsWith("Dedicated Booking Test")
+                                               && !e.Title.StartsWith("Exclusive Camera")
+                                               && !e.Title.StartsWith("Generator - ")
+                                               && !e.Title.StartsWith("Image Management Test")
+                                               && !e.Title.StartsWith("Maintenance Test Gear")
+                                               && !e.Title.StartsWith("Updated Title Safely")
+                                               && !e.Title.Contains(" - Test ")
+                                               && !e.Title.StartsWith("Milwaukee M18")
+                                               && !e.Title.StartsWith("Hidden Pending Store")
+                                               && !e.Title.StartsWith("Draft Inactive")))
                 .ThenInclude(e => e.Images)
             .AsQueryable();
 
@@ -163,6 +190,9 @@ public class EquipmentCatalogService : IEquipmentCatalogService
                                                && e.Status == EquipmentStatus.Active 
                                                && e.Business.Status == BusinessStatus.Approved
                                                && !e.Title.StartsWith("Dedicated Test Item")
+                                               && !e.Title.StartsWith("Dedicated Booking Test")
+                                               && !e.Title.StartsWith("Exclusive Camera")
+                                               && !e.Title.StartsWith("Generator - ")
                                                && !e.Title.StartsWith("Image Management Test")
                                                && !e.Title.StartsWith("Maintenance Test Gear")
                                                && !e.Title.StartsWith("Updated Title Safely")
@@ -201,6 +231,9 @@ public class EquipmentCatalogService : IEquipmentCatalogService
                      && e.Status == EquipmentStatus.Active 
                      && e.Business.Status == BusinessStatus.Approved
                      && !e.Title.StartsWith("Dedicated Test Item")
+                     && !e.Title.StartsWith("Dedicated Booking Test")
+                     && !e.Title.StartsWith("Exclusive Camera")
+                     && !e.Title.StartsWith("Generator - ")
                      && !e.Title.StartsWith("Image Management Test")
                      && !e.Title.StartsWith("Maintenance Test Gear")
                      && !e.Title.StartsWith("Updated Title Safely")

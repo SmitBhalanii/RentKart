@@ -492,10 +492,7 @@ public static class CatalogDataSeeder
                 Condition = EquipmentCondition.New,
                 Status = EquipmentStatus.Inactive,
                 IsActive = false,
-                Images = new List<EquipmentImage>
-                {
-                    new() { ImageUrl = "/images/categories/cameras-optics.svg", IsPrimary = true, DisplayOrder = 1 }
-                }
+                Images = new List<EquipmentImage>()
             }
         };
 
@@ -541,6 +538,9 @@ public static class CatalogDataSeeder
                 .Include(e => e.BookingItems)
                     .ThenInclude(bi => bi.BookingGroup)
                 .Where(e => (e.Title.StartsWith("Dedicated Test Item") ||
+                             e.Title.StartsWith("Dedicated Booking Test") ||
+                             e.Title.StartsWith("Exclusive Camera") ||
+                             e.Title.StartsWith("Generator - ") ||
                              e.Title.StartsWith("Image Management Test") ||
                              e.Title.StartsWith("Maintenance Test Gear") ||
                              e.Title == "Updated Title Safely" ||

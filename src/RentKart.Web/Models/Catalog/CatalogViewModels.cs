@@ -56,10 +56,7 @@ public class EquipmentListItemViewModel
     public EquipmentCondition Condition { get; set; }
     public string? PrimaryImageUrl { get; set; }
     public bool IsInWishlist { get; set; }
-
-    public string FallbackImageUrl => RentKart.Core.Utilities.CategoryImageHelper.GetCategoryFallbackImage(CategorySlug);
-    public bool HasRealImage => !string.IsNullOrWhiteSpace(PrimaryImageUrl) && !RentKart.Core.Utilities.CategoryImageHelper.IsCategoryVisual(PrimaryImageUrl);
-    public string DisplayImageUrl => !string.IsNullOrWhiteSpace(PrimaryImageUrl) ? PrimaryImageUrl : FallbackImageUrl;
+    public bool HasImage => !string.IsNullOrWhiteSpace(PrimaryImageUrl);
 }
 
 public class CategoryOptionViewModel
@@ -103,10 +100,7 @@ public class EquipmentDetailViewModel
     public bool IsActive { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public List<string> ImageUrls { get; set; } = new();
-
-    public string FallbackImageUrl => RentKart.Core.Utilities.CategoryImageHelper.GetCategoryFallbackImage(CategorySlug);
-    public bool HasRealImage => ImageUrls.Any(url => !RentKart.Core.Utilities.CategoryImageHelper.IsCategoryVisual(url));
-    public List<string> DisplayImageUrls => ImageUrls.Any() ? ImageUrls : new List<string> { FallbackImageUrl };
+    public bool HasImage => ImageUrls.Any(url => !string.IsNullOrWhiteSpace(url));
 
     // Business & Physical Store Details
     public int BusinessId { get; set; }
@@ -181,8 +175,6 @@ public class WishlistItemViewModel
     public decimal SecurityDeposit { get; set; }
     public EquipmentCondition Condition { get; set; }
     public string? PrimaryImageUrl { get; set; }
-    public string FallbackImageUrl => CategoryImageHelper.GetCategoryFallbackImage(CategorySlug);
-    public bool HasRealImage => !string.IsNullOrWhiteSpace(PrimaryImageUrl) && !CategoryImageHelper.IsCategoryVisual(PrimaryImageUrl);
-    public string DisplayImageUrl => !string.IsNullOrWhiteSpace(PrimaryImageUrl) ? PrimaryImageUrl : FallbackImageUrl;
+    public bool HasImage => !string.IsNullOrWhiteSpace(PrimaryImageUrl);
     public DateTime AddedAtUtc { get; set; }
 }
