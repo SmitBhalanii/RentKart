@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using RentKart.Core.Entities;
 using RentKart.Core.Enums;
 using RentKart.Core.Interfaces;
+using RentKart.Core.Utilities;
 using RentKart.Infrastructure.Data;
 
 namespace RentKart.Infrastructure.Services;
@@ -89,13 +90,9 @@ public class BusinessEquipmentService : IBusinessEquipmentService
         }
 
         // 2. Validate inputs
-        if (string.IsNullOrWhiteSpace(dto.Title))
+        if (!EquipmentTitleHelper.IsProfessionalTitle(dto.Title, out var titleError))
         {
-            return EquipmentOperationResult.Failed("Equipment title is required.");
-        }
-        if (dto.Title.Trim().Length > 200)
-        {
-            return EquipmentOperationResult.Failed("Equipment title cannot exceed 200 characters.");
+            return EquipmentOperationResult.Failed(titleError!);
         }
         if (string.IsNullOrWhiteSpace(dto.Description))
         {
@@ -190,13 +187,9 @@ public class BusinessEquipmentService : IBusinessEquipmentService
         }
 
         // 3. Validate inputs
-        if (string.IsNullOrWhiteSpace(dto.Title))
+        if (!EquipmentTitleHelper.IsProfessionalTitle(dto.Title, out var titleError))
         {
-            return EquipmentOperationResult.Failed("Equipment title is required.");
-        }
-        if (dto.Title.Trim().Length > 200)
-        {
-            return EquipmentOperationResult.Failed("Equipment title cannot exceed 200 characters.");
+            return EquipmentOperationResult.Failed(titleError!);
         }
         if (string.IsNullOrWhiteSpace(dto.Description))
         {

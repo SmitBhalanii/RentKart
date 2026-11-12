@@ -21,6 +21,7 @@ public class EquipmentCatalogService : IEquipmentCatalogService
     public async Task<EquipmentCatalogResult> SearchCatalogAsync(CatalogFilterCriteria criteria)
     {
         // Authoritative requirement: Only active listings belonging to approved businesses
+        // Exclude development/test fixtures from public catalog discovery
         var query = _context.Equipments
             .AsNoTracking()
             .Include(e => e.Business)
@@ -28,7 +29,14 @@ public class EquipmentCatalogService : IEquipmentCatalogService
             .Include(e => e.Images)
             .Where(e => e.IsActive 
                      && e.Status == EquipmentStatus.Active 
-                     && e.Business.Status == BusinessStatus.Approved);
+                     && e.Business.Status == BusinessStatus.Approved
+                     && !e.Title.StartsWith("Dedicated Test Item")
+                     && !e.Title.StartsWith("Image Management Test")
+                     && !e.Title.StartsWith("Maintenance Test Gear")
+                     && !e.Title.StartsWith("Updated Title Safely")
+                     && !e.Title.Contains(" - Test ")
+                     && !e.Title.StartsWith("Hidden Pending Store")
+                     && !e.Title.StartsWith("Draft Inactive"));
 
         // 1. Keyword search (Title and Description)
         if (!string.IsNullOrWhiteSpace(criteria.Search))
@@ -145,7 +153,16 @@ public class EquipmentCatalogService : IEquipmentCatalogService
         return await _context.Categories
             .AsNoTracking()
             .Where(c => c.IsActive)
-            .Include(c => c.Equipments.Where(e => e.IsActive && e.Status == EquipmentStatus.Active && e.Business.Status == BusinessStatus.Approved))
+            .Include(c => c.Equipments.Where(e => e.IsActive 
+                                               && e.Status == EquipmentStatus.Active 
+                                               && e.Business.Status == BusinessStatus.Approved
+                                               && !e.Title.StartsWith("Dedicated Test Item")
+                                               && !e.Title.StartsWith("Image Management Test")
+                                               && !e.Title.StartsWith("Maintenance Test Gear")
+                                               && !e.Title.StartsWith("Updated Title Safely")
+                                               && !e.Title.Contains(" - Test ")
+                                               && !e.Title.StartsWith("Hidden Pending Store")
+                                               && !e.Title.StartsWith("Draft Inactive")))
             .OrderBy(c => c.DisplayOrder)
             .ToListAsync();
     }
@@ -170,7 +187,14 @@ public class EquipmentCatalogService : IEquipmentCatalogService
             .Include(e => e.Images)
             .Where(e => e.IsActive 
                      && e.Status == EquipmentStatus.Active 
-                     && e.Business.Status == BusinessStatus.Approved)
+                     && e.Business.Status == BusinessStatus.Approved
+                     && !e.Title.StartsWith("Dedicated Test Item")
+                     && !e.Title.StartsWith("Image Management Test")
+                     && !e.Title.StartsWith("Maintenance Test Gear")
+                     && !e.Title.StartsWith("Updated Title Safely")
+                     && !e.Title.Contains(" - Test ")
+                     && !e.Title.StartsWith("Hidden Pending Store")
+                     && !e.Title.StartsWith("Draft Inactive"))
             .OrderByDescending(e => e.CreatedAtUtc)
             .Take(count)
             .ToListAsync();

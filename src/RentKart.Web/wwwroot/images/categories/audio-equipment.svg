@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="audBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070B19" />
+      <stop offset="50%" stop-color="#0B132B" />
+      <stop offset="100%" stop-color="#162447" />
+    </linearGradient>
+    <radialGradient id="soundGlow" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#A855F7" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0B132B" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#audBg)" />
+  <circle cx="400" cy="270" r="260" fill="url(#soundGlow)" />
+  <rect x="20" y="20" width="760" height="560" rx="16" fill="none" stroke="#1E293B" stroke-width="2" />
+
+  <!-- PA Speaker Cabinet Graphic -->
+  <g transform="translate(250, 90)">
+    <!-- Trapezoidal Speaker Box -->
+    <polygon points="40,20 260,20 280,330 20,330" fill="#0F172A" stroke="#334155" stroke-width="4" />
+    
+    <!-- Metal Grill Inset -->
+    <polygon points="55,35 245,35 262,315 38,315" fill="#1E293B" stroke="#475569" stroke-width="2" />
+
+    <!-- High Frequency Compression Horn -->
+    <rect x="110" y="60" width="80" height="50" rx="8" fill="#020617" stroke="#A855F7" stroke-width="3" />
+    <ellipse cx="150" cy="85" rx="25" ry="14" fill="#A855F7" fill-opacity="0.4" />
+
+    <!-- 15-inch Low Frequency Woofer -->
+    <circle cx="150" cy="210" r="75" fill="#020617" stroke="#334155" stroke-width="4" />
+    <circle cx="150" cy="210" r="55" fill="#0F172A" stroke="#A855F7" stroke-width="2" stroke-dasharray="6 3" />
+    <circle cx="150" cy="210" r="28" fill="#1E293B" stroke="#64748B" stroke-width="2" />
+    <circle cx="150" cy="210" r="14" fill="#A855F7" />
+
+    <!-- Power Indicator LED -->
+    <circle cx="150" cy="300" r="4" fill="#10B981" />
+  </g>
+
+  <!-- Typography & Badge -->
+  <g transform="translate(400, 475)">
+    <rect x="-135" y="-35" width="270" height="30" rx="15" fill="#A855F7" fill-opacity="0.18" stroke="#A855F7" stroke-width="1.5" />
+    <text x="0" y="-15" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#C084FC" letter-spacing="1.5">AUDIO &amp; SOUND SYSTEMS</text>
+    <text x="0" y="28" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">Powered PA Speakers &amp; Consoles</text>
+    <text x="0" y="58" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="500" fill="#94A3B8">RentKart Verified Equipment Category</text>
+  </g>
+</svg>
+

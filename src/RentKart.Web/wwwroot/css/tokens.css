@@ -70,6 +70,31 @@
   --rk-border-strong:   var(--rk-color-slate-300);
   --rk-border-focus:    var(--rk-color-teal-500);
 
+  /* Shorthand Token Aliases for Unified View Compatibility */
+  --rk-navy-950:        var(--rk-color-navy-950);
+  --rk-navy-900:        var(--rk-color-navy-900);
+  --rk-navy-800:        var(--rk-color-navy-800);
+  --rk-navy-700:        var(--rk-color-navy-700);
+  --rk-navy-600:        var(--rk-color-navy-600);
+  --rk-teal-700:        var(--rk-color-teal-700);
+  --rk-teal-600:        var(--rk-color-teal-600);
+  --rk-teal-500:        var(--rk-color-teal-500);
+  --rk-teal-400:        var(--rk-color-teal-400);
+  --rk-teal-100:        var(--rk-color-teal-100);
+  --rk-teal-50:         var(--rk-color-teal-50);
+  --rk-neutral-50:      var(--rk-color-slate-50);
+  --rk-neutral-100:     var(--rk-color-slate-100);
+  --rk-neutral-200:     var(--rk-color-slate-200);
+  --rk-neutral-300:     var(--rk-color-slate-300);
+  --rk-neutral-400:     var(--rk-color-slate-400);
+  --rk-neutral-500:     var(--rk-color-slate-500);
+  --rk-neutral-600:     var(--rk-color-slate-600);
+  --rk-neutral-700:     var(--rk-color-slate-700);
+  --rk-neutral-800:     var(--rk-color-slate-800);
+  --rk-neutral-900:     var(--rk-color-slate-900);
+  --rk-border-light:    var(--rk-color-slate-200);
+  --rk-error:           var(--rk-color-danger-solid);
+
   /* Typography */
   --rk-font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --rk-font-mono:   ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

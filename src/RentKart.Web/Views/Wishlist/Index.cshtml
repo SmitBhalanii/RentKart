@@ -25,17 +25,14 @@
                 {
                     <div class="rk-card rk-card-elevated" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
                         <div style="position: relative; height: 180px; background: var(--rk-neutral-100); overflow: hidden;">
-                            @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
-                            {
-                                <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.src='/images/placeholder-equipment.svg'" />
-                            }
-                            else
-                            {
-                                <img src="/images/placeholder-equipment.svg" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
-                            }
+                            <img src="@item.DisplayImageUrl" alt="@item.CleanTitle" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.src='@item.FallbackImageUrl'" />
 
-                            <div style="position: absolute; top: 0.5rem; left: 0.5rem;">
+                            <div style="position: absolute; top: 0.5rem; left: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
                                 <span class="rk-badge rk-badge-info" style="font-size: 0.68rem;">@item.CategoryName</span>
+                                @if (!item.HasRealImage)
+                                {
+                                    <span class="rk-badge-visual-indicator" style="font-size: 0.6rem; padding: 2px 6px;">Category Visual</span>
+                                }
                             </div>
 
                             <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
@@ -62,7 +59,7 @@
 
                                 <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-2);">
                                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.EquipmentId" style="color: inherit; text-decoration: none;">
-                                        @item.Title
+                                        @item.CleanTitle
                                     </a>
                                 </h3>
                             </div>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pDrillBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <radialGradient id="pDrillGlow" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#pDrillBg)" />
+  <circle cx="400" cy="270" r="260" fill="url(#pDrillGlow)" />
+  <rect x="20" y="20" width="760" height="560" rx="16" fill="none" stroke="#334155" stroke-width="2" />
+
+  <!-- Bosch Blue Rotary Hammer Illustration -->
+  <g transform="translate(190, 110)">
+    <!-- Drill Bit & SDS Chuck -->
+    <line x1="-30" y1="125" x2="30" y2="125" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round" />
+    <rect x="30" y="112" width="60" height="26" rx="4" fill="#334155" stroke="#64748B" stroke-width="2" />
+    <rect x="90" y="105" width="40" height="40" rx="6" fill="#090D16" />
+
+    <!-- Gearcase (Silver/Aluminum) -->
+    <rect x="130" y="95" width="100" height="65" rx="10" fill="#64748B" stroke="#94A3B8" stroke-width="3" />
+    <!-- Auxiliary D-Handle -->
+    <path d="M 160 160 L 160 250 C 160 270 120 270 120 250 L 120 160" fill="none" stroke="#090D16" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Main Motor Body (Bosch Professional Deep Blue) -->
+    <rect x="225" y="80" width="150" height="100" rx="16" fill="#0369A1" stroke="#0284C7" stroke-width="4" />
+    <rect x="245" y="105" width="90" height="15" rx="3" fill="#DC2626" />
+    <text x="290" y="117" font-family="-apple-system, sans-serif" font-size="11" font-weight="900" fill="#FFFFFF" text-anchor="middle">BOSCH PRO</text>
+
+    <!-- Rear D-Handle with Vibration Control -->
+    <path d="M 370 100 C 420 100 420 230 370 230 L 330 230 L 330 180" fill="none" stroke="#090D16" stroke-width="20" stroke-linejoin="round" />
+    <rect x="375" y="140" width="16" height="40" rx="4" fill="#DC2626" />
+  </g>
+
+  <!-- Title & Specs -->
+  <g transform="translate(400, 475)">
+    <rect x="-135" y="-35" width="270" height="28" rx="14" fill="#0284C7" fill-opacity="0.2" stroke="#0284C7" stroke-width="1.5" />
+    <text x="0" y="-16" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#38BDF8" letter-spacing="1">BOSCH HEAVY DEMOLITION</text>
+    <text x="0" y="26" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="22" font-weight="800" fill="#FFFFFF">Bosch Professional Rotary Hammer Drill</text>
+    <text x="0" y="54" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="500" fill="#94A3B8">1-5/8" SDS-Max • Vibration Control • 1500W</text>
+  </g>
+</svg>
+

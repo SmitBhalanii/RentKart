@@ -1,4 +1,5 @@
 using RentKart.Core.Enums;
+using RentKart.Core.Utilities;
 
 namespace RentKart.Web.Models.Catalog;
 
@@ -42,6 +43,7 @@ public class EquipmentListItemViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string CleanTitle => RentKart.Core.Utilities.EquipmentTitleHelper.FormatCleanTitle(Title);
     public string CategoryName { get; set; } = string.Empty;
     public string CategorySlug { get; set; } = string.Empty;
     public int BusinessId { get; set; }
@@ -54,6 +56,10 @@ public class EquipmentListItemViewModel
     public EquipmentCondition Condition { get; set; }
     public string? PrimaryImageUrl { get; set; }
     public bool IsInWishlist { get; set; }
+
+    public string FallbackImageUrl => RentKart.Core.Utilities.CategoryImageHelper.GetCategoryFallbackImage(CategorySlug);
+    public bool HasRealImage => !string.IsNullOrWhiteSpace(PrimaryImageUrl) && !RentKart.Core.Utilities.CategoryImageHelper.IsCategoryVisual(PrimaryImageUrl);
+    public string DisplayImageUrl => !string.IsNullOrWhiteSpace(PrimaryImageUrl) ? PrimaryImageUrl : FallbackImageUrl;
 }
 
 public class CategoryOptionViewModel
@@ -84,6 +90,7 @@ public class EquipmentDetailViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string CleanTitle => RentKart.Core.Utilities.EquipmentTitleHelper.FormatCleanTitle(Title);
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
@@ -96,6 +103,10 @@ public class EquipmentDetailViewModel
     public bool IsActive { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public List<string> ImageUrls { get; set; } = new();
+
+    public string FallbackImageUrl => RentKart.Core.Utilities.CategoryImageHelper.GetCategoryFallbackImage(CategorySlug);
+    public bool HasRealImage => ImageUrls.Any(url => !RentKart.Core.Utilities.CategoryImageHelper.IsCategoryVisual(url));
+    public List<string> DisplayImageUrls => ImageUrls.Any() ? ImageUrls : new List<string> { FallbackImageUrl };
 
     // Business & Physical Store Details
     public int BusinessId { get; set; }
@@ -159,6 +170,7 @@ public class WishlistItemViewModel
     public int WishlistId { get; set; }
     public int EquipmentId { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string CleanTitle => EquipmentTitleHelper.FormatCleanTitle(Title);
     public string CategoryName { get; set; } = string.Empty;
     public string CategorySlug { get; set; } = string.Empty;
     public int BusinessId { get; set; }
@@ -169,5 +181,8 @@ public class WishlistItemViewModel
     public decimal SecurityDeposit { get; set; }
     public EquipmentCondition Condition { get; set; }
     public string? PrimaryImageUrl { get; set; }
+    public string FallbackImageUrl => CategoryImageHelper.GetCategoryFallbackImage(CategorySlug);
+    public bool HasRealImage => !string.IsNullOrWhiteSpace(PrimaryImageUrl) && !CategoryImageHelper.IsCategoryVisual(PrimaryImageUrl);
+    public string DisplayImageUrl => !string.IsNullOrWhiteSpace(PrimaryImageUrl) ? PrimaryImageUrl : FallbackImageUrl;
     public DateTime AddedAtUtc { get; set; }
 }

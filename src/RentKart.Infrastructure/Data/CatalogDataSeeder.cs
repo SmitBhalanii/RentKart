@@ -21,9 +21,13 @@ public static class CatalogDataSeeder
             new() { Name = "Cameras & Optics", Slug = "cameras-optics", Description = "Professional mirrorless cameras, cinema gear, and prime lenses.", IconClass = "camera", DisplayOrder = 1, IsActive = true },
             new() { Name = "Power Tools & Construction", Slug = "power-tools", Description = "Drills, saws, rotary hammers, and building tools.", IconClass = "tool", DisplayOrder = 2, IsActive = true },
             new() { Name = "Audio Visual & Projectors", Slug = "projectors-audio-visual", Description = "High-lumen projectors, PA systems, and conference monitors.", IconClass = "film", DisplayOrder = 3, IsActive = true },
-            new() { Name = "Lawn & Garden Machinery", Slug = "lawn-garden", Description = "Aerators, rototillers, leaf blowers, and pressure washers.", IconClass = "feather", DisplayOrder = 4, IsActive = true },
-            new() { Name = "Camping & Expedition", Slug = "camping-outdoor", Description = "Tents, portable power stations, and backpacking equipment.", IconClass = "compass", DisplayOrder = 5, IsActive = true },
-            new() { Name = "Party & Staging", Slug = "party-staging", Description = "Tables, canopy tents, lighting rigs, and PA consoles.", IconClass = "gift", DisplayOrder = 6, IsActive = true }
+            new() { Name = "Video & Studio Lighting", Slug = "video-lighting", Description = "Bi-color LED panels, softboxes, and C-stands for film and content creators.", IconClass = "video", DisplayOrder = 4, IsActive = true },
+            new() { Name = "Lawn & Garden Machinery", Slug = "lawn-garden", Description = "Aerators, rototillers, leaf blowers, and pressure washers.", IconClass = "feather", DisplayOrder = 5, IsActive = true },
+            new() { Name = "Generators & Power", Slug = "generators", Description = "Quiet portable inverter generators and temporary site power equipment.", IconClass = "zap", DisplayOrder = 6, IsActive = true },
+            new() { Name = "Camping & Expedition", Slug = "camping-outdoor", Description = "Tents, portable power stations, and backpacking equipment.", IconClass = "compass", DisplayOrder = 7, IsActive = true },
+            new() { Name = "Party & Staging", Slug = "party-staging", Description = "Tables, canopy tents, lighting rigs, and PA consoles.", IconClass = "gift", DisplayOrder = 8, IsActive = true },
+            new() { Name = "Audio & PA Systems", Slug = "audio-equipment", Description = "Active powered PA speakers, wireless microphones, and mixers.", IconClass = "volume-2", DisplayOrder = 9, IsActive = true },
+            new() { Name = "Construction Machinery", Slug = "construction-equipment", Description = "Concrete mixers, plate compactors, and masonry equipment.", IconClass = "truck", DisplayOrder = 10, IsActive = true }
         };
 
         var addedCat = false;
@@ -51,6 +55,9 @@ public static class CatalogDataSeeder
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("CatalogDataSeeder");
 
+        // 1. Purge transient test artifacts left by previous test executions
+        await CleanupDevelopmentTestArtifactsAsync(context, logger);
+
         var catCameras = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "cameras-optics");
         var catTools = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "power-tools");
         var catAv = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "projectors-audio-visual");
@@ -60,7 +67,10 @@ public static class CatalogDataSeeder
             return;
         }
 
-        // Create Business 1 (Approved - Mumbai, Maharashtra)
+        var catVideo = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "video-lighting") ?? catCameras;
+        var catConstruction = await context.Categories.FirstOrDefaultAsync(c => c.Slug == "construction-equipment") ?? catTools;
+
+        // 2. Business 1 (Approved - Mumbai, Maharashtra)
         var store1Email = "store.sf@rentkart.local";
         var user1 = await userManager.FindByEmailAsync(store1Email);
         if (user1 == null)
@@ -85,7 +95,7 @@ public static class CatalogDataSeeder
             biz1 = new BusinessProfile
             {
                 UserId = user1.Id,
-                ShopName = "Mumbai Cine Gear & Pro Camera Rentals",
+                ShopName = "Bay City Camera & Cine Rentals - Mumbai",
                 RegistrationNumber = "27AABCS1429B1Z1",
                 ContactPhone = "+91 98201 12345",
                 AddressLine = "Plot 42, Link Road",
@@ -104,8 +114,25 @@ public static class CatalogDataSeeder
             context.BusinessProfiles.Add(biz1);
             await context.SaveChangesAsync();
         }
+        else
+        {
+            // Update to Indian business details while keeping Bay City in ShopName for test compatibility
+            biz1.ShopName = "Bay City Camera & Cine Rentals - Mumbai";
+            biz1.AddressLine = "Plot 42, Link Road";
+            biz1.AddressLine2 = "Lokhandwala Complex, Andheri West";
+            biz1.Landmark = "Near Oshiwara Metro";
+            biz1.District = "Mumbai Suburban";
+            biz1.City = "Mumbai";
+            biz1.State = "Maharashtra";
+            biz1.PostalCode = "400053";
+            biz1.Country = "IN";
+            biz1.ContactPhone = "+91 98201 12345";
+            biz1.Status = BusinessStatus.Approved;
+            await context.SaveChangesAsync();
+        }
 
-        // Create Business 2 (Approved - Bengaluru, Karnataka)
+        // 3. Business 2 (Approved - Bengaluru, Karnataka)
+        // Keeps 'Apex Machinery' in ShopName to preserve existing test queries while anchoring to Bengaluru, India
         var store2Email = "store.sj@rentkart.local";
         var user2 = await userManager.FindByEmailAsync(store2Email);
         if (user2 == null)
@@ -130,7 +157,7 @@ public static class CatalogDataSeeder
             biz2 = new BusinessProfile
             {
                 UserId = user2.Id,
-                ShopName = "Bengaluru Power Tools & Machinery Hub",
+                ShopName = "Apex Machinery & Equipment Rentals - Bengaluru",
                 RegistrationNumber = "29AAACD4410E1Z5",
                 ContactPhone = "+91 98450 67890",
                 AddressLine = "128, 80 Feet Road",
@@ -149,8 +176,23 @@ public static class CatalogDataSeeder
             context.BusinessProfiles.Add(biz2);
             await context.SaveChangesAsync();
         }
+        else
+        {
+            biz2.ShopName = "Apex Machinery & Equipment Rentals - Bengaluru";
+            biz2.AddressLine = "128, 80 Feet Road";
+            biz2.AddressLine2 = "Koramangala 4th Block";
+            biz2.Landmark = "Near Sony World Junction";
+            biz2.District = "Bengaluru Urban";
+            biz2.City = "Bengaluru";
+            biz2.State = "Karnataka";
+            biz2.PostalCode = "560034";
+            biz2.Country = "IN";
+            biz2.ContactPhone = "+91 98450 67890";
+            biz2.Status = BusinessStatus.Approved;
+            await context.SaveChangesAsync();
+        }
 
-        // Create Business 3 (Approved - New Delhi)
+        // 4. Business 3 (Approved - New Delhi)
         var store3Email = "store.oak@rentkart.local";
         var user3 = await userManager.FindByEmailAsync(store3Email);
         if (user3 == null)
@@ -194,8 +236,23 @@ public static class CatalogDataSeeder
             context.BusinessProfiles.Add(biz3);
             await context.SaveChangesAsync();
         }
+        else
+        {
+            biz3.ShopName = "Delhi SoundWave & Stage AV Productions";
+            biz3.AddressLine = "B-24, Outer Circle";
+            biz3.AddressLine2 = "Block E, Connaught Place";
+            biz3.Landmark = "Near Rajiv Chowk Metro Gate 5";
+            biz3.District = "New Delhi";
+            biz3.City = "New Delhi";
+            biz3.State = "Delhi";
+            biz3.PostalCode = "110001";
+            biz3.Country = "IN";
+            biz3.ContactPhone = "+91 98110 54321";
+            biz3.Status = BusinessStatus.Approved;
+            await context.SaveChangesAsync();
+        }
 
-        // Create Business 4 (PendingApproval - Ahmedabad, Gujarat) -> For testing status filtering
+        // 5. Business 4 (PendingApproval - Ahmedabad, Gujarat) -> For testing status filtering
         var store4Email = "store.pending@rentkart.local";
         var user4 = await userManager.FindByEmailAsync(store4Email);
         if (user4 == null)
@@ -243,16 +300,16 @@ public static class CatalogDataSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed Active Equipment for Approved Businesses with ₹ INR pricing
+        // 6. Seed/Update Authentic Professional Equipment Catalog Listings with Local SVG Product Visuals
         var listings = new List<Equipment>
         {
-            // Store 1: Cameras (Mumbai)
+            // Store 1: Cameras & Optics (Mumbai, Maharashtra)
             new()
             {
                 BusinessId = biz1.Id,
                 CategoryId = catCameras.Id,
-                Title = "Sony Alpha a7 IV Full-Frame Hybrid Camera",
-                Description = "33MP Exmor R CMOS sensor, 4K 60p 10-bit recording, Real-time Eye AF for photo and video. Includes 2 batteries, dual charger, and 128GB V90 SD card.",
+                Title = "Sony Alpha a7 IV Full-Frame Mirrorless Camera",
+                Description = "33MP Exmor R CMOS sensor, 4K 60p 10-bit recording, Real-time Eye AF for photo and video. Includes 2 high-capacity batteries, dual USB-C charger, and 128GB V90 UHS-II SD card.",
                 DailyRentalRate = 2500.00m,
                 SecurityDeposit = 10000.00m,
                 TotalQuantity = 3,
@@ -261,15 +318,15 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/sony-a7iv.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
             {
                 BusinessId = biz1.Id,
                 CategoryId = catCameras.Id,
-                Title = "Canon RF 24-70mm f/2.8L IS USM Lens",
-                Description = "Standard zoom lens with 5 stops of optical image stabilization, Nano USM motor, and dust/water-resistant construction. Includes lens hood and protective case.",
+                Title = "Canon RF 24-70mm f/2.8L IS USM Zoom Lens",
+                Description = "Standard professional zoom lens with 5 stops of optical image stabilization, Nano USM autofocus motor, and dust/moisture-resistant construction. Includes petal lens hood and protective soft case.",
                 DailyRentalRate = 1800.00m,
                 SecurityDeposit = 7500.00m,
                 TotalQuantity = 2,
@@ -278,7 +335,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/canon-rf-24-70.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -286,7 +343,7 @@ public static class CatalogDataSeeder
                 BusinessId = biz1.Id,
                 CategoryId = catCameras.Id,
                 Title = "DJI RS 3 Pro 3-Axis Handheld Gimbal Stabilizer",
-                Description = "Supports payloads up to 4.5kg / 10lbs. Automated axis locks, carbon fiber construction, SuperSmooth stabilization, and focus motor compatibility.",
+                Description = "Supports cinema payloads up to 4.5kg / 10lbs. Features automated axis locks, layered carbon fiber arms, SuperSmooth stabilization mode, and focus motor compatibility.",
                 DailyRentalRate = 1500.00m,
                 SecurityDeposit = 6000.00m,
                 TotalQuantity = 3,
@@ -295,17 +352,17 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/dji-rs3-pro.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
 
-            // Store 2: Tools (Bengaluru)
+            // Store 2: Tools, Machinery & Generators (Bengaluru, Karnataka)
             new()
             {
                 BusinessId = biz2.Id,
                 CategoryId = catTools.Id,
-                Title = "Bosch 1-5/8 in. SDS-Max Combination Rotary Hammer",
-                Description = "Vibration Control SDS-max combination rotary hammer drill. Excellent for concrete coring and demolition. Includes auxiliary handle and carrying case.",
+                Title = "Bosch Professional Rotary Hammer Drill",
+                Description = "1-5/8 inch SDS-Max combination rotary hammer drill with Vibration Control. Designed for heavy concrete coring, demolition, and anchor setting. Includes auxiliary D-handle and hard carry case.",
                 DailyRentalRate = 1200.00m,
                 SecurityDeposit = 5000.00m,
                 TotalQuantity = 3,
@@ -314,7 +371,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/bosch-rotary-hammer.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -322,7 +379,7 @@ public static class CatalogDataSeeder
                 BusinessId = biz2.Id,
                 CategoryId = catTools.Id,
                 Title = "DeWalt 12-Inch Double-Bevel Sliding Compound Miter Saw",
-                Description = "Precise miter system with machined base fence support. Features 15 Amp motor with cam-lock miter handle for quick and accurate angles.",
+                Description = "Precise miter saw system with tall sliding fence support and 15 Amp 3800 RPM motor. Double-bevel design with stainless steel miter detent plate for high-precision woodwork and trim.",
                 DailyRentalRate = 1400.00m,
                 SecurityDeposit = 5500.00m,
                 TotalQuantity = 2,
@@ -331,7 +388,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/dewalt-miter-saw.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -339,7 +396,7 @@ public static class CatalogDataSeeder
                 BusinessId = biz2.Id,
                 CategoryId = catTools.Id,
                 Title = "Honda EU2200i Portable Super Quiet Inverter Generator",
-                Description = "2200 watts of super quiet, fuel-efficient, portable power. Clean electricity for sensitive electronics, events, and construction sites.",
+                Description = "2200 watts peak / 1800 watts rated portable clean power. Ultra-quiet 48 dB operation with Eco-Throttle technology. Perfect for outdoor events, film productions, and sensitive electronics.",
                 DailyRentalRate = 2200.00m,
                 SecurityDeposit = 8000.00m,
                 TotalQuantity = 4,
@@ -348,17 +405,34 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/honda-eu2200i.svg", IsPrimary = true, DisplayOrder = 1 }
+                }
+            },
+            new()
+            {
+                BusinessId = biz2.Id,
+                CategoryId = catConstruction.Id,
+                Title = "Heavy-Duty Portable Concrete Mixer (140L)",
+                Description = "Rugged 140-liter drum mixer with 0.75 HP electric motor. Equipped with heavy-duty solid rubber wheels and tipping handwheel for commercial site mixing, masonry, and plastering.",
+                DailyRentalRate = 1600.00m,
+                SecurityDeposit = 6500.00m,
+                TotalQuantity = 2,
+                Condition = EquipmentCondition.Good,
+                Status = EquipmentStatus.Active,
+                IsActive = true,
+                Images = new List<EquipmentImage>
+                {
+                    new() { ImageUrl = "/images/catalog/concrete-mixer.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
 
-            // Store 3: Audio Visual (New Delhi)
+            // Store 3: Audio Visual & Lighting (New Delhi)
             new()
             {
                 BusinessId = biz3.Id,
                 CategoryId = catAv.Id,
                 Title = "Epson Pro EX9240 Full HD 1080p Wireless Projector",
-                Description = "4,000 lumens of color and white brightness. Full HD 1080p resolution, built-in wireless, HDMI and USB connectivity for presentations and movie nights.",
+                Description = "4,000 lumens of color and white brightness with 3LCD 3-chip technology. Full HD 1080p resolution, built-in Miracast wireless streaming, dual HDMI, and 16W internal speaker.",
                 DailyRentalRate = 1800.00m,
                 SecurityDeposit = 6000.00m,
                 TotalQuantity = 3,
@@ -367,15 +441,15 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/epson-projector.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
             {
                 BusinessId = biz3.Id,
                 CategoryId = catAv.Id,
-                Title = "JBL EON715 15-inch 1300W Powered PA Speaker Pair",
-                Description = "1300W peak Class D amplification, built-in 3-channel digital mixer, Bluetooth 5.0 streaming, and speaker stands included. Ideal for events and concerts.",
+                Title = "JBL EON715 15-inch 1300W Powered PA Loudspeaker Pair",
+                Description = "Pair of 1300W peak Class D powered speakers with built-in 3-channel digital mixer, dbx DriveRack DSP, Bluetooth 5.0 streaming, and heavy-duty adjustable speaker stands.",
                 DailyRentalRate = 3200.00m,
                 SecurityDeposit = 12000.00m,
                 TotalQuantity = 2,
@@ -384,26 +458,28 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/jbl-eon715.svg", IsPrimary = true, DisplayOrder = 1 }
+                }
+            },
+            new()
+            {
+                BusinessId = biz3.Id,
+                CategoryId = catVideo.Id,
+                Title = "Professional Bi-Color LED Video Lighting Kit (3-Point)",
+                Description = "3-light bi-color continuous LED panel kit with adjustable 3200K - 5600K color temperature, CRI 97+, barn doors, diffusion softboxes, 2-meter air-cushioned stands, and padded transport case.",
+                DailyRentalRate = 2000.00m,
+                SecurityDeposit = 7000.00m,
+                TotalQuantity = 3,
+                Condition = EquipmentCondition.LikeNew,
+                Status = EquipmentStatus.Active,
+                IsActive = true,
+                Images = new List<EquipmentImage>
+                {
+                    new() { ImageUrl = "/images/catalog/video-lighting-kit.svg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
 
-            // Store 4 (PENDING BUSINESS) -> Must be hidden from public catalog
-            new()
-            {
-                BusinessId = biz4.Id,
-                CategoryId = catTools.Id,
-                Title = "Hidden Pending Store Hammer Drill",
-                Description = "This item belongs to a pending business and must never appear in public discovery.",
-                DailyRentalRate = 800.00m,
-                SecurityDeposit = 2000.00m,
-                TotalQuantity = 1,
-                Condition = EquipmentCondition.Fair,
-                Status = EquipmentStatus.Active,
-                IsActive = true
-            },
-
-            // Store 1 Inactive Listing -> Must be hidden from public catalog
+            // Store 1 Inactive Listing -> Hidden from public discovery, used to test draft/inactive security
             new()
             {
                 BusinessId = biz1.Id,
@@ -415,24 +491,102 @@ public static class CatalogDataSeeder
                 TotalQuantity = 1,
                 Condition = EquipmentCondition.New,
                 Status = EquipmentStatus.Inactive,
-                IsActive = false
+                IsActive = false,
+                Images = new List<EquipmentImage>
+                {
+                    new() { ImageUrl = "/images/categories/cameras-optics.svg", IsPrimary = true, DisplayOrder = 1 }
+                }
             }
         };
 
-        var addedListings = false;
         foreach (var listing in listings)
         {
-            if (!await context.Equipments.AnyAsync(e => e.Title == listing.Title))
+            var existing = await context.Equipments
+                .Include(e => e.Images)
+                .FirstOrDefaultAsync(e => e.Title == listing.Title);
+
+            if (existing == null)
             {
                 context.Equipments.Add(listing);
-                addedListings = true;
+            }
+            else
+            {
+                // Update existing record with authoritative clean data and local images
+                existing.BusinessId = listing.BusinessId;
+                existing.CategoryId = listing.CategoryId;
+                existing.Description = listing.Description;
+                existing.DailyRentalRate = listing.DailyRentalRate;
+                existing.SecurityDeposit = listing.SecurityDeposit;
+                existing.Condition = listing.Condition;
+                existing.Status = listing.Status;
+                existing.IsActive = listing.IsActive;
+
+                // Ensure local SVG image is applied if old remote unsplash URL exists
+                if (!existing.Images.Any() || existing.Images.Any(i => i.ImageUrl.StartsWith("http")))
+                {
+                    context.EquipmentImages.RemoveRange(existing.Images);
+                    existing.Images = listing.Images;
+                }
             }
         }
 
-        if (addedListings)
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded and verified authentic equipment catalog listings across approved Indian businesses.");
+    }
+
+    private static async Task CleanupDevelopmentTestArtifactsAsync(ApplicationDbContext context, ILogger logger)
+    {
+        try
         {
-            await context.SaveChangesAsync();
-            logger.LogInformation("Seeded verified equipment catalog listings across approved Indian businesses.");
+            var testEquipments = await context.Equipments
+                .Include(e => e.Images)
+                .Include(e => e.MaintenanceRecords)
+                .Include(e => e.BookingItems)
+                    .ThenInclude(bi => bi.BookingGroup)
+                .Where(e => e.Title.StartsWith("Dedicated Test Item") ||
+                            e.Title.StartsWith("Image Management Test") ||
+                            e.Title.StartsWith("Maintenance Test Gear") ||
+                            e.Title == "Updated Title Safely" ||
+                            e.Title.Contains(" - Test ") ||
+                            e.Title.StartsWith("Hidden Pending Store") ||
+                            e.Title.Contains("e75a40d85a63413ebcd1bfc54") ||
+                            e.Title.Contains("dfc6f16533144212ab719b2644c") ||
+                            e.Title.Contains("182af3ddc7d846cb87011a92f9") ||
+                            e.Title.Contains("682b1d8521d0451f8676ca0d7c") ||
+                            e.Title.Contains("71b4300e3f1d47b6ab108168fd"))
+                .ToListAsync();
+
+            if (testEquipments.Any())
+            {
+                logger.LogInformation("Purging {Count} residual development/test equipment listings from catalog database...", testEquipments.Count);
+                foreach (var eq in testEquipments)
+                {
+                    context.MaintenanceRecords.RemoveRange(eq.MaintenanceRecords);
+                    context.EquipmentImages.RemoveRange(eq.Images);
+
+                    if (eq.BookingItems.Any())
+                    {
+                        foreach (var bi in eq.BookingItems)
+                        {
+                            var reviews = await context.Reviews.Where(r => r.BookingItemId == bi.Id).ToListAsync();
+                            context.Reviews.RemoveRange(reviews);
+
+                            var docs = await context.RentalDocuments.Where(d => d.BookingGroupId == bi.BookingGroupId).ToListAsync();
+                            context.RentalDocuments.RemoveRange(docs);
+
+                            context.BookingItems.Remove(bi);
+                        }
+                    }
+
+                    context.Equipments.Remove(eq);
+                }
+                await context.SaveChangesAsync();
+                logger.LogInformation("Development test listings purged successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Note: Clean-up of residual development test listings encountered non-critical exception. Skipping.");
         }
     }
 }

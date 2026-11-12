@@ -119,28 +119,28 @@ public class EquipmentDiscoveryTests : IClassFixture<WebApplicationFactory<Progr
         using var scope = _factory.Services.CreateScope();
         var catalogService = scope.ServiceProvider.GetRequiredService<IEquipmentCatalogService>();
 
-        // Filter by San Francisco
-        var sfResult = await catalogService.SearchCatalogAsync(new CatalogFilterCriteria
+        // Filter by Mumbai
+        var mumbaiResult = await catalogService.SearchCatalogAsync(new CatalogFilterCriteria
         {
-            City = "San Francisco"
+            City = "Mumbai"
         });
 
-        Assert.NotEmpty(sfResult.Items);
-        Assert.All(sfResult.Items, e =>
+        Assert.NotEmpty(mumbaiResult.Items);
+        Assert.All(mumbaiResult.Items, e =>
         {
-            Assert.Equal("San Francisco", e.Business.City, ignoreCase: true);
+            Assert.Equal("Mumbai", e.Business.City, ignoreCase: true);
         });
 
-        // Filter by Oakland
-        var oaklandResult = await catalogService.SearchCatalogAsync(new CatalogFilterCriteria
+        // Filter by Bengaluru
+        var blrResult = await catalogService.SearchCatalogAsync(new CatalogFilterCriteria
         {
-            City = "Oakland"
+            City = "Bengaluru"
         });
 
-        Assert.NotEmpty(oaklandResult.Items);
-        Assert.All(oaklandResult.Items, e =>
+        Assert.NotEmpty(blrResult.Items);
+        Assert.All(blrResult.Items, e =>
         {
-            Assert.Equal("Oakland", e.Business.City, ignoreCase: true);
+            Assert.Equal("Bengaluru", e.Business.City, ignoreCase: true);
         });
     }
 
@@ -426,7 +426,7 @@ public class EquipmentDiscoveryTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(HttpStatusCode.OK, catalogResponse.StatusCode);
 
         // 3. Search query
-        var searchResponse = await client.GetAsync("/Catalog?search=Sony&city=San+Francisco");
+        var searchResponse = await client.GetAsync("/Catalog?search=Sony&city=Mumbai");
         Assert.Equal(HttpStatusCode.OK, searchResponse.StatusCode);
 
         // 4. Equipment route alias

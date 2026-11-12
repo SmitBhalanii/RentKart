@@ -79,68 +79,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--rk-space-5);">
                 @foreach (var item in Model.Listings)
                 {
-                    <div class="rk-card rk-card-elevated" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
-                        <div style="position: relative; height: 180px; background: var(--rk-neutral-100); overflow: hidden;">
-                            @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
-                            {
-                                <img src="@item.PrimaryImageUrl" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.src='/images/placeholder-equipment.svg'" />
-                            }
-                            else
-                            {
-                                <img src="/images/placeholder-equipment.svg" alt="@item.Title" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
-                            }
-
-                            <div style="position: absolute; top: 0.5rem; left: 0.5rem;">
-                                <span class="rk-badge rk-badge-info" style="font-size: 0.68rem;">@item.CategoryName</span>
-                            </div>
-
-                            <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                                <form asp-controller="Wishlist" asp-action="Toggle" method="post" style="margin: 0;">
-                                    <input type="hidden" name="equipmentId" value="@item.Id" />
-                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                    <button type="submit" 
-                                            class="rk-btn rk-btn-sm" 
-                                            style="padding: 0.35rem; border-radius: var(--rk-radius-full); background: rgba(255, 255, 255, 0.9); border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15); color: @(item.IsInWishlist ? "var(--rk-error)" : "var(--rk-neutral-500)");" 
-                                            title="@(item.IsInWishlist ? "Remove from Wishlist" : "Save to Wishlist")">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="@(item.IsInWishlist ? "currentColor" : "none")" stroke="currentColor" stroke-width="2">
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div style="padding: var(--rk-space-4); display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
-                            <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-                                    <span class="rk-badge rk-badge-neutral" style="font-size: 0.65rem;">@item.Condition</span>
-                                    <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">@item.TotalQuantity units</span>
-                                </div>
-
-                                <h3 style="font-size: var(--rk-font-size-base); font-weight: 700; color: var(--rk-navy-900); margin-bottom: var(--rk-space-3);">
-                                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.Id" style="color: inherit; text-decoration: none;">
-                                        @item.Title
-                                    </a>
-                                </h3>
-                            </div>
-
-                            <div style="border-top: 1px solid var(--rk-border-light); padding-top: var(--rk-space-3);">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--rk-space-3);">
-                                    <div>
-                                        <span style="font-size: var(--rk-font-size-xl); font-weight: 800; color: var(--rk-navy-900);">@item.DailyRentalRate.ToInr()</span>
-                                        <span style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">/ day</span>
-                                    </div>
-                                    <div style="font-size: var(--rk-font-size-xs); color: var(--rk-text-muted);">
-                                        Deposit: @item.SecurityDeposit.ToInr()
-                                    </div>
-                                </div>
-
-                                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.Id" class="rk-btn rk-btn-primary" style="width: 100%; justify-content: center; font-size: var(--rk-font-size-xs);">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    <partial name="_EquipmentCard" model="item" />
                 }
             </div>
         }
