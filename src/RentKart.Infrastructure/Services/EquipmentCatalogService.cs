@@ -35,8 +35,14 @@ public class EquipmentCatalogService : IEquipmentCatalogService
                      && !e.Title.StartsWith("Maintenance Test Gear")
                      && !e.Title.StartsWith("Updated Title Safely")
                      && !e.Title.Contains(" - Test ")
+                     && !e.Title.StartsWith("Milwaukee M18")
                      && !e.Title.StartsWith("Hidden Pending Store")
-                     && !e.Title.StartsWith("Draft Inactive"));
+                     && !e.Title.StartsWith("Draft Inactive")
+                     && !e.Title.Contains("e75a40d85a63413ebcd1bfc54")
+                     && !e.Title.Contains("dfc6f16533144212ab719b2644c")
+                     && !e.Title.Contains("182af3ddc7d846cb87011a92f9")
+                     && !e.Title.Contains("682b1d8521d0451f8676ca0d7c")
+                     && !e.Title.Contains("71b4300e3f1d47b6ab108168fd"));
 
         // 1. Keyword search (Title and Description)
         if (!string.IsNullOrWhiteSpace(criteria.Search))
@@ -161,8 +167,14 @@ public class EquipmentCatalogService : IEquipmentCatalogService
                                                && !e.Title.StartsWith("Maintenance Test Gear")
                                                && !e.Title.StartsWith("Updated Title Safely")
                                                && !e.Title.Contains(" - Test ")
+                                               && !e.Title.StartsWith("Milwaukee M18")
                                                && !e.Title.StartsWith("Hidden Pending Store")
-                                               && !e.Title.StartsWith("Draft Inactive")))
+                                               && !e.Title.StartsWith("Draft Inactive")
+                                               && !e.Title.Contains("e75a40d85a63413ebcd1bfc54")
+                                               && !e.Title.Contains("dfc6f16533144212ab719b2644c")
+                                               && !e.Title.Contains("182af3ddc7d846cb87011a92f9")
+                                               && !e.Title.Contains("682b1d8521d0451f8676ca0d7c")
+                                               && !e.Title.Contains("71b4300e3f1d47b6ab108168fd")))
             .OrderBy(c => c.DisplayOrder)
             .ToListAsync();
     }
@@ -193,8 +205,15 @@ public class EquipmentCatalogService : IEquipmentCatalogService
                      && !e.Title.StartsWith("Maintenance Test Gear")
                      && !e.Title.StartsWith("Updated Title Safely")
                      && !e.Title.Contains(" - Test ")
+                     && !e.Title.StartsWith("Milwaukee M18")
                      && !e.Title.StartsWith("Hidden Pending Store")
-                     && !e.Title.StartsWith("Draft Inactive"))
+                     && !e.Title.StartsWith("Draft Inactive")
+                     && !e.Title.Contains("e75a40d85a63413ebcd1bfc54")
+                     && !e.Title.Contains("dfc6f16533144212ab719b2644c")
+                     && !e.Title.Contains("182af3ddc7d846cb87011a92f9")
+                     && !e.Title.Contains("682b1d8521d0451f8676ca0d7c")
+                     && !e.Title.Contains("71b4300e3f1d47b6ab108168fd")
+                     && e.Images.Any(i => !i.ImageUrl.Contains("placeholder")))
             .OrderByDescending(e => e.CreatedAtUtc)
             .Take(count)
             .ToListAsync();

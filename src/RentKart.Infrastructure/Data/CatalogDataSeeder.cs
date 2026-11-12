@@ -318,7 +318,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/sony-a7iv.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/sony-a7iv.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -335,7 +335,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/canon-rf-24-70.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/canon-rf-24-70.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -352,7 +352,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/dji-rs3-pro.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/dji-rs3-pro.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
 
@@ -371,7 +371,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/bosch-rotary-hammer.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/bosch-rotary-hammer.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -388,7 +388,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/dewalt-miter-saw.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/dewalt-miter-saw.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -405,7 +405,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/honda-eu2200i.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/honda-eu2200i.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -422,7 +422,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/concrete-mixer.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/concrete-mixer.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
 
@@ -441,7 +441,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/epson-projector.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/epson-projector.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -458,7 +458,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/jbl-eon715.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/jbl-eon715.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
             new()
@@ -475,7 +475,7 @@ public static class CatalogDataSeeder
                 IsActive = true,
                 Images = new List<EquipmentImage>
                 {
-                    new() { ImageUrl = "/images/catalog/video-lighting-kit.svg", IsPrimary = true, DisplayOrder = 1 }
+                    new() { ImageUrl = "/images/catalog/video-lighting-kit.jpg", IsPrimary = true, DisplayOrder = 1 }
                 }
             },
 
@@ -521,12 +521,9 @@ public static class CatalogDataSeeder
                 existing.Status = listing.Status;
                 existing.IsActive = listing.IsActive;
 
-                // Ensure local SVG image is applied if old remote unsplash URL exists
-                if (!existing.Images.Any() || existing.Images.Any(i => i.ImageUrl.StartsWith("http")))
-                {
-                    context.EquipmentImages.RemoveRange(existing.Images);
-                    existing.Images = listing.Images;
-                }
+                // Always ensure authoritative local real product image is applied
+                context.EquipmentImages.RemoveRange(existing.Images);
+                existing.Images = listing.Images;
             }
         }
 
@@ -543,17 +540,19 @@ public static class CatalogDataSeeder
                 .Include(e => e.MaintenanceRecords)
                 .Include(e => e.BookingItems)
                     .ThenInclude(bi => bi.BookingGroup)
-                .Where(e => e.Title.StartsWith("Dedicated Test Item") ||
-                            e.Title.StartsWith("Image Management Test") ||
-                            e.Title.StartsWith("Maintenance Test Gear") ||
-                            e.Title == "Updated Title Safely" ||
-                            e.Title.Contains(" - Test ") ||
-                            e.Title.StartsWith("Hidden Pending Store") ||
-                            e.Title.Contains("e75a40d85a63413ebcd1bfc54") ||
-                            e.Title.Contains("dfc6f16533144212ab719b2644c") ||
-                            e.Title.Contains("182af3ddc7d846cb87011a92f9") ||
-                            e.Title.Contains("682b1d8521d0451f8676ca0d7c") ||
-                            e.Title.Contains("71b4300e3f1d47b6ab108168fd"))
+                .Where(e => (e.Title.StartsWith("Dedicated Test Item") ||
+                             e.Title.StartsWith("Image Management Test") ||
+                             e.Title.StartsWith("Maintenance Test Gear") ||
+                             e.Title == "Updated Title Safely" ||
+                             e.Title.Contains(" - Test ") ||
+                             e.Title.StartsWith("Milwaukee M18") ||
+                             e.Title.StartsWith("Hidden Pending Store") ||
+                             e.Title.Contains("e75a40d85a63413ebcd1bfc54") ||
+                             e.Title.Contains("dfc6f16533144212ab719b2644c") ||
+                             e.Title.Contains("182af3ddc7d846cb87011a92f9") ||
+                             e.Title.Contains("682b1d8521d0451f8676ca0d7c") ||
+                             e.Title.Contains("71b4300e3f1d47b6ab108168fd"))
+                            && e.Title != "Draft Inactive Camera Rig")
                 .ToListAsync();
 
             if (testEquipments.Any())

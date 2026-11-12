@@ -36,8 +36,8 @@
                 @{
                     var primaryImg = Model.DisplayImageUrls.FirstOrDefault() ?? Model.FallbackImageUrl;
                 }
-                <div class="rk-card" style="padding: 0; overflow: hidden; position: relative; height: 380px; background: #0B132B; display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-3); border: 1px solid var(--rk-border-light);">
-                    <img id="mainEquipmentImage" src="@primaryImg" alt="@Model.CleanTitle" style="width: 100%; height: 100%; object-fit: contain; max-height: 380px;" onerror="this.src='@Model.FallbackImageUrl'" />
+                <div class="rk-card" style="padding: 0; overflow: hidden; position: relative; height: 380px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin-bottom: var(--rk-space-3); border: 1px solid var(--rk-border-light); border-radius: var(--rk-radius-lg);">
+                    <img id="mainEquipmentImage" src="@primaryImg" alt="@Model.CleanTitle" style="width: 100%; height: 100%; object-fit: cover; max-height: 380px;" onerror="this.src='@Model.FallbackImageUrl'" />
                     @if (!Model.HasRealImage)
                     {
                         <div style="position: absolute; top: 12px; left: 12px; z-index: 2;">
@@ -56,8 +56,8 @@
                             <button type="button" 
                                     onclick="document.getElementById('mainEquipmentImage').src = '@thumbUrl'; document.querySelectorAll('.rk-thumb-btn').forEach(function(b){ b.style.borderColor='var(--rk-border-light)'; }); this.style.borderColor='var(--rk-teal-500)';" 
                                     class="rk-thumb-btn" 
-                                    style="border: 2px solid @(i == 0 ? "var(--rk-teal-500)" : "var(--rk-border-light)"); border-radius: var(--rk-radius-md); padding: 2px; background: #0B132B; cursor: pointer; width: 68px; height: 68px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s ease;">
-                                <img src="@thumbUrl" alt="View @(i + 1)" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.src='@Model.FallbackImageUrl'" />
+                                    style="border: 2px solid @(i == 0 ? "var(--rk-teal-500)" : "var(--rk-border-light)"); border-radius: var(--rk-radius-md); padding: 2px; background: #F8FAFC; cursor: pointer; width: 68px; height: 68px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s ease;">
+                                <img src="@thumbUrl" alt="View @(i + 1)" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='@Model.FallbackImageUrl'" />
                             </button>
                         }
                     </div>
